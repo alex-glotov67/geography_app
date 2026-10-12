@@ -20,7 +20,7 @@
 Наслідки для нас (SPEC 3.4):
 - у хмарі один проєкт — `geo-prod`; staging — локальний Supabase CLI (розділ 1) і в CI; другий слот вільний;
 - бекапи робимо самі: `backup.yml` з Фази 2 (зашифрований `pg_dump` + копія Storage);
-- на канікулах: `keepalive.yml` (щотижневий запит до prod) — закладено за замовчуванням; рішення — за вчителем (SPEC 19.10). Якщо проєкт усе ж призупинився — розділ 3.4.
+- на канікулах: `keepalive.yml` (щотижневий запит до prod) — закладено за замовчуванням; рішення — за вчителем (SPEC 19.10). Якщо проєкт усе ж призупинився — розділ 3.5.
 
 **Cloudflare Pages Free** ([developers.cloudflare.com/pages/platform/limits](https://developers.cloudflare.com/pages/platform/limits/)): 500 збірок на місяць, 1 збірка одночасно, до 20 000 файлів, до 25 МіБ на файл, до 100 власних доменів, у `_redirects` — до 2 000 статичних і 100 динамічних правил.
 
@@ -33,7 +33,7 @@
 ```bash
 nvm use                # Node з .nvmrc
 npm ci
-cp .env.example .env.local
+cp .env.example .env.local   # уже містить URL і publishable key локального Supabase
 npm run dev            # http://localhost:5173
 ```
 
@@ -44,7 +44,9 @@ npm run dev            # http://localhost:5173
 npm run db:start       # Postgres, Auth, Storage, Realtime, Studio у Docker
 ```
 
-Команда виведе `API URL` і `anon key` — впиши їх у `.env.local` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). Studio (адмінка бази) — http://127.0.0.1:54323.
+Команда виведе `API URL` і `Publishable key` — вони вже є в `.env.example` (демо-ключі CLI однакові на всіх машинах). Studio (адмінка бази) — http://127.0.0.1:54323.
+
+**Таблиці не відкриваються в API автоматично.** У `supabase/config.toml` стоїть `auto_expose_new_tables = false` — так само, як у хмарних проєктах, створених після 30.05.2026 ([changelog](https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically)). Тому кожна міграція з новою таблицею містить і `GRANT` для потрібних ролей (`anon`, `authenticated`), і `enable row level security` з політиками. `GRANT` вирішує, чи таблиця взагалі доступна через API, а RLS — які рядки. Перевірено локально: без `GRANT` — `401 permission denied`; з `GRANT` і RLS без політик — порожній результат. Після зміни цього параметра потрібен `npm run db:reset` (привілеї задаються при створенні бази).
 
 Корисне:
 
@@ -52,6 +54,8 @@ npm run db:start       # Postgres, Auth, Storage, Realtime, Studio у Docker
 npm run db:reset       # перестворити базу з міграцій + supabase/seed.sql
 npm run db:stop
 npx supabase migration new <назва>   # нова міграція в supabase/migrations/
+npx supabase db lint --level warning  # помилки в SQL-функціях
+npx supabase db advisors --local      # безпека й продуктивність (RLS, індекси, security definer)
 ```
 
 > Що таке Supabase: Postgres + готові Auth, Storage, Realtime і Edge Functions (серверні функції на Deno). Фронт ходить у базу напряму через `supabase-js`, а що кому можна — вирішують політики Row Level Security у самій базі. Тому кожна таблиця — з RLS і тестами.
@@ -73,7 +77,7 @@ npm run e2e                           # телефон + комп'ютер пр�
 
    | Секрет | Звідки |
    |---|---|
-   | `SUPABASE_ACCESS_TOKEN` | supabase.com → Account → Access Tokens |
+   | `SUPABASE_ACCESS_TOKEN` | supabase.com → Account → Access Tokens. Створи **scoped** токен лише для організації/проєкту `geo-prod` (класичний токен дає доступ до всього акаунта) |
    | `SUPABASE_PROJECT_REF` | ref проєкту з URL панелі (`https://supabase.com/dashboard/project/<ref>`) |
    | `SUPABASE_DB_PASSWORD` | пароль бази, заданий при створенні проєкту |
 
@@ -86,7 +90,8 @@ Workflows:
 
 ### 3.1 Створення
 1. supabase.com → New project: назва `geo-prod`, **регіон — ЄС** (напр. Frankfurt `eu-central-1`), план Free. Пароль бази збережи в менеджері паролів → секрет `SUPABASE_DB_PASSWORD`.
-2. **Project Settings → API**: скопіюй `Project URL` і `anon` (publishable) key — вони публічні, підуть у Cloudflare Pages. `service_role` / secret key **нікуди не копіюй**, крім секретів Edge Functions (з'являться у Фазі 2).
+2. **Project Settings → API Keys**: скопіюй `Project URL` і **publishable key** (`sb_publishable_…`) — вони публічні, підуть у Cloudflare Pages. Secret key (`sb_secret_…`) і legacy `service_role` **нікуди не копіюй**, крім секретів Edge Functions (з'являться у Фазі 2).
+3. **Integrations → Data API → Settings**: переконайся, що нові таблиці **не** відкриваються автоматично (для проєктів, створених після 30.05.2026, це за замовчуванням). Схема `public` має бути у списку exposed schemas.
 
 ### 3.2 Auth
 - **Authentication → URL Configuration**: Site URL — адреса сайту на Cloudflare (розділ 4), у Redirect URLs додай її ж.
@@ -96,7 +101,10 @@ Workflows:
 ### 3.3 Міграції
 Лише через `deploy-prod.yml` після зеленого CI. Ніяких ручних змін схеми в панелі (SPEC 2.2).
 
-### 3.4 Якщо проєкт призупинився
+### 3.4 MCP-сервер Supabase (для Claude Code)
+`.mcp.json` у корені підключає `geo-prod` у режимі **`read_only=true`**: агент читає схему, логи, advisors і документацію, але нічого не змінює — міграції на prod ідуть лише через `deploy-prod.yml`. Перший виклик відкриває вхід у Supabase (OAuth) у браузері; у VS Code — через `/mcp` в інтерактивній сесії. Скіли Supabase лежать у `.agents/skills/` (підключені для Claude Code через `.claude/skills/`).
+
+### 3.5 Якщо проєкт призупинився
 1. supabase.com → проєкт → **Restore project** (відновлення займає кілька хвилин; дані зберігаються).
 2. Перевір сайт: вхід учня, відкриття уроку.
 3. Якщо пауза повторюється на канікулах — перевір, що `keepalive.yml` увімкнений і проходить (Actions).
@@ -119,7 +127,9 @@ Workflows:
    |---|---|
    | `NODE_VERSION` | `22.19.0` |
    | `VITE_SUPABASE_URL` | Project URL з 3.1 |
-   | `VITE_SUPABASE_ANON_KEY` | anon key з 3.1 |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | publishable key з 3.1 (`sb_publishable_…`) |
+
+   Якщо раніше вже задано `VITE_SUPABASE_ANON_KEY` — він працює як запасний варіант, але краще замінити на publishable key.
 
 4. Кожна гілка/PR отримує **preview-адресу**; `main` — production.
 5. SPA-fallback задано явно в `public/_redirects` (`/* /index.html 200`). Перевірка після першого деплою: відкрий напряму `https://<адреса-сайту>/lesson/test` і онови сторінку — має відкритися сторінка застосунку, а не 404 Cloudflare.
