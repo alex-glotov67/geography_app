@@ -274,6 +274,8 @@ quiz_answers    (id, session_id, player_id, question_index, answer jsonb, correc
 audit_log       (id, teacher_id, action, details jsonb, at)                  -- створення/скидання паролів, імпорт, видалення
 ```
 
+**Доступ через Data API.** Нові таблиці не відкриваються автоматично (поведінка Supabase для проєктів після 30.05.2026; локально — `auto_expose_new_tables = false`): кожна міграція з таблицею містить явний `GRANT` лише потрібним ролям і `enable row level security` з політиками. `GRANT` визначає, чи таблиця доступна через API, RLS — які рядки.
+
 **RLS (обов'язково, тестами):**
 - `students`, `submissions`, `lesson_progress`, `quiz_answers` — учень читає лише рядки, де `auth.uid()` = його `auth_user_id`; вчитель — рядки своїх класів.
 - **Анонімні користувачі** (гості квізу, `is_anonymous = true`) явно виключені з усіх політик для даних учнів і вчителя: `coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = false`. Анонім бачить лише свій рядок `quiz_players`, свої `quiz_answers` і публічний стан своєї сесії.

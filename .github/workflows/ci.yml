@@ -29,7 +29,7 @@ jobs:
         env:
           # Лише публічні значення; справжні задаються в Cloudflare Pages
           VITE_SUPABASE_URL: http://127.0.0.1:54321
-          VITE_SUPABASE_ANON_KEY: ci-placeholder
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci-placeholder
       - name: У dist/ немає секретів
         run: npm run check:dist
       - run: npx playwright install --with-deps chromium
@@ -56,4 +56,6 @@ jobs:
         run: supabase db reset
       - name: Лінт схеми
         run: supabase db lint --level warning
+      - name: Advisors (безпека й продуктивність)
+        run: supabase db advisors --local --type all
       # З Фази 1: RLS-тести (pgTAP) — supabase test db
