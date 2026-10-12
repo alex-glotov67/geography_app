@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Вхід учня</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="position: relative; padding: 64px 24px 36px 24px; background: #E4ECEA; overflow: hidden">
+<svg width="390" height="260" viewBox="0 0 390 260" fill="none" stroke="#1D5E8C" stroke-width="1" style="position: absolute; right: -60px; top: -30px; opacity: 0.35" aria-hidden="true">
+<path d="M150 140 C 170 70, 300 50, 350 110 S 360 230, 270 230 S 130 210, 150 140 Z"></path>
+<path d="M180 140 C 195 95, 290 80, 325 120 S 330 205, 268 205 S 165 190, 180 140 Z"></path>
+<path d="M210 142 C 220 115, 280 105, 300 128 S 302 182, 265 182 S 200 170, 210 142 Z"></path>
+<path d="M238 143 C 244 130, 270 126, 279 138 S 278 160, 262 160 S 233 155, 238 143 Z"></path>
+</svg>
+<div style="position: relative; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 20px">Географія</span>
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 32px; line-height: 1.1">Вхід</h1>
+</div>
+</header>
+
+<main style="flex-grow: 1; padding: 28px 24px; display: flex; flex-direction: column; gap: 18px">
+<label style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 17px; font-weight: 600">Логін</span>
+<input type="text" autocomplete="username" placeholder="Наприклад: 8b-07" style="height: 52px; box-sizing: border-box; border: 1px solid #B9C3BE; border-radius: 12px; padding: 0 14px; font-family: inherit; font-size: 18px; color: #1E2A2F; background: #FFFFFF">
+</label>
+<label style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 17px; font-weight: 600">Пароль</span>
+<span style="display: flex; align-items: center; border: 1px solid #B9C3BE; border-radius: 12px; background: #FFFFFF; padding-right: 4px">
+<input type="{{pwType}}" value="gora-step-47" autocomplete="current-password" style="flex-grow: 1; min-width: 0; height: 50px; box-sizing: border-box; border: 0; border-radius: 12px; padding: 0 14px; font-family: inherit; font-size: 18px; color: #1E2A2F; background: transparent">
+<button onClick="{{togglePw}}" aria-label="{{pwLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#55636A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+</button>
+</span>
+</label>
+<a href="Cabinet.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 54px; border-radius: 14px; background: #1D5E8C; color: #FFFFFF; text-decoration: none; font-size: 18px; font-weight: 600">Увійти</a>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; color: #55636A">Логін і пароль видає вчитель. Забув їх? Скажи вчителю — він створить новий пароль.</p>
+
+<div style="height: 1px; background: #D5DAD0; margin: 6px 0"></div>
+
+<a href="QuizJoin.dc.html" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0; text-decoration: none; color: #1E2A2F">
+<span style="flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; background: #8F6A1F; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9z"></path></svg>
+</span>
+<span style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; font-weight: 600">Живий квіз</span>
+<span style="font-size: 14px; color: #55636A">Увійти за PIN-кодом з екрана</span>
+</span>
+</a>
+<a href="Main.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 16px">Переглянути уроки без входу</a>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { show: false }; }
+renderVals() {
+const s = this.state;
+return {
+pwType: s.show ? 'text' : 'password',
+pwLabel: s.show ? 'Сховати пароль' : 'Показати пароль',
+togglePw: () => this.setState({ show: !s.show })
+};
+}
+}
+</script>
+</body>
+</html>

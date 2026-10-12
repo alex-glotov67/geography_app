@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Квіз: телефон учня</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#FFFFFF}a:hover{color:#DCE8F2}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #16313F; color: #FFFFFF; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column; padding: 28px 22px; gap: 20px">
+
+<div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 18px">Квіз</span>
+<span style="font-size: 14px; opacity: 0.85">Коваль О., 8-Б</span>
+</div>
+
+<sc-if value="{{isPin}}" hint-placeholder-val="{{true}}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px">
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.2">Введи PIN з екрана</h1>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 15px">
+<span>PIN-код</span>
+<input type="text" inputmode="numeric" value="482 913" aria-label="PIN-код" style="height: 64px; box-sizing: border-box; border: 0; border-radius: 14px; padding: 0 16px; font-family: 'Unbounded', sans-serif; font-size: 28px; letter-spacing: 4px; text-align: center; color: #16313F; background: #FFFFFF">
+</label>
+<button onClick="{{go}}" style="min-height: 58px; border-radius: 14px; border: 0; background: #C99A3A; color: #1E2A2F; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">Приєднатися</button>
+<p style="margin: 0; font-size: 14px; line-height: 1.45; opacity: 0.85">Ти увійшов як Коваль О. Без входу вчитель може дозволити гру під псевдонімом.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{isWait}}" hint-placeholder-val="{{false}}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; text-align: center">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 30px">Ти в грі!</span>
+<span style="font-size: 18px; line-height: 1.45; opacity: 0.9">Дивись на екран. Питання з'явиться за мить.</span>
+<button onClick="{{go}}" style="margin-top: 20px; min-height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid #5B7B8A; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 15px; cursor: pointer">Показати питання (демо)</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isAns}}" hint-placeholder-val="{{false}}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; font-size: 15px; opacity: 0.9"><span>Питання 3 з 10</span><span>Обери відповідь</span></div>
+<div style="flex-grow: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+<button onClick="{{o.pick}}" style="border-radius: 18px; border: 0; background: {{o.bg}}; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 12px; cursor: pointer">
+<sc-if value="{{o.tri}}" hint-placeholder-val="{{false}}"><svg width="56" height="56" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l17 30H3z" fill="#FFFFFF"></path></svg></sc-if>
+<sc-if value="{{o.cir}}" hint-placeholder-val="{{false}}"><svg width="56" height="56" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#FFFFFF"></circle></svg></sc-if>
+<sc-if value="{{o.sq}}" hint-placeholder-val="{{false}}"><svg width="56" height="56" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="5" width="30" height="30" rx="3" fill="#FFFFFF"></rect></svg></sc-if>
+<sc-if value="{{o.dia}}" hint-placeholder-val="{{false}}"><svg width="56" height="56" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2l18 18-18 18L2 20z" fill="#FFFFFF"></path></svg></sc-if>
+<span style="font-size: 15px; font-weight: 600; line-height: 1.25; text-align: center">{{o.text}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isRes}}" hint-placeholder-val="{{false}}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; border-radius: 22px; background: {{resBg}}; padding: 24px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 32px">{{resTitle}}</span>
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 46px">{{resPts}}</span>
+<span style="font-size: 18px; line-height: 1.4">{{resNote}}</span>
+<button onClick="{{again}}" style="margin-top: 16px; min-height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 15px; cursor: pointer">Наступне питання (демо)</button>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { step: 'pin', pick: -1 }; }
+renderVals() {
+const s = this.state;
+const shapes = ['tri', 'cir', 'sq', 'dia'];
+const bgs = ['#3F7A4A', '#8F6A1F', '#2C6E9E', '#6E4A2E'];
+const texts = ['Українські Карпати', 'Кримські гори', 'Подільська височина', 'Донецький кряж'];
+const opts = texts.map((text, i) => ({ text, bg: bgs[i], tri: shapes[i] === 'tri', cir: shapes[i] === 'cir', sq: shapes[i] === 'sq', dia: shapes[i] === 'dia', pick: () => this.setState({ step: 'res', pick: i }) }));
+const ok = s.pick === 0;
+const next = { pin: 'wait', wait: 'ans' };
+return {
+isPin: s.step === 'pin', isWait: s.step === 'wait', isAns: s.step === 'ans', isRes: s.step === 'res',
+opts,
+go: () => this.setState({ step: next[s.step] || 'pin' }),
+again: () => this.setState({ step: 'ans', pick: -1 }),
+resBg: ok ? '#3F7A4A' : '#6E4A2E',
+resTitle: ok ? 'Правильно!' : 'Не цього разу',
+resPts: ok ? '+850' : '+0',
+resNote: ok ? 'Ти на 3 місці. Так тримати!' : 'Правильна відповідь: Українські Карпати. Ти на 9 місці.'
+};
+}
+}
+</script>
+</body>
+</html>

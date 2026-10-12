@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Мій кабінет</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="width: 390px; height: 1400px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="padding: 20px 24px 24px 24px; background: #8F6A1F; color: #FFFFFF; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between; min-height: 44px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 18px">Географія</span>
+<button style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #D9C49A; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 15px; cursor: pointer">Вийти</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.2">Коваль О.</h1>
+<span style="font-size: 16px">8-Б клас</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: #7A5A18"><span style="font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700">4/8</span><span style="font-size: 13px">уроків розділу</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: #7A5A18"><span style="font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700">3</span><span style="font-size: 13px">ДЗ здано</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; background: #7A5A18"><span style="font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700">78%</span><span style="font-size: 13px">середній</span></div>
+</div>
+</header>
+
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 28px">
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Чекає на тебе</h2>
+<a href="Homework.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 16px; background: #1D5E8C; color: #FFFFFF; text-decoration: none">
+<span style="font-size: 14px; opacity: 0.9">Домашнє завдання, до 16 жовтня</span>
+<span style="font-size: 19px; font-weight: 600">Урок 5. Рельєф України</span>
+<span style="align-self: flex-start; padding: 8px 14px; border-radius: 10px; background: #FFFFFF; color: #123F60; font-size: 15px; font-weight: 600">Виконати</span>
+</a>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Мої результати</h2>
+<div style="display: flex; gap: 4px; padding: 3px; border-radius: 10px; background: #E1E5DE">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+<button onClick="{{t.pick}}" style="min-height: 44px; padding: 0 12px; border-radius: 8px; border: 0; background: {{t.bg}}; color: #1E2A2F; font-family: inherit; font-size: 14px; font-weight: {{t.w}}; cursor: pointer">{{t.name}}</button>
+</sc-for>
+</div>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="display: flex; justify-content: space-between; gap: 10px; align-items: baseline">
+<span style="font-size: 16px; font-weight: 600">{{r.title}}</span>
+<span style="font-size: 16px; font-weight: 700; white-space: nowrap">{{r.score}}</span>
+</div>
+<div style="height: 8px; border-radius: 4px; background: #E1E5DE; overflow: hidden"><div style="height: 8px; width: {{r.pct}}; background: {{r.bar}}"></div></div>
+<span style="font-size: 13px; color: #55636A">{{r.meta}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Мій підйом</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; color: #34444B">Найвищий рівень завдань, який ти вже долаєш у цьому розділі.</p>
+<div style="display: flex; align-items: flex-end; gap: 8px; height: 110px; padding: 14px 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 100%; height: 22px; border-radius: 4px; background: #4E8A57"></div><span style="font-size: 12px">Базовий</span></div>
+<div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 100%; height: 40px; border-radius: 4px; background: #9AA33A"></div><span style="font-size: 12px">Середній</span></div>
+<div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 100%; height: 58px; border-radius: 4px; background: #C99A3A"></div><span style="font-size: 12px; font-weight: 700">Достатній</span></div>
+<div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 100%; height: 76px; border-radius: 4px; border: 2px dashed #B9C3BE; box-sizing: border-box"></div><span style="font-size: 12px; color: #55636A">Високий</span></div>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1400}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { tab: 'ДЗ' }; }
+renderVals() {
+const s = this.state;
+const tabs = ['ДЗ', 'Квізи'].map((name) => ({ name, bg: s.tab === name ? '#FFFFFF' : 'transparent', w: s.tab === name ? '600' : '400', pick: () => this.setState({ tab: name }) }));
+const band = (p) => p >= 75 ? '#3F7A4A' : p >= 50 ? '#C99A3A' : '#8A5A34';
+const hw = [
+['Урок 4. Тектонічні структури', 10, 12, 'Здано 09.10, спроба 1 з 2'],
+['Урок 3. Геологічна будова', 8, 12, 'Здано 06.10, спроба 2 з 2'],
+['Урок 2. [Тема уроку]', 11, 12, 'Здано 02.10, спроба 1 з 2']
+];
+const qz = [
+['Квіз: рельєф України', 7, 10, 'На уроці 13.10, 5 місце з 27'],
+['Квіз: географічне положення', 9, 10, 'На уроці 29.09, 2 місце з 26']
+];
+const rows = (s.tab === 'ДЗ' ? hw : qz).map(([title, a, b, meta]) => {
+const p = Math.round(a / b * 100);
+return { title, score: a + ' з ' + b, pct: p + '%', bar: band(p), meta };
+});
+return { tabs, rows };
+}
+}
+</script>
+</body>
+</html>

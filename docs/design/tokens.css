@@ -1,0 +1,24 @@
+/* Дизайн-токени «Географія 6–9» — з затвердженого полотна (SPEC.md, розділ 13) */
+:root {
+  --paper: #F2F4EF;  --paper-tint: #E4ECEA;  --surface: #FFFFFF;
+  --line: #D5DAD0;   --line-strong: #B9C3BE;
+  --ink: #1E2A2F;    --ink-2: #34444B;       --muted: #55636A;
+  --water: #1D5E8C;  --water-dark: #123F60;  --water-tint: #EEF4F9;
+  --ok-bg: #E3EEE4;  --ok-fg: #2E5E37;
+  --err-bg: #FBE4E1; --err-fg: #8E1B12;
+  --warn-bg: #FCEBD3; --warn-fg: #5C3A06;
+  --marker: #B42318;
+
+  --grade-6: #3F7A4A; --grade-7: #66742A; --grade-8: #8F6A1F; --grade-9: #6E4A2E;
+  --level-base: #4E8A57; --level-middle: #9AA33A; --level-sufficient: #C99A3A; --level-high: #8A5A34;
+
+  --quiz-bg: #16313F; --quiz-panel: #0F2430;
+  --quiz-a: #3F7A4A; --quiz-b: #8F6A1F; --quiz-c: #2C6E9E; --quiz-d: #6E4A2E; /* △ ○ □ ◇ */
+
+  --font-display: 'Unbounded', 'Golos Text', sans-serif;
+  --font-text: 'Golos Text', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace; /* логіни й паролі: чітка різниця l / I / 1 */
+
+  --radius-control: 12px; --radius-card: 16px; --radius-pill: 999px;
+  --tap: 44px;
+}

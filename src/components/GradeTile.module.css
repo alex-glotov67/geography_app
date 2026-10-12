@@ -1,0 +1,32 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 132px;
+  box-sizing: border-box;
+  padding: 16px 18px;
+  border-radius: var(--radius-tile);
+  color: #fff;
+  text-decoration: none;
+  outline-offset: 3px;
+}
+
+.tile:hover {
+  filter: brightness(0.94);
+}
+
+.tile:focus-visible {
+  outline: 3px solid var(--water);
+}
+
+.number {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.caption {
+  font-size: 17px;
+  font-weight: 600;
+}

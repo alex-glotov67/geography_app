@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Уроки 8 класу</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="width: 390px; height: 980px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="padding: 20px 24px 24px 24px; background: #8F6A1F; color: #FFFFFF; display: flex; flex-direction: column; gap: 18px">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 44px; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 500">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+Усі класи
+</a>
+<div style="display: flex; align-items: baseline; gap: 12px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 56px; line-height: 1">8</span>
+<span style="font-size: 22px; font-weight: 600">клас</span>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px">
+<span>Знайти урок</span>
+<input type="search" placeholder="Наприклад: рельєф" style="height: 48px; box-sizing: border-box; border: 0; border-radius: 12px; padding: 0 14px; font-family: inherit; font-size: 17px; color: #1E2A2F; background: #FFFFFF">
+</label>
+</header>
+
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; color: #55636A">Розділ [N]. [Назва розділу з програми]</h2>
+
+<sc-for list="{{lessons}}" as="l" hint-placeholder-count="6">
+<a href="Lesson.dc.html" style="display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 16px; background: #FFFFFF; border: {{l.border}}; text-decoration: none; color: #1E2A2F">
+<span style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; background: {{l.numBg}}; color: {{l.numFg}}">{{l.n}}</span>
+<span style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1; min-width: 0">
+<span style="font-size: 17px; font-weight: 600; line-height: 1.3">{{l.title}}</span>
+<span style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="font-size: 13px; padding: 3px 9px; border-radius: 999px; background: {{l.statusBg}}; color: {{l.statusFg}}">{{l.status}}</span>
+<sc-if value="{{l.hw}}" hint-placeholder-val="{{false}}">
+<span style="font-size: 13px; padding: 3px 9px; border-radius: 999px; background: #FCEBD3; color: #7A4A0C">{{l.hw}}</span>
+</sc-if>
+</span>
+</span>
+</a>
+</sc-for>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":980}}'>
+class Component extends DCLogic {
+renderVals() {
+const done = { status: 'Пройдено', statusBg: '#E3EEE4', statusFg: '#2E5E37', numBg: '#E3EEE4', numFg: '#2E5E37', border: '1px solid #D5DAD0' };
+const now = { status: 'Сьогодні', statusBg: '#DCE8F2', statusFg: '#123F60', numBg: '#1D5E8C', numFg: '#FFFFFF', border: '2px solid #1D5E8C' };
+const next = { status: 'Далі', statusBg: '#ECEEEA', statusFg: '#55636A', numBg: '#ECEEEA', numFg: '#55636A', border: '1px solid #D5DAD0' };
+return {
+lessons: [
+{ n: 3, title: 'Геологічна будова', hw: '', ...done },
+{ n: 4, title: 'Тектонічні структури', hw: 'ДЗ здано', ...done },
+{ n: 5, title: 'Рельєф України', hw: 'ДЗ до 16.10', ...now },
+{ n: 6, title: 'Корисні копалини', hw: '', ...next },
+{ n: 7, title: 'Практична робота', hw: '', ...next },
+{ n: 8, title: 'Узагальнення', hw: '', ...next }
+]
+};
+}
+}
+</script>
+</body>
+</html>

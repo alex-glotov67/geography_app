@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Квіз: відповіді й рейтинг</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#FFFFFF}a:hover{color:#DCE8F2}
+</style>
+</helmet>
+<div style="width: 1440px; height: 810px; box-sizing: border-box; background: #16313F; color: #FFFFFF; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column; padding: 36px 48px; gap: 28px">
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 18px; opacity: 0.85">Питання 3 з 10</span>
+<h1 style="margin: 0; font-size: 32px; font-weight: 700; line-height: 1.2">Де розташована найвища точка України — гора Говерла?</h1>
+</div>
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #0F2430; flex-shrink: 0">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<button onClick="{{m.pick}}" style="min-height: 44px; padding: 0 16px; border-radius: 9px; border: 0; background: {{m.bg}}; color: {{m.fg}}; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer">{{m.name}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; gap: 40px; min-height: 0">
+<section style="flex: 3 1 0; display: flex; align-items: flex-end; gap: 22px; padding: 10px 0 0 0">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="4">
+<div style="flex: 1 1 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; opacity: {{b.op}}">
+<span style="font-family: 'Unbounded', sans-serif; font-size: 34px; font-weight: 700; text-align: center">{{b.n}}</span>
+<div style="height: {{b.h}}; border-radius: 12px 12px 4px 4px; background: {{b.bg}}"></div>
+<div style="display: flex; align-items: center; gap: 10px; min-height: 64px">
+<sc-if value="{{b.ok}}" hint-placeholder-val="{{false}}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-label="Правильна відповідь"><path d="M4 12l5 5L20 6"></path></svg></sc-if>
+<span style="font-size: 20px; font-weight: 600; line-height: 1.25">{{b.text}}</span>
+</div>
+</div>
+</sc-for>
+</section>
+
+<section style="flex: 2 1 0; display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 20px; background: #0F2430">
+<sc-if value="{{rated}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0 0 6px 0; font-size: 22px; font-weight: 600">Рейтинг</h2>
+<sc-for list="{{top}}" as="p" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 16px; min-height: 58px; padding: 0 18px; border-radius: 12px; background: {{p.bg}}">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 22px; width: 28px">{{p.place}}</span>
+<span style="flex-grow: 1; font-size: 21px; font-weight: 600">{{p.name}}</span>
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 20px">{{p.pts}}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{unrated}}" hint-placeholder-val="{{false}}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 84px; line-height: 1">81%</span>
+<span style="font-size: 24px; line-height: 1.35">класу відповіли правильно</span>
+<span style="font-size: 18px; opacity: 0.85; line-height: 1.4">Режим без рейтингу: імена й бали не показуються на екрані, результати бачить лише вчитель.</span>
+</div>
+</sc-if>
+</section>
+</div>
+
+<div style="display: flex; justify-content: flex-end">
+<a href="QuizHost.dc.html" style="display: flex; align-items: center; min-height: 54px; padding: 0 28px; border-radius: 12px; background: #FFFFFF; color: #16313F; text-decoration: none; font-size: 18px; font-weight: 700">Наступне питання</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":810}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { rated: true }; }
+renderVals() {
+const s = this.state;
+const modes = [['З рейтингом', true], ['Без рейтингу', false]].map(([name, v]) => ({ name, bg: s.rated === v ? '#FFFFFF' : 'transparent', fg: s.rated === v ? '#16313F' : '#FFFFFF', pick: () => this.setState({ rated: v }) }));
+const data = [['Українські Карпати', 17, '#3F7A4A', true], ['Кримські гори', 2, '#8F6A1F', false], ['Подільська височина', 1, '#2C6E9E', false], ['Донецький кряж', 1, '#6E4A2E', false]];
+const bars = data.map(([text, n, bg, ok]) => ({ text, n, bg, ok, op: ok ? '1' : '0.45', h: Math.max(8, Math.round(n / 17 * 300)) + 'px' }));
+const top = [['Мельник Д.', 2840], ['Бондар А.', 2710], ['Коваль О.', 2395], ['Савчук І.', 2210], ['Гнатюк В.', 1980]].map(([name, pts], i) => ({ place: i + 1, name, pts, bg: i === 0 ? '#2C4C5C' : '#163746' }));
+return { modes, bars, top, rated: s.rated, unrated: !s.rated };
+}
+}
+</script>
+</body>
+</html>

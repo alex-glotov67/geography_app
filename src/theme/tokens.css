@@ -1,0 +1,102 @@
+/*
+ * Дизайн-токени «Географія 6–9».
+ * Основа — docs/design/tokens.css (SPEC 13.1). Нижче — похідні кольори, які трапляються в макетах
+ * docs/design/screens, але не мали назви. У компонентах — лише змінні, без шістнадцяткових значень.
+ */
+:root {
+  /* Папір і лінії */
+  --paper: #f2f4ef;
+  --paper-tint: #e4ecea;
+  --surface: #ffffff;
+  --surface-sunken: #f7f8f5; /* фон варіантів, рядків усередині карток */
+  --line: #d5dad0;
+  --line-strong: #b9c3be;
+  --line-soft: #eceeea; /* роздільники в картках */
+
+  /* Текст */
+  --ink: #1e2a2f;
+  --ink-2: #34444b;
+  --muted: #55636a;
+
+  /* Вода — дії, посилання, вибране */
+  --water: #1d5e8c;
+  --water-dark: #123f60;
+  --water-tint: #eef4f9;
+  --water-soft: #dce8f2; /* статус «Сьогодні» */
+  --on-water-line: #a9c6dc; /* межа другорядної кнопки на синьому */
+
+  /* Стани */
+  --ok-bg: #e3eee4;
+  --ok-fg: #2e5e37;
+  --err-bg: #fbe4e1;
+  --err-fg: #8e1b12;
+  --warn-bg: #fcebd3;
+  --warn-fg: #5c3a06;
+  --near-bg: #f6ecd6; /* «близько» (map_pin), група «височини» */
+  --near-fg: #5c430e;
+  --marker: #b42318;
+
+  /* Нейтральні заливки */
+  --neutral-bg: #eceeea; /* «Далі», «не здано», фон перемикачів */
+  --track: #e1e5de; /* доріжки прогрес-барів */
+  --switch-off: #9aa5a0;
+  --video-bg: #2b3d44;
+
+  /* Класи — висоти фізичної карти */
+  --grade-6: #3f7a4a;
+  --grade-7: #66742a;
+  --grade-8: #8f6a1f;
+  --grade-9: #6e4a2e;
+
+  /* Рівні завдань: заливка «сходинок» і колір підпису */
+  --level-base: #4e8a57;
+  --level-middle: #9aa33a;
+  --level-sufficient: #c99a3a;
+  --level-high: #8a5a34;
+  --level-base-fg: #2e5e37;
+  --level-middle-fg: #4f5716;
+  --level-sufficient-fg: #7a5a12;
+  --level-high-fg: #6e4a2e;
+
+  /* Матриця результатів (SPEC 13.1): різна світлість, не лише відтінок */
+  --matrix-high-bg: #2f6a3b;
+  --matrix-high-fg: #ffffff;
+  --matrix-mid-bg: #f1dfb5;
+  --matrix-mid-fg: #3e2c06;
+  --matrix-low-bg: #7a4b2a;
+  --matrix-low-fg: #ffffff;
+  --matrix-none-bg: #eceeea;
+
+  /* Квіз */
+  --quiz-bg: #16313f;
+  --quiz-panel: #0f2430;
+  --quiz-row: #163746;
+  --quiz-row-top: #2c4c5c;
+  --quiz-line: #5b7b8a;
+  --quiz-a: #3f7a4a; /* △ */
+  --quiz-b: #8f6a1f; /* ○ */
+  --quiz-c: #2c6e9e; /* □ */
+  --quiz-d: #6e4a2e; /* ◇ */
+
+  /* Шрифти */
+  --font-display: 'Unbounded', 'Golos Text', sans-serif;
+  --font-text: 'Golos Text', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace; /* логіни й паролі: чітка різниця l / I / 1 */
+
+  /* Форма */
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-tile: 18px;
+  --radius-pill: 999px;
+  --tap: 44px; /* мінімальна ціль дотику */
+  --tap-main: 52px; /* основні кнопки */
+
+  /* Поля сторінки */
+  --page-x: 24px;
+}
+
+@media (min-width: 64em) {
+  :root {
+    --page-x: 40px;
+  }
+}

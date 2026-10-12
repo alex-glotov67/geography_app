@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Конструктор уроку</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 1200px; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; padding: 14px 28px; background: #FFFFFF; border-bottom: 1px solid #D5DAD0">
+<div style="display: flex; align-items: center; gap: 14px; min-width: 0">
+<a href="TeacherHome.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 44px; text-decoration: none; font-weight: 500">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D5E8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Уроки
+</a>
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 18px">8 клас · Урок 5. Рельєф України</span>
+<span style="padding: 4px 10px; border-radius: 999px; background: #FCEBD3; color: #5C3A06; font-size: 13px; font-weight: 600">Чернетка</span>
+<span style="font-size: 13px; color: #55636A">Збережено о 20:41</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<div style="display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: #ECEEEA">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="3">
+<button onClick="{{v.pick}}" style="min-height: 44px; padding: 0 12px; border-radius: 8px; border: 0; background: {{v.bg}}; font-family: inherit; font-size: 14px; font-weight: {{v.w}}; color: #1E2A2F; cursor: pointer">{{v.name}}</button>
+</sc-for>
+</div>
+<button style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">Експорт</button>
+<button style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: #1D5E8C; font-family: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; cursor: pointer">Опублікувати</button>
+</div>
+</header>
+
+<div style="flex-grow: 1; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px 28px; align-items: flex-start">
+
+<aside style="flex: 1 1 250px; display: flex; flex-direction: column; gap: 18px">
+<section style="display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Про урок</h2>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Тема<input value="Рельєф України" style="height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">§<input value="[N]" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
+<label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Сторінки<input value="[00–00]" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
+</div>
+<span style="font-size: 13px; color: #55636A">Очікувані результати: 2 × ГР1, 1 × ГР2, 1 × ГР3</span>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<h2 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 600">Структура</h2>
+<sc-for list="{{outline}}" as="o" hint-placeholder-count="8">
+<button onClick="{{o.pick}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px; border-radius: 10px; border: 0; background: {{o.bg}}; font-family: inherit; font-size: 14px; color: #1E2A2F; text-align: left; cursor: pointer">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="#9AA5A0" aria-hidden="true"><circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle><circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle><circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle></svg>
+<span style="flex-grow: 1">{{o.name}}</span>
+<span style="font-size: 12px; color: #55636A">{{o.meta}}</span>
+</button>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 14px; background: #FCEBD3; color: #5C3A06; font-size: 14px; line-height: 1.45">
+<span style="font-weight: 600">Перевірка перед публікацією</span>
+<span>У зображення «Фізична карта» немає джерела.</span>
+<span>Немає завдань високого рівня.</span>
+</section>
+</aside>
+
+<main style="flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 13px; font-weight: 600; color: #55636A">Мета</span><span style="font-size: 13px; color: #55636A">Що ти дізнаєшся</span></div>
+<span style="font-size: 16px">• Які форми рельєфу є в Україні</span>
+<span style="font-size: 16px">• Як читати висоти на фізичній карті</span>
+<button style="align-self: flex-start; min-height: 44px; padding: 0 10px; border-radius: 8px; border: 1px dashed #B9C3BE; background: transparent; font-family: inherit; font-size: 14px; color: #1D5E8C; cursor: pointer">+ пункт</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D5E8C">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 13px; font-weight: 600; color: #55636A">Текст</span><label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #55636A"><input type="checkbox" checked>У спрощеному режимі</label></div>
+<div style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 10px; background: #F7F8F5">
+<sc-for list="{{tools}}" as="t" hint-placeholder-count="7">
+<button style="min-width: 44px; min-height: 44px; padding: 0 8px; border-radius: 8px; border: 0; background: transparent; font-family: inherit; font-size: 14px; font-weight: 600; color: #34444B; cursor: pointer">{{t}}</button>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 16px; line-height: 1.6">Більшу частину України займають <b>рівнини</b>: низовини і височини. Вони чергуються між собою, тому на фізичній карті видно смуги зеленого і жовтого кольорів.</p>
+</div>
+
+<div style="display: flex; gap: 16px; align-items: center; padding: 14px 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="width: 120px; height: 80px; border-radius: 10px; background: #E4ECEA; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #55636A">зображення</div>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="font-size: 13px; font-weight: 600; color: #55636A">Зображення</span>
+<span style="font-size: 15px; font-weight: 600">Фізична карта України</span>
+<span style="font-size: 13px; color: #8E1B12">Джерело не вказано</span>
+</div>
+</div>
+
+<div style="display: flex; gap: 16px; align-items: center; padding: 14px 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="width: 120px; height: 68px; border-radius: 10px; background: #2B3D44; flex-shrink: 0; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span style="font-size: 13px; font-weight: 600; color: #55636A">Відео</span>
+<span style="font-size: 15px; font-weight: 600">[Назва відео]</span>
+<span style="font-size: 13px; color: #55636A">Фрагмент 01:20–05:40 · затверджено</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 13px; font-weight: 600; color: #55636A">Тренування · відкриті завдання</span><a href="TaskEditor.dc.html" style="font-size: 14px">+ з банку / нове</a></div>
+<sc-for list="{{tasks}}" as="k" hint-placeholder-count="4">
+<a href="TaskEditor.dc.html" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 12px; border-radius: 10px; background: #F7F8F5; text-decoration: none; color: #1E2A2F">
+<svg width="28" height="20" viewBox="0 0 34 24" aria-hidden="true"><rect x="0" y="16" width="6" height="8" rx="1.5" fill="{{k.c1}}"></rect><rect x="9" y="11" width="6" height="13" rx="1.5" fill="{{k.c2}}"></rect><rect x="18" y="6" width="6" height="18" rx="1.5" fill="{{k.c3}}"></rect><rect x="27" y="0" width="6" height="24" rx="1.5" fill="{{k.c4}}"></rect></svg>
+<span style="flex-grow: 1; font-size: 15px">{{k.text}}</span>
+<span style="font-size: 13px; color: #55636A">{{k.type}}</span>
+</a>
+</sc-for>
+</div>
+
+<div style="position: relative">
+<button onClick="{{toggleMenu}}" style="width: 100%; min-height: 52px; border-radius: 14px; border: 2px dashed #B9C3BE; background: transparent; font-family: inherit; font-size: 16px; font-weight: 600; color: #1D5E8C; cursor: pointer">+ Додати блок</button>
+<sc-if value="{{menu}}" hint-placeholder-val="{{true}}">
+<div style="margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; padding: 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<sc-for list="{{blockTypes}}" as="b" hint-placeholder-count="14">
+<button style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 58px; padding: 8px 12px; border-radius: 10px; border: 1px solid #ECEEEA; background: #F7F8F5; font-family: inherit; text-align: left; cursor: pointer; color: #1E2A2F">
+<span style="font-size: 14px; font-weight: 600">{{b.name}}</span>
+<span style="font-size: 12px; color: #55636A">{{b.hint}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { view: 'Редагування', sel: 'Текст', menu: true }; }
+renderVals() {
+const s = this.state;
+const views = ['Редагування', 'Телефон', 'Комп’ютер'].map((name) => ({ name, bg: s.view === name ? '#FFFFFF' : 'transparent', w: s.view === name ? '600' : '400', pick: () => this.setState({ view: name }) }));
+const outline = [['Мета', '2 пункти'], ['Текст', ''], ['Зображення', '!'], ['Відео', '4 хв'], ['Терміни', '4'], ['Тренування', '4 завд.'], ['Рефлексія', ''], ['ДЗ', '6 завд.']].map(([name, meta]) => ({ name, meta, bg: s.sel === name ? '#EEF4F9' : 'transparent', pick: () => this.setState({ sel: name }) }));
+const off = '#D5DAD0', L = ['#4E8A57', '#9AA33A', '#C99A3A', '#8A5A34'];
+const lv = (n) => ({ c1: L[n-1], c2: n >= 2 ? L[n-1] : off, c3: n >= 3 ? L[n-1] : off, c4: n >= 4 ? L[n-1] : off });
+const tasks = [['Які форми рельєфу переважають в Україні?', 'Вибір відповіді', 1], ['Форма рельєфу і висота', 'Відповідність', 2], ['Від найнижчого до найвищого', 'Порядок', 2], ['Знайди Подільську височину', 'Клік по карті', 3]].map(([text, type, n]) => ({ text, type, ...lv(n) }));
+const blockTypes = [['Мета', 'що дізнаєшся'], ['Текст', 'пояснення'], ['Терміни', 'термін → визначення'], ['Зображення', 'з медіатеки'], ['Галерея', '2–8 фото'], ['Відео', 'YouTube'], ['Карта', 'для перегляду'], ['Виділений блок', 'цікаво знати, мій край'], ['Таблиця', 'дані з джерелом'], ['Діаграма', 'з таблиці'], ['Файл', 'PDF-додаток'], ['Тренування', 'відкриті завдання'], ['Рефлексія', 'самооцінка'], ['ДЗ', 'захищені завдання']].map(([name, hint]) => ({ name, hint }));
+return { views, outline, tasks, blockTypes, menu: s.menu, toggleMenu: () => this.setState({ menu: !s.menu }), tools: ['Н3', 'Ж', 'К', '• —', '1.', 'Посил.', 'Табл.'] };
+}
+}
+</script>
+</body>
+</html>

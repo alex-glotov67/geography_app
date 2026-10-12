@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Домашнє завдання</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="width: 390px; height: 1000px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="padding: 20px 24px 22px 24px; background: #1D5E8C; color: #FFFFFF; display: flex; flex-direction: column; gap: 10px">
+<a href="Lesson.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 44px; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 500">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+До уроку
+</a>
+<span style="font-size: 15px; opacity: 0.9">8 клас, урок 5: Рельєф України</span>
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.2">Домашнє завдання</h1>
+<span style="font-size: 15px; opacity: 0.9">Здати до 16 жовтня. Спроб: 2.</span>
+</header>
+
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px">
+
+<sc-if value="{{isForm}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 17px; font-weight: 600">Твій клас</span>
+<div style="display: flex; gap: 10px">
+<sc-for list="{{classes}}" as="c" hint-placeholder-count="3">
+<button onClick="{{c.pick}}" style="flex: 1 1 0; min-height: 52px; border-radius: 12px; border: {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; font-family: inherit; font-size: 18px; font-weight: 600; cursor: pointer">{{c.name}}</button>
+</sc-for>
+</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 17px; font-weight: 600">Прізвище та ініціал</span>
+<input type="text" value="{{name}}" onChange="{{setName}}" placeholder="Наприклад: Коваль О." style="height: 52px; box-sizing: border-box; border: 1px solid #B9C3BE; border-radius: 12px; padding: 0 14px; font-family: inherit; font-size: 17px; color: #1E2A2F; background: #FFFFFF">
+<span style="font-size: 14px; color: #55636A">Запам'ятаємо на цьому пристрої для наступних ДЗ.</span>
+</label>
+<sc-if value="{{formErr}}" hint-placeholder-val="{{false}}">
+<p role="alert" style="margin: 0; padding: 12px 14px; border-radius: 12px; background: #FBE4E1; color: #8E1B12; font-size: 16px">{{formErr}}</p>
+</sc-if>
+<button onClick="{{start}}" style="min-height: 54px; border-radius: 14px; border: 0; background: #1D5E8C; color: #FFFFFF; font-family: inherit; font-size: 18px; font-weight: 600; cursor: pointer">Почати</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isTask}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 15px; color: #55636A">Завдання 4 з 6</span>
+<div style="height: 8px; border-radius: 4px; background: #D5DAD0; overflow: hidden"><div style="width: 66%; height: 8px; background: #1D5E8C"></div></div>
+</div>
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<h2 style="margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4">Чи правильні твердження?</h2>
+<sc-for list="{{stmts}}" as="st" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #ECEEEA">
+<span style="font-size: 17px; line-height: 1.4">{{st.text}}</span>
+<div style="display: flex; gap: 8px">
+<button onClick="{{st.yes}}" style="flex: 1 1 0; min-height: 46px; border-radius: 10px; border: {{st.yBorder}}; background: {{st.yBg}}; color: {{st.yFg}}; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">Так</button>
+<button onClick="{{st.no}}" style="flex: 1 1 0; min-height: 46px; border-radius: 10px; border: {{st.nBorder}}; background: {{st.nBg}}; color: {{st.nFg}}; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">Ні</button>
+</div>
+</div>
+</sc-for>
+</section>
+<div style="display: flex; gap: 10px">
+<button style="flex: 1 1 0; min-height: 52px; border-radius: 14px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 17px; color: #1E2A2F; cursor: pointer">Назад</button>
+<button onClick="{{submit}}" style="flex: 2 1 0; min-height: 52px; border-radius: 14px; border: 0; background: #1D5E8C; color: #FFFFFF; font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Надіслати вчителю</button>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.4; color: #55636A">Після надсилання змінити відповіді не можна.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<section style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0; text-align: center">
+<span style="font-size: 16px; color: #2E5E37; font-weight: 600">Надіслано вчителю</span>
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 52px; line-height: 1.1">9 з 12</span>
+<span style="font-size: 15px; color: #55636A">{{who}}</span>
+</section>
+<section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 18px; background: #E4ECEA">
+<span style="font-size: 16px; font-weight: 600">Код підтвердження</span>
+<span style="font-family: 'Unbounded', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: 4px">K7M4PX</span>
+<button style="min-height: 48px; border-radius: 12px; border: 1px solid #1D5E8C; background: #FFFFFF; color: #123F60; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">Скопіювати код</button>
+<p style="margin: 0; font-size: 15px; line-height: 1.45; color: #34444B">Навчаєшся дистанційно? Встав код у приватний коментар до завдання в Classroom і натисни «Здати».</p>
+</section>
+<a href="Lesson.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 14px; background: #1D5E8C; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 600">Повернутися до уроку</a>
+</div>
+</sc-if>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { screen: 'form', cls: '', name: '', err: '', a: { s1: true } }; }
+renderVals() {
+const s = this.state;
+const classes = ['8-А', '8-Б', '8-В'].map((name) => {
+const sel = s.cls === name;
+return { name, border: sel ? '2px solid #1D5E8C' : '1px solid #B9C3BE', bg: sel ? '#1D5E8C' : '#FFFFFF', fg: sel ? '#FFFFFF' : '#1E2A2F', pick: () => this.setState({ cls: name, err: '' }) };
+});
+const st = [
+['s1', 'Найвища точка України — гора Говерла.'],
+['s2', 'Подільська височина розташована на сході України.'],
+['s3', 'Низовини на фізичній карті позначають зеленим кольором.']
+].map(([id, text]) => {
+const v = s.a[id];
+const on = ['2px solid #1D5E8C', '#1D5E8C', '#FFFFFF'], off = ['1px solid #B9C3BE', '#FFFFFF', '#1E2A2F'];
+const y = v === true ? on : off, n = v === false ? on : off;
+return { text, yBorder: y[0], yBg: y[1], yFg: y[2], nBorder: n[0], nBg: n[1], nFg: n[2],
+yes: () => this.setState({ a: { ...s.a, [id]: true } }), no: () => this.setState({ a: { ...s.a, [id]: false } }) };
+});
+return {
+isForm: s.screen === 'form', isTask: s.screen === 'task', isDone: s.screen === 'done',
+classes, stmts: st, name: s.name, formErr: s.err,
+who: (s.name || 'Коваль О.') + ', ' + (s.cls || '8-Б') + '. Спроба 1 з 2.',
+setName: (e) => this.setState({ name: e.target.value, err: '' }),
+start: () => {
+if (!s.cls) return this.setState({ err: 'Обери свій клас.' });
+if (s.name.trim().length < 2) return this.setState({ err: 'Напиши прізвище та ініціал, наприклад: Коваль О.' });
+this.setState({ screen: 'task' });
+},
+submit: () => this.setState({ screen: 'done' }),
+restart: () => this.setState({ screen: 'form' })
+};
+}
+}
+</script>
+</body>
+</html>

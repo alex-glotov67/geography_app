@@ -1,0 +1,28 @@
+# залежності й збірка
+node_modules/
+dist/
+*.tsbuildinfo
+
+# секрети — лише локально
+.env
+.env.local
+.env.*.local
+
+# тести
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
+
+# навчальні джерела вчителя (програма, КТП, нотатки) — не публікуються
+sources/
+
+# система й редактори
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/

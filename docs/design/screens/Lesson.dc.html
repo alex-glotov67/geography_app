@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Урок: Рельєф України</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="width: 390px; height: 2050px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="position: relative; padding: 20px 24px 28px 24px; background: #E4ECEA; overflow: hidden; display: flex; flex-direction: column; gap: 14px">
+<svg width="300" height="220" viewBox="0 0 300 220" fill="none" stroke="#8F6A1F" stroke-width="1" style="position: absolute; right: -70px; bottom: -60px; opacity: 0.35" aria-hidden="true">
+<path d="M40 120 C 50 50, 200 30, 250 90 S 250 200, 160 200 S 30 190, 40 120 Z"></path>
+<path d="M75 122 C 85 75, 195 62, 225 102 S 222 175, 158 175 S 68 168, 75 122 Z"></path>
+<path d="M108 124 C 115 98, 182 90, 200 112 S 196 152, 158 152 S 102 146, 108 124 Z"></path>
+<path d="M138 126 C 142 115, 165 112, 172 122 S 168 136, 157 136 S 135 133, 138 126 Z"></path>
+</svg>
+<a href="Class.dc.html" style="position: relative; display: flex; align-items: center; gap: 6px; min-height: 44px; text-decoration: none; font-size: 16px; font-weight: 500">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D5E8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+8 клас
+</a>
+<div style="position: relative; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; color: #55636A">Урок 5</span>
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.15">Рельєф України</h1>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 15px; color: #34444B">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34444B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"></path><path d="M4 19V5"></path></svg>
+Підручник: § [N], с. [00–00]
+</span>
+</div>
+<button onClick="{{toggleSimple}}" style="position: relative; align-self: flex-start; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px 0 6px; border-radius: 999px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">
+<span style="width: 40px; height: 24px; border-radius: 12px; background: {{switchBg}}; display: flex; align-items: center; justify-content: {{switchJustify}}; padding: 0 3px; box-sizing: border-box">
+<span style="width: 18px; height: 18px; border-radius: 9px; background: #FFFFFF"></span>
+</span>
+Спрощений режим
+</button>
+</header>
+
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 32px">
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Що ти дізнаєшся</h2>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 17px; line-height: 1.45">
+<li>Які форми рельєфу є в Україні</li>
+<li>Як читати висоти на фізичній карті</li>
+<li>Чому рельєф заходу і сходу країни різний</li>
+</ul>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Ключові терміни</h2>
+<sc-for list="{{terms}}" as="t" hint-placeholder-count="4">
+<div style="border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0; overflow: hidden">
+<button onClick="{{t.toggle}}" style="width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 0; background: transparent; font-family: inherit; font-size: 17px; font-weight: 600; color: #1E2A2F; text-align: left; cursor: pointer">
+{{t.term}}
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D5E8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: {{t.rot}}" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+</button>
+<sc-if value="{{t.open}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 0 16px 14px 16px; font-size: 16px; line-height: 1.5; color: #34444B">{{t.def}}</p>
+</sc-if>
+</div>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Пояснення</h2>
+<sc-if value="{{simple}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 14px; background: #E3EEE4; font-size: 19px; line-height: 1.55">
+<p style="margin: 0">Україна здебільшого рівнинна.</p>
+<p style="margin: 0">Низькі рівнини — це низовини. Вищі рівнини — це височини.</p>
+<p style="margin: 0">Гори є лише у двох місцях: Карпати і Кримські гори.</p>
+</div>
+</sc-if>
+<sc-if value="{{full}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 12px; font-size: 17px; line-height: 1.6; max-width: 34em">
+<p style="margin: 0">Більшу частину України займають рівнини: низовини і височини. Вони чергуються між собою, тому на фізичній карті видно смуги зеленого і жовтого кольорів.</p>
+<p style="margin: 0">Гори є лише на заході (Українські Карпати) і на півдні (Кримські гори). Найвища точка країни — гора Говерла в Карпатах, 2061 м.</p>
+<p style="margin: 0">Подивись на карту в атласі: знайди Подільську височину і Поліську низовину. Котра з них вища?</p>
+</div>
+</sc-if>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Відео</h2>
+<button style="position: relative; height: 196px; border-radius: 16px; border: 0; background: #2B3D44; color: #FFFFFF; font-family: inherit; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 16px; gap: 6px; text-align: left; cursor: pointer; overflow: hidden" aria-label="Відтворити відео">
+<span style="position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 32px; background: #FFFFFF; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="#1D5E8C" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+</span>
+<span style="font-size: 16px; font-weight: 600">[Назва відео — додасть вчитель]</span>
+<span style="font-size: 14px; opacity: 0.85">[Канал], [тривалість]</span>
+</button>
+<p style="margin: 0; font-size: 14px; color: #55636A">Відео завантажиться лише після натискання.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Завдання</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.45; color: #34444B">Почни з першого рівня й піднімайся вище, як на гору.</p>
+<sc-for list="{{levels}}" as="lv" hint-placeholder-count="4">
+<a href="Tasks.dc.html" style="display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 10px 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0; text-decoration: none; color: #1E2A2F">
+<svg width="34" height="24" viewBox="0 0 34 24" aria-hidden="true">
+<rect x="0" y="16" width="6" height="8" rx="1.5" fill="{{lv.c1}}"></rect>
+<rect x="9" y="11" width="6" height="13" rx="1.5" fill="{{lv.c2}}"></rect>
+<rect x="18" y="6" width="6" height="18" rx="1.5" fill="{{lv.c3}}"></rect>
+<rect x="27" y="0" width="6" height="24" rx="1.5" fill="{{lv.c4}}"></rect>
+</svg>
+<span style="flex-grow: 1; font-size: 17px; font-weight: 600">{{lv.name}}</span>
+<span style="font-size: 14px; color: #55636A">{{lv.count}}</span>
+</a>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #1D5E8C; color: #FFFFFF">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Домашнє завдання</h2>
+<p style="margin: 0; font-size: 16px; opacity: 0.9">6 завдань, здати до 16 жовтня</p>
+</div>
+<a href="Homework.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 14px; background: #FFFFFF; color: #123F60; text-decoration: none; font-size: 17px; font-weight: 600">Виконати онлайн</a>
+<button style="display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; border-radius: 14px; border: 1px solid #A9C6DC; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 17px; font-weight: 500; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+Завантажити для друку (PDF)
+</button>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2050}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { open: 'Низовина', simple: false }; }
+renderVals() {
+const s = this.state;
+const terms = [
+['Рельєф', 'Сукупність усіх нерівностей земної поверхні: рівнин, гір, долин, ярів.'],
+['Низовина', 'Рівнина з висотами до 200 м над рівнем моря. На фізичній карті — зелена.'],
+['Височина', 'Рівнина з висотами від 200 до 500 м над рівнем моря. На карті — жовта.'],
+['Гори', 'Ділянки з висотами понад 500 м і великими перепадами висот. На карті — коричневі.']
+].map(([term, def]) => ({
+term, def,
+open: s.open === term,
+rot: s.open === term ? 'rotate(180deg)' : 'none',
+toggle: () => this.setState({ open: s.open === term ? '' : term })
+}));
+const off = '#D5DAD0';
+const L = ['#4E8A57', '#9AA33A', '#C99A3A', '#8A5A34'];
+const lv = (n, name, count) => ({ name, count, c1: n >= 1 ? L[n-1] : off, c2: n >= 2 ? L[n-1] : off, c3: n >= 3 ? L[n-1] : off, c4: n >= 4 ? L[n-1] : off });
+return {
+terms,
+simple: s.simple,
+full: !s.simple,
+switchBg: s.simple ? '#3F7A4A' : '#9AA5A0',
+switchJustify: s.simple ? 'flex-end' : 'flex-start',
+toggleSimple: () => this.setState({ simple: !s.simple }),
+levels: [lv(1, 'Базовий', '2 завдання'), lv(2, 'Середній', '2 завдання'), lv(3, 'Достатній', '2 завдання'), lv(4, 'Високий', '1 завдання')]
+};
+}
+}
+</script>
+</body>
+</html>

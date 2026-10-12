@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Нові типи завдань</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="width: 390px; height: 2200px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="padding: 28px 24px 20px 24px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #D5DAD0">
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.2">Ще типи завдань</h1>
+<p style="margin: 0; font-size: 16px; color: #55636A">Кожен блок — окремий тип для рушія.</p>
+</header>
+
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px">
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<span style="font-size: 14px; font-weight: 600; color: #55636A">Оціни значення</span>
+<h2 style="margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4">Яка висота Говерли над рівнем моря?</h2>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-family: 'Unbounded', sans-serif; font-size: 30px; font-weight: 700">{{h}} м</span>
+<input type="range" min="0" max="3000" step="10" value="{{h}}" onChange="{{setH}}" aria-label="Висота в метрах" style="width: 100%; height: 44px; accent-color: #1D5E8C">
+<div style="display: flex; justify-content: space-between; font-size: 13px; color: #55636A"><span>0 м</span><span>3000 м</span></div>
+</div>
+<button onClick="{{checkH}}" style="min-height: 50px; border-radius: 12px; border: 0; background: #1D5E8C; color: #FFFFFF; font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Перевірити</button>
+<sc-if value="{{fbH}}" hint-placeholder-val="{{false}}">
+<p role="status" style="margin: 0; padding: 12px 14px; border-radius: 12px; background: {{fbHbg}}; color: {{fbHfg}}; font-size: 16px; line-height: 1.45">{{fbH}}</p>
+</sc-if>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<span style="font-size: 14px; font-weight: 600; color: #55636A">Знайди зайве</span>
+<h2 style="margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4">Що зайве в цьому ряду?</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{odd}}" as="o" hint-placeholder-count="4">
+<button onClick="{{o.pick}}" style="min-height: 72px; padding: 10px; border-radius: 12px; border: {{o.border}}; background: {{o.bg}}; color: {{o.fg}}; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.3; cursor: pointer">{{o.text}}</button>
+</sc-for>
+</div>
+<sc-if value="{{fbO}}" hint-placeholder-val="{{false}}">
+<p role="status" style="margin: 0; padding: 12px 14px; border-radius: 12px; background: {{fbObg}}; color: {{fbOfg}}; font-size: 16px; line-height: 1.45">{{fbO}}</p>
+</sc-if>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<span style="font-size: 14px; font-weight: 600; color: #55636A">Розташуй у порядку</span>
+<h2 style="margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4">Від найнижчого до найвищого</h2>
+<sc-for list="{{ord}}" as="it" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 12px; background: #F7F8F5; border: 1px solid #D5DAD0">
+<span style="font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; width: 18px">{{it.n}}</span>
+<span style="flex-grow: 1; font-size: 16px">{{it.text}}</span>
+<button onClick="{{it.up}}" aria-label="Вище" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #B9C3BE; background: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E2A2F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+<button onClick="{{it.down}}" aria-label="Нижче" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #B9C3BE; background: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E2A2F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+</div>
+</sc-for>
+<button onClick="{{checkOrd}}" style="min-height: 50px; border-radius: 12px; border: 0; background: #1D5E8C; color: #FFFFFF; font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Перевірити</button>
+<sc-if value="{{fbR}}" hint-placeholder-val="{{false}}">
+<p role="status" style="margin: 0; padding: 12px 14px; border-radius: 12px; background: {{fbRbg}}; color: {{fbRfg}}; font-size: 16px; line-height: 1.45">{{fbR}}</p>
+</sc-if>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<span style="font-size: 14px; font-weight: 600; color: #55636A">Розподіли за групами</span>
+<h2 style="margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4">Торкнись картки, потім групи</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="padding: 10px 14px; border-radius: 999px; border: 2px solid #1D5E8C; background: #EEF4F9; font-size: 15px; font-weight: 600">Придніпровська низовина</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: #E3EEE4; min-height: 130px">
+<span style="font-size: 15px; font-weight: 700; color: #2E5E37">Низовини</span>
+<span style="padding: 8px 10px; border-radius: 10px; background: #FFFFFF; font-size: 14px">Поліська</span>
+<span style="padding: 8px 10px; border-radius: 10px; background: #FFFFFF; font-size: 14px">Причорноморська</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: #F6ECD6; min-height: 130px">
+<span style="font-size: 15px; font-weight: 700; color: #7A5A12">Височини</span>
+<span style="padding: 8px 10px; border-radius: 10px; background: #FFFFFF; font-size: 14px">Волинська</span>
+<span style="padding: 8px 10px; border-radius: 10px; background: #FFFFFF; font-size: 14px">Придніпровська</span>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<span style="font-size: 14px; font-weight: 600; color: #55636A">Постав точку на карті</span>
+<h2 style="margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4">Познач, де розташоване місто Чернівці</h2>
+<div style="position: relative; height: 220px; border-radius: 14px; border: 2px dashed #B9C3BE; background: #F7F8F5; display: flex; align-items: center; justify-content: center; text-align: center; padding: 16px; box-sizing: border-box">
+<span style="font-size: 14px; color: #55636A">[Карта України, SVG]</span>
+<svg width="28" height="36" viewBox="0 0 24 30" style="position: absolute; left: 70px; top: 120px" aria-hidden="true"><path d="M12 29s10-10 10-17A10 10 0 0 0 2 12c0 7 10 17 10 17z" fill="#B42318"></path><circle cx="12" cy="12" r="4" fill="#FFFFFF"></circle></svg>
+</div>
+<p style="margin: 0; padding: 12px 14px; border-radius: 12px; background: #F6ECD6; color: #5C430E; font-size: 16px; line-height: 1.45">Близько: точка за ~40 км від правильного місця. 8 балів з 10.</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<span style="font-size: 14px; font-weight: 600; color: #55636A">Картки для повторення</span>
+<button onClick="{{flip}}" style="min-height: 160px; border-radius: 16px; border: 0; background: {{cardBg}}; color: {{cardFg}}; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px; cursor: pointer">
+<span style="font-size: {{cardSize}}; font-weight: 600; line-height: 1.4">{{cardText}}</span>
+<span style="font-size: 13px; opacity: 0.8">{{cardHint}}</span>
+</button>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #55636A"><span>Картка 2 з 12</span><span>Знаю: 1</span></div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2200}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { h: 1500, fbH: '', okH: false, odd: '', ord: ['Подільська височина', 'Говерла', 'Причорноморська низовина'], fbR: '', okR: false, flipped: false };
+}
+renderVals() {
+const s = this.state;
+const good = ['#E3EEE4', '#2E5E37'], bad = ['#FBE4E1', '#8E1B12'];
+const oddItems = ['Поліська низовина', 'Придніпровська низовина', 'Подільська височина', 'Причорноморська низовина'];
+const odd = oddItems.map((text) => {
+const sel = s.odd === text, right = text === 'Подільська височина';
+let bg = '#F7F8F5', border = '1px solid #D5DAD0', fg = '#1E2A2F';
+if (sel) { bg = right ? good[0] : bad[0]; fg = right ? good[1] : bad[1]; border = '2px solid ' + fg; }
+return { text, bg, border, fg, pick: () => this.setState({ odd: text }) };
+});
+const fbO = !s.odd ? '' : s.odd === 'Подільська височина' ? 'Так: це височина, а решта — низовини.' : 'Ні, це низовина, як і більшість у ряду. Шукай іншу форму рельєфу.';
+const okO = s.odd === 'Подільська височина';
+const move = (i, d) => () => { const a = s.ord.slice(); const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; this.setState({ ord: a, fbR: '' }); };
+const ord = s.ord.map((text, i) => ({ text, n: i + 1, up: move(i, -1), down: move(i, 1) }));
+const correctOrd = ['Причорноморська низовина', 'Подільська височина', 'Говерла'];
+return {
+h: s.h,
+setH: (e) => this.setState({ h: Number(e.target.value), fbH: '' }),
+checkH: () => { const d = Math.abs(s.h - 2061); const ok = d <= 100; this.setState({ okH: ok, fbH: ok ? 'Влучно! Говерла — 2061 м.' : (s.h < 2061 ? 'Замало. Говерла — найвища вершина України, спробуй вище.' : 'Забагато. Українські гори нижчі, спробуй менше.') }); },
+fbH: s.fbH, fbHbg: s.okH ? good[0] : bad[0], fbHfg: s.okH ? good[1] : bad[1],
+odd, fbO, fbObg: okO ? good[0] : bad[0], fbOfg: okO ? good[1] : bad[1],
+ord,
+checkOrd: () => { const ok = s.ord.every((x, i) => x === correctOrd[i]); this.setState({ okR: ok, fbR: ok ? 'Правильно: низовина, височина, гори.' : 'Ще ні. Згадай: низовини до 200 м, височини 200–500 м.' }); },
+fbR: s.fbR, fbRbg: s.okR ? good[0] : bad[0], fbRfg: s.okR ? good[1] : bad[1],
+flip: () => this.setState({ flipped: !s.flipped }),
+cardText: s.flipped ? 'Рівнина з висотами до 200 м над рівнем моря' : 'Низовина',
+cardHint: s.flipped ? 'Торкнись, щоб повернути' : 'Торкнись, щоб побачити визначення',
+cardBg: s.flipped ? '#3F7A4A' : '#E4ECEA',
+cardFg: s.flipped ? '#FFFFFF' : '#1E2A2F',
+cardSize: s.flipped ? '18px' : '26px'
+};
+}
+}
+</script>
+</body>
+</html>

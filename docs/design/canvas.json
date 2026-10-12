@@ -1,0 +1,275 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Cabinet.dc.html": {
+      "h": 1400,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "7. Мій кабінет",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "Class.dc.html": {
+      "h": 980,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "2. Уроки 8 класу",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Homework.dc.html": {
+      "h": 1000,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "5. Домашнє завдання",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "Lesson.dc.html": {
+      "h": 2050,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "3. Сторінка уроку",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "LessonDesktop.dc.html": {
+      "expand": "fill",
+      "h": 1500,
+      "is_interactive": true,
+      "page": "desktop",
+      "title": "Урок на комп'ютері",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "Login.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "6. Вхід учня",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "1. Вибір класу",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "MoreTasks.dc.html": {
+      "h": 2200,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "8. Нові типи завдань",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "QuizBoard.dc.html": {
+      "h": 810,
+      "is_interactive": true,
+      "page": "quiz",
+      "title": "Квіз: відповіді й рейтинг",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "QuizHost.dc.html": {
+      "h": 810,
+      "is_interactive": true,
+      "page": "quiz",
+      "title": "Квіз: питання на проєкторі",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "QuizJoin.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "quiz",
+      "radius": 28,
+      "title": "Квіз: телефон учня",
+      "w": 390,
+      "x": 3040,
+      "y": 0
+    },
+    "Tasks.dc.html": {
+      "h": 1650,
+      "is_interactive": true,
+      "page": "phone",
+      "radius": 28,
+      "title": "4. Інтерактивні завдання",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "TeacherClass.dc.html": {
+      "expand": "fill",
+      "h": 1150,
+      "is_interactive": true,
+      "page": "teacher",
+      "title": "Вчитель: клас, імпорт і логіни",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "TeacherHome.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "teacher",
+      "title": "Вчитель: огляд",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "TeacherResults.dc.html": {
+      "expand": "fill",
+      "h": 1000,
+      "is_interactive": true,
+      "page": "teacher",
+      "title": "Вчитель: результати",
+      "w": 1440,
+      "x": 3040,
+      "y": 0
+    },
+    "LessonBuilder.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 1200,
+      "title": "Вчитель: конструктор уроку",
+      "is_interactive": true,
+      "expand": "fill",
+      "page": "teacher"
+    },
+    "TaskEditor.dc.html": {
+      "x": 6080,
+      "y": 0,
+      "w": 1440,
+      "h": 1150,
+      "title": "Вчитель: редактор завдання",
+      "is_interactive": true,
+      "expand": "fill",
+      "page": "teacher"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-07T12:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "page": "phone",
+    "view": "canvas"
+  },
+  "notes": {
+    "s1": {
+      "fill": "orange",
+      "page": "phone",
+      "text": "Теми, номери уроків, § і дати тут демонстраційні. У робочому ресурсі їх беремо з програми та КТП.",
+      "w": 380,
+      "x": 0,
+      "y": 2310
+    },
+    "s3": {
+      "fill": "orange",
+      "page": "teacher",
+      "text": "Імена учнів вигадані. Зберігаємо лише прізвище та ініціал.",
+      "w": 380,
+      "x": 0,
+      "y": 1270
+    },
+    "t1": {
+      "kind": "title1",
+      "maxW": 3680,
+      "page": "phone",
+      "text": "Географія 6–9: екрани учня (телефон)",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 1440,
+      "page": "desktop",
+      "text": "Учень: комп'ютер",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t3": {
+      "kind": "title1",
+      "maxW": 7520,
+      "page": "teacher",
+      "text": "Кабінет вчителя",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t4": {
+      "kind": "title1",
+      "maxW": 3430,
+      "page": "quiz",
+      "text": "Живий квіз на уроці",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Class.dc.html",
+    "Lesson.dc.html",
+    "Tasks.dc.html",
+    "Homework.dc.html",
+    "Login.dc.html",
+    "Cabinet.dc.html",
+    "MoreTasks.dc.html",
+    "LessonDesktop.dc.html",
+    "TeacherHome.dc.html",
+    "TeacherClass.dc.html",
+    "TeacherResults.dc.html",
+    "QuizHost.dc.html",
+    "QuizBoard.dc.html",
+    "QuizJoin.dc.html",
+    "LessonBuilder.dc.html",
+    "TaskEditor.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "phone",
+      "name": "Учень: телефон"
+    },
+    {
+      "id": "desktop",
+      "name": "Учень: комп'ютер"
+    },
+    {
+      "id": "teacher",
+      "name": "Вчитель"
+    },
+    {
+      "id": "quiz",
+      "name": "Живий квіз"
+    }
+  ],
+  "title": "Географія 6–9 — дизайн ресурсу"
+}

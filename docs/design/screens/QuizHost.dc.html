@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Квіз: питання на проєкторі</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#FFFFFF}a:hover{color:#DCE8F2}
+</style>
+</helmet>
+<div style="width: 1440px; height: 810px; box-sizing: border-box; background: #16313F; color: #FFFFFF; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column; padding: 32px 48px 36px 48px; gap: 28px; position: relative; overflow: hidden">
+<svg width="700" height="500" viewBox="0 0 300 220" fill="none" stroke="#FFFFFF" stroke-width="0.5" style="position: absolute; left: -160px; bottom: -200px; opacity: 0.12" aria-hidden="true">
+<path d="M40 120 C 50 50, 200 30, 250 90 S 250 200, 160 200 S 30 190, 40 120 Z"></path>
+<path d="M75 122 C 85 75, 195 62, 225 102 S 222 175, 158 175 S 68 168, 75 122 Z"></path>
+<path d="M108 124 C 115 98, 182 90, 200 112 S 196 152, 158 152 S 102 146, 108 124 Z"></path>
+<path d="M138 126 C 142 115, 165 112, 172 122 S 168 136, 157 136 S 135 133, 138 126 Z"></path>
+</svg>
+
+<div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px">
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="width: 76px; height: 76px; border-radius: 10px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #16313F; font-size: 12px; font-weight: 600; text-align: center">QR</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 16px; opacity: 0.85">[адреса сайту]/quiz</span>
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 34px; letter-spacing: 3px">PIN 482 913</span>
+</div>
+</div>
+<span style="font-size: 20px; font-weight: 600">Питання 3 з 10</span>
+<div style="width: 92px; height: 92px; border-radius: 46px; border: 6px solid #C99A3A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'Unbounded', sans-serif; font-size: 34px; font-weight: 700">{{sec}}</div>
+</div>
+
+<div style="position: relative; flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 0 40px">
+<h1 style="margin: 0; text-align: center; font-size: 50px; line-height: 1.2; font-weight: 700; max-width: 1100px">Де розташована найвища точка України — гора Говерла?</h1>
+</div>
+
+<div style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 20px; min-height: 104px; padding: 0 28px; border-radius: 18px; background: {{o.bg}}; box-sizing: border-box">
+<span style="flex-shrink: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{o.tri}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l17 30H3z" fill="#FFFFFF"></path></svg></sc-if>
+<sc-if value="{{o.cir}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#FFFFFF"></circle></svg></sc-if>
+<sc-if value="{{o.sq}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="5" width="30" height="30" rx="3" fill="#FFFFFF"></rect></svg></sc-if>
+<sc-if value="{{o.dia}}" hint-placeholder-val="{{false}}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2l18 18-18 18L2 20z" fill="#FFFFFF"></path></svg></sc-if>
+</span>
+<span style="font-size: 30px; font-weight: 600">{{o.text}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px; font-size: 20px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 28px">21</span>
+<span style="opacity: 0.9">з 27 уже відповіли</span>
+</div>
+<div style="display: flex; gap: 12px">
+<button onClick="{{tick}}" style="min-height: 52px; padding: 0 22px; border-radius: 12px; border: 1px solid #5B7B8A; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 17px; cursor: pointer">{{pauseLabel}}</button>
+<a href="QuizBoard.dc.html" style="display: flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 12px; background: #FFFFFF; color: #16313F; text-decoration: none; font-size: 17px; font-weight: 700">Показати відповідь</a>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":810}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { sec: 20, paused: false }; }
+componentDidMount() { this.timer = setInterval(() => { if (!this.state.paused) this.setState({ sec: this.state.sec > 0 ? this.state.sec - 1 : 20 }); }, 1000); }
+componentWillUnmount() { clearInterval(this.timer); }
+renderVals() {
+const s = this.state;
+const shapes = ['tri', 'cir', 'sq', 'dia'];
+const bgs = ['#3F7A4A', '#8F6A1F', '#2C6E9E', '#6E4A2E'];
+const texts = ['Українські Карпати', 'Кримські гори', 'Подільська височина', 'Донецький кряж'];
+const opts = texts.map((text, i) => ({ text, bg: bgs[i], tri: shapes[i] === 'tri', cir: shapes[i] === 'cir', sq: shapes[i] === 'sq', dia: shapes[i] === 'dia' }));
+return { sec: s.sec, opts, pauseLabel: s.paused ? 'Продовжити' : 'Пауза', tick: () => this.setState({ paused: !s.paused }) };
+}
+}
+</script>
+</body>
+</html>

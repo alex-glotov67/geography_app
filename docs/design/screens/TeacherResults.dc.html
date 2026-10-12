@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Вчитель: результати</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 1000px; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<nav style="flex: 1 1 220px; max-width: 100%; box-sizing: border-box; padding: 24px 16px; background: #FFFFFF; border-right: 1px solid #D5DAD0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 20px; padding: 0 12px 4px 12px">Географія</span>
+<span style="font-size: 13px; color: #55636A; padding: 0 12px 18px 12px">Кабінет вчителя</span>
+<a href="TeacherHome.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Огляд</a>
+<a href="TeacherClass.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Класи й учні</a>
+<a href="LessonBuilder.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Уроки й конструктор</a><a href="TaskEditor.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Банк завдань</a>
+<a href="TeacherResults.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; background: #1D5E8C; color: #FFFFFF; font-weight: 600">Результати</a>
+<a href="QuizHost.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Квізи</a>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Налаштування</a>
+</nav>
+
+<main style="flex: 999 1 640px; min-width: 0; box-sizing: border-box; padding: 32px 40px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 32px">Результати</h1>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">Експорт для журналу (Excel, CSV)</button>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+<button onClick="{{t.pick}}" style="min-height: 44px; padding: 0 18px; border-radius: 999px; border: {{t.border}}; background: {{t.bg}}; color: {{t.fg}}; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer">{{t.name}}</button>
+</sc-for>
+<span style="font-size: 14px; color: #55636A; margin-left: 8px">Розділ [N]: домашні завдання, % від максимуму</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<section style="flex: 3 1 560px; min-width: 0; padding: 22px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0; display: flex; flex-direction: column; gap: 14px">
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: separate; border-spacing: 4px; font-size: 15px; min-width: 600px">
+<thead><tr style="color: #55636A; font-size: 13px; text-align: center">
+<th style="text-align: left; padding: 6px; font-weight: 500">Учень</th><th style="padding: 6px; font-weight: 500">Урок 2</th><th style="padding: 6px; font-weight: 500">Урок 3</th><th style="padding: 6px; font-weight: 500">Урок 4</th><th style="padding: 6px; font-weight: 500">Урок 5</th><th style="padding: 6px; font-weight: 500">Квізи</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<tr>
+<td style="padding: 8px 6px; font-weight: 600; white-space: nowrap">{{r.name}}</td>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="5">
+<td style="padding: 10px 6px; border-radius: 8px; text-align: center; background: {{c.bg}}; color: {{c.fg}}; font-weight: 600">{{c.t}}</td>
+</sc-for>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: #34444B">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #2F6A3B"></span>75% і більше</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #F1DFB5"></span>50–74%</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #7A4B2A"></span>менше 50%</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #ECEEEA"></span>не здано</span>
+<span>* здано після терміну</span>
+</div>
+</section>
+
+<section style="flex: 1 1 280px; padding: 22px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 19px; font-weight: 600">Найважчі завдання, урок 5</h2>
+<sc-for list="{{hard}}" as="h" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 15px"><span>{{h.name}}</span><span style="font-weight: 700">{{h.p}}</span></div>
+<div style="height: 8px; border-radius: 4px; background: #E1E5DE; overflow: hidden"><div style="height: 8px; width: {{h.p}}; background: #1D5E8C"></div></div>
+<span style="font-size: 13px; color: #55636A">{{h.note}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { cls: '8-Б' }; }
+renderVals() {
+const s = this.state;
+const tabs = ['8-А', '8-Б', '8-В'].map((name) => { const on = s.cls === name; return { name, border: on ? '2px solid #1D5E8C' : '1px solid #B9C3BE', bg: on ? '#1D5E8C' : '#FFFFFF', fg: on ? '#FFFFFF' : '#1E2A2F', pick: () => this.setState({ cls: name }) }; });
+const cell = (v) => {
+if (v === null) return { t: '—', bg: '#ECEEEA', fg: '#55636A' };
+const late = typeof v === 'string'; const p = late ? Number(v) : v;
+const t = p + '%' + (late ? '*' : '');
+if (p >= 75) return { t, bg: '#2F6A3B', fg: '#FFFFFF' };
+if (p >= 50) return { t, bg: '#F1DFB5', fg: '#3E2C06' };
+return { t, bg: '#7A4B2A', fg: '#FFFFFF' };
+};
+const data = [
+['Бондар А.', 92, 83, 100, 75, 80],
+['Гнатюк В.', 67, 58, '75', null, 60],
+['Коваль О.', 92, 67, 83, 75, 70],
+['Литвин М.', 42, null, 50, null, 40],
+['Мельник Д.', 83, 75, 92, 83, 90],
+['Савчук І.', 58, 67, 42, 58, 50]
+];
+const rows = data.map(([name, ...v]) => ({ name, cells: v.map(cell) }));
+const hard = [
+['Завдання 5: карта', '38%', 'Найчастіше обирають Придніпровську замість Подільської'],
+['Завдання 6: відкрита відповідь', '52%', 'Перевірено 11 з 18'],
+['Завдання 3: відповідність', '64%', 'Плутають межі висот 200 і 500 м'],
+['Завдання 1: вибір відповіді', '91%', '']
+].map(([name, p, note]) => ({ name, p, note }));
+return { tabs, rows, hard };
+}
+}
+</script>
+</body>
+</html>

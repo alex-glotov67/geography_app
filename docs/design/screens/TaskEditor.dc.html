@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Редактор завдання</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 1150px; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column">
+
+<header style="display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; padding: 14px 28px; background: #FFFFFF; border-bottom: 1px solid #D5DAD0">
+<div style="display: flex; align-items: center; gap: 14px">
+<a href="LessonBuilder.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 44px; text-decoration: none; font-weight: 500">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D5E8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Банк завдань
+</a>
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 18px">{{headTitle}}</span>
+</div>
+<div style="display: flex; gap: 8px">
+<button style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">Скасувати</button>
+<button style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: #1D5E8C; font-family: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; cursor: pointer">Зберегти завдання</button>
+</div>
+</header>
+
+<div style="flex-grow: 1; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px 28px; align-items: flex-start">
+
+<aside style="flex: 1 1 230px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600">Тип завдання</h2>
+<sc-for list="{{types}}" as="t" hint-placeholder-count="12">
+<button onClick="{{t.pick}}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding: 8px 12px; border-radius: 12px; border: {{t.border}}; background: {{t.bg}}; font-family: inherit; text-align: left; color: #1E2A2F; cursor: pointer">
+<span style="font-size: 14px; font-weight: 600">{{t.name}}</span>
+<span style="font-size: 12px; color: #55636A">{{t.hint}}</span>
+</button>
+</sc-for>
+<span style="font-size: 13px; color: #55636A; padding: 4px 2px">+ ще 9 типів: карта, точка, зони на схемі, графік, координати…</span>
+</aside>
+
+<main style="flex: 2 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<section style="display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Текст завдання
+<textarea rows="2" style="border: 1px solid #B9C3BE; border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 16px; font-weight: 400; color: #1E2A2F; resize: vertical">{{prompt}}</textarea>
+</label>
+
+<sc-if value="{{isChoice}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; font-weight: 600">Варіанти відповіді <span style="font-weight: 400; color: #55636A">— познач правильний</span></span>
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 8px">
+<button onClick="{{o.mark}}" aria-label="Позначити правильним" style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; border: {{o.border}}; background: {{o.bg}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<sc-if value="{{o.ok}}" hint-placeholder-val="{{false}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"></path></svg></sc-if>
+</button>
+<input value="{{o.text}}" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 12px; font-family: inherit; font-size: 15px; color: #1E2A2F">
+<button aria-label="Видалити варіант" style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; border: 1px solid #D5DAD0; background: #FFFFFF; cursor: pointer; font-size: 18px; color: #55636A">×</button>
+</div>
+</sc-for>
+<button style="align-self: flex-start; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px dashed #B9C3BE; background: transparent; font-family: inherit; font-size: 14px; color: #1D5E8C; cursor: pointer">+ варіант</button>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px"><input type="checkbox" checked>Перемішувати варіанти</label>
+</div>
+</sc-if>
+
+<sc-if value="{{isSlider}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px">
+<sc-for list="{{sliderFields}}" as="f" hint-placeholder-count="6">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">{{f.label}}<input value="{{f.value}}" style="height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isOther}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 14px; border-radius: 10px; background: #F7F8F5; font-size: 15px; color: #34444B">Форма цього типу: {{otherHint}}</p>
+</sc-if>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; padding: 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Рівень<select style="height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 8px; font-family: inherit; font-size: 15px; color: #1E2A2F; background: #FFFFFF"><option>Базовий</option><option>Середній</option><option>Достатній</option><option>Високий</option></select></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Група результатів<select style="height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 8px; font-family: inherit; font-size: 15px; color: #1E2A2F; background: #FFFFFF"><option>ГР1</option><option>ГР2</option><option>ГР3</option></select></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Бали<input value="1" style="height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Використання
+<span style="display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: #ECEEEA">
+<sc-for list="{{vis}}" as="v" hint-placeholder-count="2">
+<button onClick="{{v.pick}}" style="flex: 1 1 0; min-height: 44px; border-radius: 8px; border: 0; background: {{v.bg}}; font-family: inherit; font-size: 13px; font-weight: {{v.w}}; color: #1E2A2F; cursor: pointer">{{v.name}}</button>
+</sc-for>
+</span>
+</label>
+<label style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Коментар при помилці<input value="Подивись на фізичну карту: яких кольорів на ній найбільше?" style="height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
+<span style="grid-column: 1 / -1; font-size: 13px; color: #55636A">{{visNote}}</span>
+</section>
+</main>
+
+<aside style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Як побачить учень</h2><span style="font-size: 13px; color: #55636A">телефон</span></div>
+<div style="padding: 18px; border-radius: 22px; background: #FFFFFF; border: 1px solid #D5DAD0; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 17px; font-weight: 600; line-height: 1.4">{{prompt}}</span>
+<sc-if value="{{isChoice}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+<div style="min-height: 46px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; border: 1px solid #D5DAD0; font-size: 15px"><span style="width: 18px; height: 18px; border-radius: 9px; border: 2px solid #9AA5A0; box-sizing: border-box"></span>{{o.text}}</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isSlider}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'Unbounded', sans-serif; font-size: 24px; font-weight: 700">1500 м</span><div style="height: 6px; border-radius: 3px; background: #D5DAD0"><div style="width: 50%; height: 6px; border-radius: 3px; background: #1D5E8C"></div></div></div>
+</sc-if>
+<button style="min-height: 46px; border-radius: 12px; border: 0; background: #1D5E8C; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">Перевірити</button>
+</div>
+<button style="min-height: 44px; border-radius: 12px; border: 1px solid #1D5E8C; background: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600; color: #123F60; cursor: pointer">Спробувати як учень</button>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { type: 'single_choice', ok: 1, vis: 'open' }; }
+renderVals() {
+const s = this.state;
+const T = [
+['single_choice', 'Вибір відповіді', 'одна правильна'], ['multiple_choice', 'Кілька відповідей', 'часткові бали'],
+['true_false', 'Так чи ні', 'серія тверджень'], ['matching', 'Відповідність', 'пари'],
+['ordering', 'Порядок', 'розташуй'], ['categorize', 'Групи', 'розподіли картки'],
+['fill_blanks', 'Пропуски', 'у тексті'], ['numeric', 'Обчислення', 'з допуском'],
+['odd_one_out', 'Знайди зайве', ''], ['slider_estimate', 'Оціни повзунком', 'за близькістю'],
+['map_click', 'Клік по карті', 'знайди об’єкт'], ['short_text', 'Відкрита відповідь', 'перевіряє вчитель']
+];
+const types = T.map(([id, name, hint]) => ({ name, hint, border: s.type === id ? '2px solid #1D5E8C' : '1px solid #D5DAD0', bg: s.type === id ? '#EEF4F9' : '#FFFFFF', pick: () => this.setState({ type: id }) }));
+const name = (T.find((t) => t[0] === s.type) || T[0])[1];
+const isChoice = ['single_choice', 'multiple_choice', 'odd_one_out'].includes(s.type);
+const isSlider = s.type === 'slider_estimate';
+const optTexts = ['Гори', 'Рівнини', 'Плоскогір’я'];
+const opts = optTexts.map((text, i) => ({ text, ok: s.ok === i, border: s.ok === i ? '0' : '1px solid #B9C3BE', bg: s.ok === i ? '#3F7A4A' : '#FFFFFF', mark: () => this.setState({ ok: i }) }));
+const hints = { true_false: 'список тверджень з перемикачем «так/ні»', matching: 'дві колонки пар + зайві варіанти', ordering: 'елементи, правильний порядок задається перетягуванням', categorize: 'групи й картки, картку перетягують у групу', fill_blanks: 'текст, виділене слово стає пропуском; варіанти написання', numeric: 'відповідь, допуск, одиниця, розв’язання для ключа', map_click: 'вибір карти й клік по правильному об’єкту', short_text: 'максимальна довжина і критерії для вчителя' };
+const forced = s.type === 'short_text';
+const eff = forced ? 'secure' : s.vis;
+const vis = [['open', 'Тренування'], ['secure', 'ДЗ / квіз']].map(([id, n]) => ({ name: n, bg: eff === id ? '#FFFFFF' : 'transparent', w: eff === id ? '600' : '400', pick: () => { if (!forced) this.setState({ vis: id }); } }));
+return {
+types, opts, isChoice, isSlider, isOther: !isChoice && !isSlider, otherHint: hints[s.type] || '',
+headTitle: 'Нове завдання: ' + name,
+prompt: isSlider ? 'Яка висота Говерли над рівнем моря?' : 'Які форми рельєфу переважають на території України?',
+sliderFields: [['Мін.', '0'], ['Макс.', '3000'], ['Крок', '10'], ['Одиниця', 'м'], ['Відповідь', '2061'], ['Повний бал у межах', '100']].map(([label, value]) => ({ label, value })),
+vis,
+visNote: forced ? 'Відкриту відповідь перевіряє вчитель, тому вона можлива лише в ДЗ.' : eff === 'open' ? 'Відкрите: учень бачить перевірку одразу. Підходить лише для тренування на сторінці уроку.' : 'Захищене: відповідь перевіряє сервер. Для домашніх завдань і квізів.'
+};
+}
+}
+</script>
+</body>
+</html>

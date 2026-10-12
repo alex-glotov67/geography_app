@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Вчитель: клас 8-Б</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 1150px; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<nav style="flex: 1 1 220px; max-width: 100%; box-sizing: border-box; padding: 24px 16px; background: #FFFFFF; border-right: 1px solid #D5DAD0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 20px; padding: 0 12px 4px 12px">Географія</span>
+<span style="font-size: 13px; color: #55636A; padding: 0 12px 18px 12px">Кабінет вчителя</span>
+<a href="TeacherHome.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Огляд</a>
+<a href="TeacherClass.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; background: #1D5E8C; color: #FFFFFF; font-weight: 600">Класи й учні</a>
+<a href="LessonBuilder.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Уроки й конструктор</a><a href="TaskEditor.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Банк завдань</a>
+<a href="TeacherResults.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Результати</a>
+<a href="QuizHost.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Квізи</a>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; text-decoration: none; color: #1E2A2F">Налаштування</a>
+</nav>
+
+<main style="flex: 999 1 640px; min-width: 0; box-sizing: border-box; padding: 32px 40px; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: baseline; gap: 14px">
+<h1 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 32px">8-Б</h1>
+<span style="font-size: 16px; color: #55636A">27 учнів, навчальний рік 2026–2027</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<button style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">Додати учня</button>
+<button style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">Друкувати картки входу</button>
+<button onClick="{{openImport}}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: #1D5E8C; font-family: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; cursor: pointer">Імпортувати список</button>
+</div>
+</div>
+
+<sc-if value="{{importOpen}}" hint-placeholder-val="{{true}}">
+<section style="display: flex; flex-direction: column; gap: 18px; padding: 24px; border-radius: 18px; background: #FFFFFF; border: 2px solid #1D5E8C">
+<div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center">
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">Імпорт учнів зі списку</h2>
+<div style="display: flex; gap: 6px; font-size: 14px">
+<span style="padding: 6px 12px; border-radius: 999px; background: #E3EEE4; color: #2E5E37">1. Файл</span>
+<span style="padding: 6px 12px; border-radius: 999px; background: #1D5E8C; color: #FFFFFF; font-weight: 600">2. Стовпці</span>
+<span style="padding: 6px 12px; border-radius: 999px; background: #ECEEEA; color: #55636A">3. Логіни</span>
+</div>
+</div>
+<p style="margin: 0; font-size: 15px; color: #34444B">Файл <b>8B_spysok.xlsx</b>: 27 рядків. Підходить експорт з електронного журналу, Excel або CSV.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #55636A">Стовпець «ПІБ» це
+<select style="height: 44px; border-radius: 10px; border: 1px solid #B9C3BE; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F; background: #FFFFFF"><option>Прізвище та ім'я разом</option><option>Лише прізвище</option></select>
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #55636A">Стовпець «Клас» це
+<select style="height: 44px; border-radius: 10px; border: 1px solid #B9C3BE; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F; background: #FFFFFF"><option>Клас</option><option>Не імпортувати</option></select>
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #55636A">Зберігати як
+<select style="height: 44px; border-radius: 10px; border: 1px solid #B9C3BE; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F; background: #FFFFFF"><option>Прізвище та ініціал (Коваль О.)</option></select>
+</label>
+</div>
+<div style="overflow-x: auto; border-radius: 12px; border: 1px solid #ECEEEA">
+<table style="width: 100%; border-collapse: collapse; font-size: 15px; min-width: 520px">
+<thead><tr style="text-align: left; background: #F7F8F5; color: #55636A; font-size: 14px"><th style="padding: 8px 12px; font-weight: 500">У файлі</th><th style="padding: 8px 12px; font-weight: 500">Буде збережено</th><th style="padding: 8px 12px; font-weight: 500">Перевірка</th></tr></thead>
+<tbody>
+<tr style="border-top: 1px solid #ECEEEA"><td style="padding: 10px 12px">Бондар Анна</td><td style="padding: 10px 12px; font-weight: 600">Бондар А.</td><td style="padding: 10px 12px; color: #2E5E37">Новий учень</td></tr>
+<tr style="border-top: 1px solid #ECEEEA"><td style="padding: 10px 12px">Коваль Олена</td><td style="padding: 10px 12px; font-weight: 600">Коваль О.</td><td style="padding: 10px 12px; color: #55636A">Уже є в класі, пропустити</td></tr>
+<tr style="border-top: 1px solid #ECEEEA"><td style="padding: 10px 12px">Мельник Дмитро</td><td style="padding: 10px 12px; font-weight: 600">Мельник Д.</td><td style="padding: 10px 12px; color: #2E5E37">Новий учень</td></tr>
+</tbody>
+</table>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end">
+<button onClick="{{closeImport}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #B9C3BE; background: #FFFFFF; font-family: inherit; font-size: 15px; color: #1E2A2F; cursor: pointer">Скасувати</button>
+<button onClick="{{closeImport}}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: #1D5E8C; font-family: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; cursor: pointer">Додати 26 учнів і створити логіни</button>
+</div>
+</section>
+</sc-if>
+
+<section style="display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 18px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center">
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">Учні</h2>
+<span style="font-size: 14px; color: #55636A; max-width: 460px">Паролі не зберігаються у відкритому вигляді: їх видно один раз, одразу після створення, і на картках для друку. Забутий пароль — кнопка «Новий пароль».</span>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; border-collapse: collapse; font-size: 15px; min-width: 680px">
+<thead><tr style="text-align: left; color: #55636A; font-size: 14px">
+<th style="padding: 8px 10px; font-weight: 500">№</th><th style="padding: 8px 10px; font-weight: 500">Учень</th><th style="padding: 8px 10px; font-weight: 500">Логін</th><th style="padding: 8px 10px; font-weight: 500">Спрощений режим</th><th style="padding: 8px 10px; font-weight: 500">Останній вхід</th><th style="padding: 8px 10px; font-weight: 500"></th>
+</tr></thead>
+<tbody>
+<sc-for list="{{students}}" as="s" hint-placeholder-count="6">
+<tr style="border-top: 1px solid #ECEEEA">
+<td style="padding: 10px; color: #55636A">{{s.n}}</td>
+<td style="padding: 10px; font-weight: 600">{{s.name}}</td>
+<td style="padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 15px">{{s.login}}</td>
+<td style="padding: 10px">
+<button onClick="{{s.toggle}}" aria-label="Спрощений режим" style="width: 56px; height: 44px; border: 0; background: transparent; padding: 0; display: flex; align-items: center; cursor: pointer"><span style="width: 48px; height: 28px; border-radius: 14px; background: {{s.swBg}}; display: flex; align-items: center; justify-content: {{s.swJ}}; padding: 0 4px; box-sizing: border-box"><span style="width: 20px; height: 20px; border-radius: 10px; background: #FFFFFF"></span></span></button>
+</td>
+<td style="padding: 10px; color: #55636A">{{s.last}}</td>
+<td style="padding: 10px"><button style="min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #D5DAD0; background: #FFFFFF; font-family: inherit; font-size: 13px; color: #1E2A2F; cursor: pointer">Новий пароль</button></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { imp: true, show: false, simple: { 4: true } }; }
+renderVals() {
+const s = this.state;
+const list = [
+['Бондар А.', 'richka-lis-12', 'сьогодні'],
+['Гнатюк В.', 'ozero-more-85', 'вчора'],
+['Коваль О.', 'gora-step-47', 'сьогодні'],
+['Литвин М.', 'pole-dolyna-30', '—'],
+['Мельник Д.', 'lis-gora-64', '13.10'],
+['Савчук І.', 'more-step-21', 'сьогодні']
+];
+const students = list.map(([name, pw, last], i) => {
+const n = i + 1, on = !!s.simple[n];
+return { n, name, login: '8b-' + String(n).padStart(2, '0'), last,
+swBg: on ? '#3F7A4A' : '#9AA5A0', swJ: on ? 'flex-end' : 'flex-start',
+toggle: () => this.setState({ simple: { ...s.simple, [n]: !on } }) };
+});
+return {
+students,
+importOpen: s.imp,
+openImport: () => this.setState({ imp: true }),
+closeImport: () => this.setState({ imp: false }),
+x: 0
+};
+}
+}
+</script>
+</body>
+</html>
