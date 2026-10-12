@@ -15,7 +15,7 @@ test('шрифти завантажуються локально, без зов�
   const external: string[] = []
   page.on('request', (r) => {
     const url = new URL(r.url())
-    if (url.hostname !== 'localhost') external.push(r.url())
+    if (url.hostname !== '127.0.0.1') external.push(r.url())
   })
   await page.goto('/')
   await page.evaluate(() => document.fonts.ready)
@@ -35,7 +35,7 @@ test('цілі дотику на головній — не менше 44 px', as
   expect(small).toEqual([])
 })
 
-test.describe('чисті адреси (history-режим)', () => {
+test.describe('чисті адреси (history-режим, SPA-fallback Workers)', () => {
   for (const path of ['/login', '/quiz', '/grade/8', '/lesson/g8-u05']) {
     test(`${path} відкривається напряму і після оновлення`, async ({ page }) => {
       await page.goto(path)

@@ -11,7 +11,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const DIST = join(import.meta.dirname, '..', 'dist')
-const TEXT = /\.(js|mjs|css|html|json|map|txt|svg|webmanifest)$|_redirects$/
+const TEXT = /\.(js|mjs|css|html|json|map|txt|svg|webmanifest)$|_(redirects|headers)$/
 
 const files = (dir: string): string[] =>
   readdirSync(dir).flatMap((name) => {
@@ -57,6 +57,14 @@ for (const file of files(DIST)) {
       console.error(`✗ ${relative(DIST, file)}: ${rule.name}: ${hit.slice(0, 24)}…`)
     }
   }
+}
+
+// SPA-fallback робить wrangler.jsonc (not_found_handling); правило `/* /index.html 200` у _redirects
+// Workers вважає нескінченним циклом і ігнорує — не повертаємо його
+const redirects = join(DIST, '_redirects')
+if (files(DIST).includes(redirects) && /\/index\.html\s+200/.test(readFileSync(redirects, 'utf8'))) {
+  found++
+  console.error('✗ _redirects: правило на /index.html 200 конфліктує з not_found_handling у wrangler.jsonc')
 }
 
 if (checked === 0) {

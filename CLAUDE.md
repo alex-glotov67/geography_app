@@ -1,12 +1,12 @@
 # CLAUDE.md — правила роботи в репозиторії «Географія 6–9»
 
-Повне технічне завдання — `SPEC.md` (версія 2.3.2). Макети — `docs/design/`. Прочитай його на початку кожної сесії.
+Повне технічне завдання — `SPEC.md` (версія 2.3.3). Макети — `docs/design/`. Прочитай його на початку кожної сесії.
 
 ## Контекст (коротко)
 - Інтерактивний ресурс уроків географії для 6–9 класів НУШ, навчальний рік 2026–2027, заклад загальної середньої освіти України.
 - Є уроки й тренування (без входу), акаунти вчителя й учнів, ДЗ з серверною перевіркою, кабінет вчителя, живий квіз на уроці.
 - Користувачі: учні (часто старі Android, слабкий інтернет), вчитель (ПК і проєктор).
-- Стек: React + Vite + TypeScript, TanStack Router/Query/Table, Zustand, React Hook Form + zod, Mantine, dnd-kit, vite-plugin-pwa; Supabase (Postgres, Auth, RLS, Realtime, Edge Functions на Deno), регіон ЄС; локальний Supabase CLI для розробки і CI, один хмарний prod-проєкт; хостинг — Cloudflare Pages; CI — GitHub Actions.
+- Стек: React + Vite + TypeScript, TanStack Router/Query/Table, Zustand, React Hook Form + zod, Mantine, dnd-kit, vite-plugin-pwa; Supabase (Postgres, Auth, RLS, Realtime, Edge Functions на Deno), регіон ЄС; локальний Supabase CLI для розробки і CI, один хмарний prod-проєкт; хостинг — Cloudflare Workers зі статичними ресурсами (assets-only, `wrangler.jsonc`, SPA через `not_found_handling`; Pages не використовуємо); CI — GitHub Actions.
 - Навчальна база: модельна програма НУШ «Географія. 6–9 класи» (наказ МОН №795 від 12.07.2021), підручники Гільберг Т., Довгань А., Совенко В., робочі зошити «Генеза», КТП вчителя.
 - Пілот: 8 клас. Дизайн затверджено на полотні; скриншоти — `docs/design/`, токени — розділ 13 SPEC.
 

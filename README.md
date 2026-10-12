@@ -7,7 +7,7 @@
 
 ## Стек
 
-React 19 + Vite + TypeScript · TanStack Router / Query · Zustand · Mantine (тема з токенів дизайну) · Supabase (Postgres, Auth, RLS, Storage, Realtime, Edge Functions) · Cloudflare Pages · GitHub Actions.
+React 19 + Vite + TypeScript · TanStack Router / Query · Zustand · Mantine (тема з токенів дизайну) · Supabase (Postgres, Auth, RLS, Storage, Realtime, Edge Functions) · Cloudflare Workers (static assets) · GitHub Actions.
 
 ## Швидкий старт
 
@@ -28,7 +28,9 @@ npm run dev
 | `npm run preview` | віддати `dist/` на http://localhost:4173 |
 | `npm run lint` / `typecheck` | ESLint / TypeScript |
 | `npm test` | Vitest (компоненти, тема) |
-| `npm run e2e` | Playwright: телефон і комп'ютер проти збірки |
+| `npm run e2e` | Playwright: телефон і комп'ютер проти збірки (через `wrangler dev`) |
+| `npm run preview:worker` | віддати `dist/` через `wrangler dev` — як на Cloudflare (SPA-fallback) |
+| `npm run deploy` | збірка + перевірка `dist/` + `wrangler deploy` (ручний деплой; основний — Workers Builds з `main`) |
 | `npm run check:dist` | у `dist/` немає секретів (service role, `sb_secret_`, приватні ключі) |
 | `npm run db:start` / `db:reset` / `db:stop` | локальний Supabase (потрібен Docker) |
 
@@ -45,7 +47,7 @@ src/
 supabase/                     config.toml, migrations/, functions/_shared/, seed.sql
 scripts/check-dist.ts         перевірка збірки
 e2e/                          Playwright
-public/_redirects             SPA-fallback для Cloudflare Pages
+wrangler.jsonc                Cloudflare Workers static assets: dist/ + SPA-fallback
 ```
 
 ## Що вже є (Фаза 0)
@@ -54,4 +56,5 @@ public/_redirects             SPA-fallback для Cloudflare Pages
 - Шрифти Golos Text, Unbounded, JetBrains Mono (латиниця, одна вага — логіни й паролі) — з пакетів `@fontsource` у бандлі (OFL), без CDN.
 - Головна «Вибір класу» за макетом `Main.dc.html` (стан гостя); інші маршрути — заглушки.
 - Базові компоненти: іконка рівня «сходинки висоти», плитка класу, фон з ізоліній.
-- CI: lint, типи, Vitest, збірка, перевірка `dist/`, e2e, локальний Supabase; ручний деплой БД на prod.
+- Хостинг: Cloudflare Workers зі статичними ресурсами (`wrangler.jsonc`, SPA-fallback без `_redirects`).
+- CI: lint, типи, Vitest, збірка, перевірка `dist/`, e2e через `wrangler dev`, локальний Supabase; ручний деплой БД на prod.
