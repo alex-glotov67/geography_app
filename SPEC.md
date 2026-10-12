@@ -1,7 +1,8 @@
 # SPEC: «Географія 6–9» — інтерактивний ресурс уроків
 
 > Технічне завдання для ШІ-агента в IDE (Claude Code, Cursor, Kiro тощо).
-> **Версія 2.3.2** · жовтень 2026 · навчальний рік 2026–2027.
+> **Версія 2.3.3** · жовтень 2026 · навчальний рік 2026–2027.
+> Зміни 2.3.3: фронтенд — Cloudflare Workers зі статичними ресурсами (assets-only, `wrangler.jsonc`, SPA через `not_found_handling`) замість Pages; `public/_redirects` прибрано; publishable key у клієнті.
 > Зміни 2.3.2: шрифти з пакетів `@fontsource` у бандлі; JetBrains Mono — латиниця, одна вага, лише логіни й паролі; формат імпорту довідника розділів і результатів (10.6); демо-розділи й демо-результати у Фазі 1; перший крок Фази 1 — стилі Mantine по компонентах і замір Lighthouse; з Фази 1 кожна фаза — окрема гілка і PR.
 > Зміни 2.3.1: стабільний `slug` уроку для адрес і QR; `school_id` в основних таблицях; видимість `secure`-змісту (призначення, поточне питання квізу через `quiz_sessions.current_question`); довідник `program_outcomes`; `sections.owner_id`; версії в `assignments` і `quiz_sessions`; бали квізу «частка × швидкість» і `coordinates` у квізі; `max_players`, гості в `quiz_players`; бекапи і keepalive — з Фази 2; `short_text` лише `secure`; без стовпця «Пароль»; моноширинний шрифт логінів; «Увійти» на головній; цілі дотику ≥ 44 px і в конструкторі.
 > Зміни 2.3: **зміст живе в базі**, а не у файлах репозиторію; конструктор уроку з блоків; банк завдань з редактором кожного типу; конструктор квізів; медіа в Supabase Storage; імпорт/експорт пакетів уроків (`.geo.zip`) і завдань з Excel.
@@ -71,7 +72,7 @@
 | Що | Рішення | Роль |
 |---|---|---|
 | Основа | React + Vite + TypeScript | |
-| Маршрутизація | TanStack Router, **history-режим** (чисті адреси `/lesson/g8-u05`) | адреси друкуються в QR і на картках входу, тому вони мають бути короткі й стабільні. На Cloudflare Pages — явне правило `public/_redirects`: `/* /index.html 200` |
+| Маршрутизація | TanStack Router, **history-режим** (чисті адреси `/lesson/g8-u05`) | адреси друкуються в QR і на картках входу, тому вони мають бути короткі й стабільні. SPA-fallback — `wrangler.jsonc`: `assets.not_found_handling: "single-page-application"` (усе, чого немає в `dist/`, віддається як `index.html` зі статусом 200). `public/_redirects` не використовуємо: правило `/* /index.html 200` Workers вважає нескінченним циклом і ігнорує |
 | Серверний стан | TanStack Query + `supabase-js` | запити, кеш, інвалідація; **без axios** |
 | Клієнтський стан | Zustand | відповіді в процесі, стан квізу на телефоні, налаштування вигляду |
 | Форми | React Hook Form + zod (`@hookform/resolvers`) | форми вчителя: видача ДЗ, імпорт, налаштування, редагування учня |
@@ -104,10 +105,10 @@ Postgres + Auth + RLS + Realtime + Edge Functions (Deno, TypeScript) + **Storage
 | Що | Рішення |
 |---|---|
 | Код | приватний репозиторій GitHub |
-| CI | GitHub Actions: lint, typecheck, Vitest, валідація змісту, локальний Supabase (`supabase start`) — міграції і тести RLS, перевірка відсутності ключів і секретів у збірці |
-| Хостинг фронту | **Cloudflare Pages** (публікація з приватного репозиторію; preview-збірки для гілок) |
+| CI | GitHub Actions: lint, typecheck, Vitest, валідація змісту, e2e проти `wrangler dev` (той самий SPA-режим, що й у prod), локальний Supabase (`supabase start`) — міграції, advisors і тести RLS, перевірка відсутності ключів і секретів у збірці |
+| Хостинг фронту | **Cloudflare Workers зі статичними ресурсами** (assets-only, без коду Worker): `wrangler.jsonc` у корені — ім'я `geography-app`, `assets.directory: "./dist"`, `not_found_handling: "single-page-application"`. Деплой — Workers Builds з приватного репозиторію GitHub: `main` → production, інші гілки → preview-URL. Запити до статичних ресурсів безкоштовні й без ліміту. Pages Cloudflare позначає як legacy, тому не використовуємо |
 | Міграції/функції | CI проганяє їх на локальному Supabase; деплой на prod — вручну (кнопка/тег) |
-| Секрети | GitHub Secrets, секрети Supabase; у клієнті лише `anon key` |
+| Секрети | GitHub Secrets, секрети Supabase; у клієнті лише publishable key (`sb_publishable_…`) |
 | Резервні копії | **обов'язкові з Фази 2** (на Free їх немає): щотижневий `pg_dump` і копія Storage з CI → зашифрований архів (age/gpg) → сховище вчителя (напр., Google Drive); ручне вивантаження з кабінету перед канікулами; відновлення перевіряється в локальний Supabase |
 | Моніторинг | безкоштовна перевірка доступності сайту і функцій з повідомленням вчителю |
 | Домен | опційно, власний короткий домен для карток входу і QR |
@@ -144,7 +145,8 @@ Postgres + Auth + RLS + Realtime + Edge Functions (Deno, TypeScript) + **Storage
 │  ├─ api/ (запити TanStack Query поверх supabase-js, згруповані за доменами)
 │  └─ lib/ (translit.ts, password-words.ts, offline-queue.ts, export-xlsx.ts)
 ├─ seed/                               # демо-пакети .geo.zip з позначкою «ДЕМО» для розробки і тестів
-├─ public/ (maps/, _redirects)          # шрифти — з @fontsource у бандлі (src/theme/fonts.css)
+├─ wrangler.jsonc                      # Cloudflare Workers static assets: dist/ + SPA-fallback
+├─ public/ (maps/)                     # шрифти — з @fontsource у бандлі (src/theme/fonts.css)
 ├─ supabase/
 │  ├─ migrations/ (*.sql: таблиці, індекси, RLS, view, функції, тригери)
 │  ├─ functions/
@@ -600,7 +602,7 @@ manifest.json      # formatVersion, створено, автор, перелік
 - [ ] Slow 3G і офлайн; повернення мережі під час ДЗ (черга) і під час квізу (перепідключення).
 - [ ] Українські символи (ґ, ї, є, ʼ) в імпорті (UTF-8 і Windows-1251), в іменах, PDF, CSV-експорті.
 - [ ] **RLS-тести** (автоматичні): учень не читає чужі `submissions`, `students`, ключі `secure`-завдань, зміст `secure`-завдань поза своїми призначеннями (до `opens_at` теж); вчитель не бачить чужих класів; **анонімний користувач** не читає й не пише даних учнів і вчителя, не читає `tasks`; з клієнта неможливо вставити рядок у `quiz_players`, `quiz_answers`, `submissions`.
-- [ ] Прямі адреси (`/login`, `/quiz`, `/lesson/<slug>`) відкриваються після оновлення сторінки і з QR (`_redirects` на preview Cloudflare).
+- [ ] Прямі адреси (`/login`, `/quiz`, `/lesson/<slug>`) відкриваються після оновлення сторінки і з QR: локально й у CI — `wrangler dev`, після деплою — на preview-URL Workers.
 - [ ] Ключі ДЗ і квізів відсутні в `dist/` (скрипт-перевірка в CI).
 - [ ] ДЗ: подвійний клік, ліміт спроб, після терміну, закрите ДЗ.
 - [ ] Квіз: 35 гравців одночасно, відповідь в останню секунду, повторна відповідь, вигнаний гравець, перевищення `max_players`; наступне питання недоступне до `quiz_advance()`; анонімні акаунти видалені після `finished`.
@@ -619,7 +621,7 @@ manifest.json      # formatVersion, створено, автор, перелік
 ## 16. Фази робіт і критерії приймання
 
 ### Фаза 0 — Каркас
-React + Vite + TS, TanStack Router/Query, Zustand, Mantine з темою з токенів (13.6), шрифти локально, базові компоненти (LevelIcon, GradeTile, ContourBackground), Vitest + Playwright, CI, Cloudflare Pages (prod + preview), локальний Supabase для розробки і CI, хмарний prod, `docs/setup.md`.
+React + Vite + TS, TanStack Router/Query, Zustand, Mantine з темою з токенів (13.6), шрифти локально, базові компоненти (LevelIcon, GradeTile, ContourBackground), Vitest + Playwright, CI, Cloudflare Workers static assets (`wrangler.jsonc`, prod + preview), локальний Supabase для розробки і CI, хмарний prod, `docs/setup.md`.
 **Приймання:** сайт відкривається на телефоні і ПК; прямі адреси працюють після оновлення сторінки; головна збігається з макетом `Main.dc.html`; CI зелений; у збірці нема секретів.
 
 ### Фаза 1 — Модель змісту, рушій і публічні уроки

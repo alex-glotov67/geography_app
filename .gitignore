@@ -26,3 +26,6 @@ sources/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Wrangler (локальний стан wrangler dev)
+.wrangler/

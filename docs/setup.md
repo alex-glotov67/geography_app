@@ -1,6 +1,6 @@
 # Налаштування сервісів
 
-Покроково: локальна розробка, GitHub, Supabase (prod), Cloudflare Pages. Секрети — лише в `.env.local`, секретах GitHub і Supabase; у git і в клієнтський код вони не потрапляють.
+Покроково: локальна розробка, GitHub, Supabase (prod), Cloudflare Workers (статичні ресурси). Секрети — лише в `.env.local`, секретах GitHub і Supabase; у git і в клієнтський код вони не потрапляють.
 
 ## 0. Умови безкоштовних планів (перевірено 12.10.2026)
 
@@ -22,7 +22,7 @@
 - бекапи робимо самі: `backup.yml` з Фази 2 (зашифрований `pg_dump` + копія Storage);
 - на канікулах: `keepalive.yml` (щотижневий запит до prod) — закладено за замовчуванням; рішення — за вчителем (SPEC 19.10). Якщо проєкт усе ж призупинився — розділ 3.5.
 
-**Cloudflare Pages Free** ([developers.cloudflare.com/pages/platform/limits](https://developers.cloudflare.com/pages/platform/limits/)): 500 збірок на місяць, 1 збірка одночасно, до 20 000 файлів, до 25 МіБ на файл, до 100 власних доменів, у `_redirects` — до 2 000 статичних і 100 динамічних правил.
+**Cloudflare Workers Free — статичні ресурси** ([billing](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/), [limits](https://developers.cloudflare.com/workers/platform/limits/)): запити до статичних ресурсів **безкоштовні й без ліміту**, зберігання — без доплати; до 20 000 файлів на версію, до 25 МіБ на файл. Ліміт Free-плану 100 000 запитів на добу задокументовано для Workers загалом; у нас коду Worker немає (assets-only), а запити до статичних ресурсів billing-сторінка називає безкоштовними й необмеженими. Pages Cloudflare позначає як legacy, тому не використовуємо.
 
 > Умови змінюються. Перед Фазою 2 (поява реальних учнів) звір таблиці з посиланнями вище й онови дату.
 
@@ -90,7 +90,7 @@ Workflows:
 
 ### 3.1 Створення
 1. supabase.com → New project: назва `geo-prod`, **регіон — ЄС** (напр. Frankfurt `eu-central-1`), план Free. Пароль бази збережи в менеджері паролів → секрет `SUPABASE_DB_PASSWORD`.
-2. **Project Settings → API Keys**: скопіюй `Project URL` і **publishable key** (`sb_publishable_…`) — вони публічні, підуть у Cloudflare Pages. Secret key (`sb_secret_…`) і legacy `service_role` **нікуди не копіюй**, крім секретів Edge Functions (з'являться у Фазі 2).
+2. **Project Settings → API Keys**: скопіюй `Project URL` і **publishable key** (`sb_publishable_…`) — вони публічні, підуть у змінні збірки Cloudflare (розділ 4). Secret key (`sb_secret_…`) і legacy `service_role` **нікуди не копіюй**, крім секретів Edge Functions (з'являться у Фазі 2).
 3. **Integrations → Data API → Settings**: переконайся, що нові таблиці **не** відкриваються автоматично (для проєктів, створених після 30.05.2026, це за замовчуванням). Схема `public` має бути у списку exposed schemas.
 
 ### 3.2 Auth
@@ -109,31 +109,62 @@ Workflows:
 2. Перевір сайт: вхід учня, відкриття уроку.
 3. Якщо пауза повторюється на канікулах — перевір, що `keepalive.yml` увімкнений і проходить (Actions).
 
-## 4. Cloudflare Pages
+## 4. Cloudflare Workers — статичні ресурси
 
-1. dash.cloudflare.com → **Workers & Pages → Create → Pages → Connect to Git** → обери репозиторій.
-2. Налаштування збірки:
+Фронт — це Worker **без коду** (assets-only): Cloudflare віддає файли з `dist/`, а все, чого там немає (`/login`, `/lesson/<slug>`…), — як `index.html` зі статусом 200. Конфіг — [`wrangler.jsonc`](../wrangler.jsonc) у корені:
+
+```jsonc
+{
+  "name": "geography-app",
+  "compatibility_date": "2026-10-12",
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" }
+}
+```
+
+> **`_redirects` не потрібен і шкодить.** SPA-fallback робить `not_found_handling`. Правило `/* /index.html 200` Workers визнає нескінченним циклом і ігнорує (перевірено `wrangler dev`, 12.10.2026); `npm run check:dist` не пропустить його назад у збірку.
+
+### 4.1 Підключення репозиторію (Workers Builds)
+1. dash.cloudflare.com → **Workers & Pages → Create application → Import a repository** → GitHub → `geography_app`.
+2. Налаштування:
 
    | Поле | Значення |
    |---|---|
+   | Project name | `geography-app` — **має збігатися з `name` у `wrangler.jsonc`**, інакше збірка впаде |
    | Production branch | `main` |
-   | Framework preset | None |
    | Build command | `npm run build` |
-   | Build output directory | `dist` |
+   | Deploy command | `npx wrangler deploy` (за замовчуванням) |
+   | Non-production branch deploy command | `npx wrangler preview` (за замовчуванням: Preview-URL для гілок і PR) |
+   | Root directory | `/` |
 
-3. **Environment variables** (Production і Preview):
+3. **Settings → Build → Variables and secrets** — це змінні **збірки** (Vite вшиває `VITE_*` у бандл під час `npm run build`; у рантаймі їх немає):
 
    | Змінна | Значення |
    |---|---|
-   | `NODE_VERSION` | `22.19.0` |
+   | `NODE_VERSION` | `22.19.0` (як у `.nvmrc`; Vite 8 і Wrangler потребують Node ≥ 22) |
    | `VITE_SUPABASE_URL` | Project URL з 3.1 |
    | `VITE_SUPABASE_PUBLISHABLE_KEY` | publishable key з 3.1 (`sb_publishable_…`) |
 
-   Якщо раніше вже задано `VITE_SUPABASE_ANON_KEY` — він працює як запасний варіант, але краще замінити на publishable key.
+   `VITE_SUPABASE_ANON_KEY` теж працює як запасний варіант, але краще publishable key. Secret key сюди не класти.
 
-4. Кожна гілка/PR отримує **preview-адресу**; `main` — production.
-5. SPA-fallback задано явно в `public/_redirects` (`/* /index.html 200`). Перевірка після першого деплою: відкрий напряму `https://<адреса-сайту>/lesson/test` і онови сторінку — має відкритися сторінка застосунку, а не 404 Cloudflare.
-6. За бажанням — власний короткий домен (Custom domains) для карток входу й QR (SPEC 19.8).
+4. Push у `main` → новий деплой на `https://geography-app.<твій-субдомен>.workers.dev`. Push в іншу гілку → preview-URL (видно в **Deployments / Versions** і в перевірці PR на GitHub).
+
+### 4.2 Перевірка після першого деплою
+- Відкрий напряму `https://<адреса>/lesson/test` і онови сторінку — має відкритися застосунок (заглушка «Урок»), а не 404.
+- Те саме для `/login`, `/quiz`, `/grade/8`.
+- Головна має виглядати як `docs/design/screens/Main.dc.html`.
+
+### 4.3 Якщо раніше створено проєкт Pages
+Після першого успішного деплою Worker — вимкни автоматичні деплої в проєкті Pages (**Settings → Builds → Disable automatic deployments**) або видали його, щоб не було двох сайтів.
+
+### 4.4 Ручний деплой (запасний варіант)
+```bash
+npx wrangler login     # один раз, вхід у браузері
+npm run deploy         # збірка + check:dist + wrangler deploy
+```
+Змінні `VITE_*` при цьому беруться з `.env.local` / `.env.production.local` на твоїй машині — для prod там мають бути значення `geo-prod`.
+
+### 4.5 Домен
+За бажанням — власний короткий домен (**Settings → Domains & Routes → Add → Custom domain**) для карток входу й QR (SPEC 19.8).
 
 ## 5. Моніторинг (Фаза 2)
 Безкоштовна перевірка доступності сайту й функцій з повідомленням вчителю — налаштовується разом із появою реальних учнів.

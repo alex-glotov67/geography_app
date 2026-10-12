@@ -1,0 +1,12 @@
+// Фронтенд на Cloudflare Workers зі статичними ресурсами (assets-only, без коду Worker) — SPEC 3.5.
+// Збірка Vite кладе файли в ./dist; усе, чого там немає (/login, /lesson/<slug>…), віддається як
+// index.html зі статусом 200 — SPA-fallback для history-режиму роутера.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "geography-app",
+  "compatibility_date": "2026-10-12",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
 /**
- * e2e проти production-збірки (`vite preview`), як на Cloudflare Pages.
+ * e2e проти production-збірки, яку віддає `wrangler dev` з wrangler.jsonc — той самий SPA-режим
+ * статичних ресурсів (not_found_handling), що й на Cloudflare Workers.
  * Два профілі: телефон (основний для учнів) і комп'ютер (SPEC 13.4).
  */
 export default defineConfig({
@@ -11,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: 'http://localhost:4173',
+    baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
     locale: 'uk-UA',
   },
@@ -20,8 +21,8 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
   ],
   webServer: {
-    command: 'npm run preview',
-    url: 'http://localhost:4173',
+    command: 'npm run preview:worker',
+    url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },
