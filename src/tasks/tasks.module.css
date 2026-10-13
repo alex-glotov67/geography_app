@@ -1,0 +1,462 @@
+/* Спільний вигляд завдань — макети Tasks.dc.html і MoreTasks.dc.html. Цілі дотику ≥ 44 px. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius-tile);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.prompt {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.hint {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Варіант відповіді: справжній input всередині label */
+.option {
+  position: relative;
+  min-height: 52px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 17px;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.option[data-checked='true'] {
+  border: 2px solid var(--water);
+  padding: 9px 13px;
+  background: var(--water-tint);
+}
+
+.option:focus-within {
+  outline: 3px solid var(--water);
+  outline-offset: 2px;
+}
+
+.option[data-result='ok'] {
+  border-color: var(--ok-fg);
+  background: var(--ok-bg);
+}
+
+.option[data-result='err'] {
+  border-color: var(--err-fg);
+  background: var(--err-bg);
+}
+
+.nativeInput {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+/* Кружок (одна відповідь) і квадрат (кілька) */
+.mark {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 2px solid var(--switch-off);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mark[data-shape='circle'] {
+  border-radius: 11px;
+}
+
+.mark[data-shape='square'] {
+  border-radius: 6px;
+}
+
+.option[data-checked='true'] .mark {
+  border-color: var(--water);
+}
+
+.option[data-checked='true'] .mark[data-shape='circle']::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--water);
+}
+
+.option[data-checked='true'] .mark[data-shape='square'] {
+  background: var(--water);
+}
+
+.option[data-checked='true'] .mark[data-shape='square']::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  margin-top: -3px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+
+/* Рядок «пігулок»: відповідність, так/ні */
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.rowTitle {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  position: relative;
+  min-height: 44px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.chip[data-checked='true'] {
+  border: 2px solid var(--water);
+  padding: 0 13px;
+  background: var(--water);
+  color: #fff;
+}
+
+.chip:focus-within {
+  outline: 3px solid var(--water);
+  outline-offset: 2px;
+}
+
+.chipsWide .chip {
+  flex: 1 1 0;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.rowResult {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rowResult[data-result='ok'] {
+  color: var(--ok-fg);
+}
+
+.rowResult[data-result='err'] {
+  color: var(--err-fg);
+}
+
+/* Кнопки */
+.primary {
+  min-height: 50px;
+  border-radius: var(--radius-control);
+  border: 0;
+  background: var(--water);
+  color: #fff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary:hover {
+  background: var(--water-dark);
+}
+
+.secondary {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.iconButton {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Зворотний зв'язок */
+.feedback {
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.feedback[data-tone='ok'] {
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+.feedback[data-tone='partial'] {
+  background: var(--near-bg);
+  color: var(--near-fg);
+}
+
+.feedback[data-tone='err'] {
+  background: var(--err-bg);
+  color: var(--err-fg);
+}
+
+.feedback[data-tone='info'] {
+  background: var(--paper-tint);
+  color: var(--ink-2);
+}
+
+/* Упорядкування */
+.orderItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+}
+
+.orderNum {
+  width: 18px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.orderText {
+  flex-grow: 1;
+  font-size: 16px;
+}
+
+/* Групи */
+.pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.card2 {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.card2[aria-pressed='true'] {
+  border: 2px solid var(--water);
+  background: var(--water-tint);
+}
+
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  min-height: 130px;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line);
+}
+
+.groupButton {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px dashed var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  padding: 0 10px;
+}
+
+.groupButton:not(:disabled):hover {
+  border-color: var(--water);
+}
+
+.placed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 4px 0 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.placed[data-result='ok'] {
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+.placed[data-result='err'] {
+  background: var(--err-bg);
+  color: var(--err-fg);
+}
+
+/* Пропуски */
+.blankText {
+  margin: 0;
+  font-size: 17px;
+  line-height: 2.4;
+}
+
+.blankField {
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: 0 4px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 17px;
+  vertical-align: middle;
+}
+
+.blankField[data-result='ok'] {
+  border: 2px solid var(--ok-fg);
+  background: var(--ok-bg);
+}
+
+.blankField[data-result='err'] {
+  border: 2px solid var(--err-fg);
+  background: var(--err-bg);
+}
+
+/* Число */
+.numberRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.numberInput {
+  width: 160px;
+  height: 52px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 18px;
+}
+
+.unit {
+  font-size: 17px;
+  color: var(--ink-2);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -7,6 +7,7 @@ import {
   createRootRoute,
   createRouter,
 } from '@tanstack/react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { routeTree } from '@/router'
 import { cssVariablesResolver, theme } from '@/theme/mantine-theme'
 
@@ -29,8 +30,15 @@ export async function renderWithRouter(ui: ReactElement) {
 
 /** Рендер застосунку за адресою — з усіма маршрутами. */
 export async function renderApp(path: string) {
-  const router = createRouter({ routeTree, history: createMemoryHistory({ initialEntries: [path] }) })
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const router = createRouter({ routeTree, context: { queryClient }, history: createMemoryHistory({ initialEntries: [path] }) })
   await router.load()
-  const result = render(withMantine(<RouterProvider router={router} />))
-  return { ...result, router }
+  const result = render(
+    withMantine(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    ),
+  )
+  return { ...result, router, queryClient }
 }

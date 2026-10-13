@@ -35,3 +35,14 @@
   line-height: 1.5;
   color: var(--ink-2);
 }
+
+.retry {
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--water);
+  text-decoration: underline;
+  cursor: pointer;
+}

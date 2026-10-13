@@ -169,6 +169,26 @@
       "is_interactive": true,
       "expand": "fill",
       "page": "teacher"
+    },
+    "Splash.dc.html": {
+      "x": 3760,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "9. Початковий екран",
+      "is_interactive": true,
+      "radius": 28,
+      "page": "phone"
+    },
+    "LessonSkeleton.dc.html": {
+      "x": 4230,
+      "y": 0,
+      "w": 390,
+      "h": 1200,
+      "title": "10. Урок завантажується",
+      "is_interactive": true,
+      "radius": 28,
+      "page": "phone"
     }
   },
   "createdOnFiles": {
@@ -199,7 +219,7 @@
     },
     "t1": {
       "kind": "title1",
-      "maxW": 3680,
+      "maxW": 4620,
       "page": "phone",
       "text": "Географія 6–9: екрани учня (телефон)",
       "w": 240,
@@ -232,6 +252,14 @@
       "w": 240,
       "x": 0,
       "y": -300
+    },
+    "s2": {
+      "x": 3760,
+      "y": 1320,
+      "text": "Splash малюється з index.html до запуску застосунку, системним шрифтом; ховається, коли застосунок і шрифти готові, але не пізніше 1,5 с. Скелетон має ту саму форму, що й готова сторінка, тож нічого не стрибає. З prefers-reduced-motion анімацій немає.",
+      "w": 420,
+      "fill": "teal",
+      "page": "phone"
     }
   },
   "order": [
@@ -251,7 +279,9 @@
     "QuizBoard.dc.html",
     "QuizJoin.dc.html",
     "LessonBuilder.dc.html",
-    "TaskEditor.dc.html"
+    "TaskEditor.dc.html",
+    "Splash.dc.html",
+    "LessonSkeleton.dc.html"
   ],
   "pages": [
     {

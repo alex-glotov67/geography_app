@@ -2,6 +2,8 @@
 
 Покроково: локальна розробка, GitHub, Supabase (prod), Cloudflare Workers (статичні ресурси). Секрети — лише в `.env.local`, секретах GitHub і Supabase; у git і в клієнтський код вони не потрапляють.
 
+**Prod:** https://geography-app.alexglotov67.workers.dev/ (Worker `geography-app`, деплой з `main` через Workers Builds). Фаза 0 прийнята 12.10.2026; перевірка зі шкільної мережі — окремо (TODO: результат дописати сюди).
+
 ## 0. Умови безкоштовних планів (перевірено 12.10.2026)
 
 **Supabase Free** ([supabase.com/pricing](https://supabase.com/pricing)):
@@ -48,6 +50,8 @@ npm run db:start       # Postgres, Auth, Storage, Realtime, Studio у Docker
 
 **Таблиці не відкриваються в API автоматично.** У `supabase/config.toml` стоїть `auto_expose_new_tables = false` — так само, як у хмарних проєктах, створених після 30.05.2026 ([changelog](https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically)). Тому кожна міграція з новою таблицею містить і `GRANT` для потрібних ролей (`anon`, `authenticated`), і `enable row level security` з політиками. `GRANT` вирішує, чи таблиця взагалі доступна через API, а RLS — які рядки. Перевірено локально: без `GRANT` — `401 permission denied`; з `GRANT` і RLS без політик — порожній результат. Після зміни цього параметра потрібен `npm run db:reset` (привілеї задаються при створенні бази).
 
+Демо-зміст (лише локально): `npm run db:reset && npm run seed` — довідник із `seed/demo-outcomes.csv` і урок із `seed/demo-lesson/` (пакується в `.geo.zip` і проходить той самий імпорт, що й справжні пакети). Відкрий http://localhost:5173/grade/8.
+
 Корисне:
 
 ```bash
@@ -57,6 +61,10 @@ npx supabase migration new <назва>   # нова міграція в supabas
 npx supabase db lint --level warning  # помилки в SQL-функціях
 npx supabase db advisors --local      # безпека й продуктивність (RLS, індекси, security definer)
 ```
+
+**Залежності з ручним оновленням:**
+- **SheetJS** (з Фази 2, XLSX): ставиться не з npm (пакет `xlsx` там застарів і має відому вразливість), а офіційним тарболом із зафіксованою версією: `https://cdn.sheetjs.com/xlsx-<версія>/xlsx-<версія>.tgz`. `npm update` його не оновлює — раз на семестр перевір [cdn.sheetjs.com](https://cdn.sheetjs.com/) і [список змін](https://docs.sheetjs.com/docs/miscellany/changelog), заміни URL у `package.json`, `npm install`, прожени тести імпорту.
+- **Метрики fallback-шрифтів** (`src/theme/font-metrics.css`): після оновлення `@fontsource/*` — `npm run fonts:metrics` і закомітити результат.
 
 > Що таке Supabase: Postgres + готові Auth, Storage, Realtime і Edge Functions (серверні функції на Deno). Фронт ходить у базу напряму через `supabase-js`, а що кому можна — вирішують політики Row Level Security у самій базі. Тому кожна таблиця — з RLS і тестами.
 

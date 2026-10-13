@@ -1,0 +1,53 @@
+[
+  { "id": "t-forms", "type": "single_choice", "level": "base", "grp": "ГР1", "visibility": "open",
+    "content": { "prompt": "ДЕМО: які форми рельєфу переважають на рівнинній місцевості?", "options": [
+      { "id": "a", "text": "Гори" }, { "id": "b", "text": "Низовини й височини" }, { "id": "c", "text": "Вулкани" } ] },
+    "key": { "correct": "b" },
+    "hint": "Згадай, що таке рівнина.",
+    "feedback": { "correct": "Так! Рівнини — це низовини й височини.", "incorrect": "Не зовсім. Подивись визначення в «Ключових термінах»." } },
+  { "id": "t-plains", "type": "multiple_choice", "level": "base", "grp": "ГР1", "visibility": "open",
+    "content": { "prompt": "ДЕМО: що з цього — рівнини?", "options": [
+      { "id": "a", "text": "Низовина" }, { "id": "b", "text": "Гори" }, { "id": "c", "text": "Височина" }, { "id": "d", "text": "Гірський хребет" } ] },
+    "key": { "correct": ["a", "c"] } },
+  { "id": "t-colors", "type": "true_false", "level": "middle", "grp": "ГР1", "visibility": "open",
+    "content": { "statements": [
+      { "id": "s1", "text": "Низовини на фізичній карті позначають зеленим кольором." },
+      { "id": "s2", "text": "Височини на фізичній карті позначають синім кольором." },
+      { "id": "s3", "text": "Гори на фізичній карті позначають коричневим кольором." } ] },
+    "key": { "answers": { "s1": true, "s2": false, "s3": true } } },
+  { "id": "t-match", "type": "matching", "level": "middle", "grp": "ГР2", "visibility": "open",
+    "content": { "prompt": "ДЕМО: встанови відповідність — форма рельєфу і висота над рівнем моря",
+      "left": [ { "id": "low", "text": "Низовина" }, { "id": "mid", "text": "Височина" }, { "id": "high", "text": "Гори" } ],
+      "right": [ { "id": "r1", "text": "до 200 м" }, { "id": "r2", "text": "200–500 м" }, { "id": "r3", "text": "понад 500 м" } ] },
+    "key": { "pairs": { "low": "r1", "mid": "r2", "high": "r3" } } },
+  { "id": "t-fill", "type": "fill_blanks", "level": "middle", "grp": "ГР1", "visibility": "open",
+    "content": { "text": "Рівнина з висотами до 200 м — це {{b1}}, а від 200 до 500 м — {{b2}}.", "mode": "select",
+      "options": { "b1": ["низовина", "височина", "гори"], "b2": ["низовина", "височина", "гори"] } },
+    "key": { "blanks": { "b1": ["низовина"], "b2": ["височина"] } } },
+  { "id": "t-order", "type": "ordering", "level": "sufficient", "grp": "ГР2", "visibility": "open",
+    "content": { "prompt": "ДЕМО: розташуй від найнижчого до найвищого", "items": [
+      { "id": "a", "text": "Височина" }, { "id": "b", "text": "Гори" }, { "id": "c", "text": "Низовина" } ] },
+    "key": { "correctOrder": ["c", "a", "b"] },
+    "feedback": { "incorrect": "Згадай: низовини до 200 м, височини 200–500 м." } },
+  { "id": "t-groups", "type": "categorize", "level": "sufficient", "grp": "ГР2", "visibility": "open",
+    "content": { "prompt": "ДЕМО: розподіли рівнини за групами",
+      "groups": [ { "id": "low", "title": "Низовини" }, { "id": "mid", "title": "Височини" } ],
+      "cards": [ { "id": "c1", "text": "Поліська" }, { "id": "c2", "text": "Волинська" }, { "id": "c3", "text": "Причорноморська" }, { "id": "c4", "text": "Подільська" } ] },
+    "key": { "groups": { "c1": "low", "c2": "mid", "c3": "low", "c4": "mid" } } },
+  { "id": "t-scale", "type": "numeric", "level": "high", "grp": "ГР3", "visibility": "open",
+    "content": { "prompt": "ДЕМО: на карті масштабу 1 : 1 000 000 відстань між двома точками — 3,5 см. Яка відстань на місцевості?", "unit": "км" },
+    "key": { "answer": 35, "tolerance": 0 },
+    "hint": "В 1 см на такій карті — 10 км." },
+
+  { "id": "hw-1", "type": "single_choice", "level": "base", "grp": "ГР1", "visibility": "secure",
+    "content": { "prompt": "ДЕМО (ДЗ): яким кольором на фізичній карті показують низовини?", "options": [
+      { "id": "a", "text": "Коричневим" }, { "id": "b", "text": "Зеленим" }, { "id": "c", "text": "Синім" } ] },
+    "key": { "correct": "b" } },
+  { "id": "hw-2", "type": "numeric", "level": "sufficient", "grp": "ГР3", "visibility": "secure",
+    "content": { "prompt": "ДЕМО (ДЗ): на карті масштабу 1 : 500 000 відстань — 4 см. Скільки це кілометрів?", "unit": "км" },
+    "key": { "answer": 20, "tolerance": 0 } },
+  { "id": "q-1", "type": "single_choice", "level": "base", "grp": "ГР1", "visibility": "secure",
+    "content": { "prompt": "ДЕМО (квіз): гори на фізичній карті — це…", "options": [
+      { "id": "a", "text": "зелений колір" }, { "id": "b", "text": "жовтий колір" }, { "id": "c", "text": "коричневий колір" }, { "id": "d", "text": "синій колір" } ] },
+    "key": { "correct": "c" } }
+]

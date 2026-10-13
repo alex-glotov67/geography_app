@@ -29,3 +29,6 @@ sources/
 
 # Wrangler (локальний стан wrangler dev)
 .wrangler/
+
+# Звіти Lighthouse (npm run perf)
+.lighthouse/

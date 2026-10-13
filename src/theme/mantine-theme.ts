@@ -4,11 +4,13 @@ import {
   Card,
   Input,
   Paper,
+  Skeleton,
   createTheme,
   type CSSVariablesResolver,
   type MantineSize,
 } from '@mantine/core'
 import { palette } from './palette'
+import classes from './components.module.css'
 
 /**
  * Висоти елементів керування: усі ≥ 44 px (ціль дотику), основні дії — 52–54 px (SPEC 13.3).
@@ -77,6 +79,11 @@ export const theme = createTheme({
     }),
     Paper: Paper.extend({
       defaultProps: { shadow: undefined },
+    }),
+    // Скелетони (SPEC 13.7): кольори з токенів, радіус рядка тексту — 6 px, як у LessonSkeleton.dc.html
+    Skeleton: Skeleton.extend({
+      defaultProps: { radius: 6 },
+      classNames: { root: classes.skeleton },
     }),
   },
 })

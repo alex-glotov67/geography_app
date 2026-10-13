@@ -1,0 +1,10 @@
+[
+  { "id": "contours", "file": "media/contours.svg", "kind": "image", "width": 640, "height": 360,
+    "alt": "Схема: замкнені горизонталі навколо вершини, ближче до вершини лінії густіші",
+    "caption": "ДЕМО: горизонталі на схемі", "source": "ДЕМО — схема намальована для ресурсу", "license": "CC0" },
+  { "id": "profile-low", "file": "media/profile-low.svg", "kind": "image", "width": 640, "height": 240,
+    "alt": "Схематичний профіль майже рівної поверхні", "source": "ДЕМО — схема намальована для ресурсу", "license": "CC0" },
+  { "id": "profile-high", "file": "media/profile-high.svg", "kind": "image", "width": 640, "height": 240,
+    "alt": "Схематичний профіль з високими гострими вершинами", "source": "ДЕМО — схема намальована для ресурсу", "license": "CC0" },
+  { "id": "worksheet", "file": "media/worksheet.pdf", "kind": "pdf", "source": "ДЕМО — аркуш створено для ресурсу", "license": "CC0" }
+]

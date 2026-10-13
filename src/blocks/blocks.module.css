@@ -1,0 +1,354 @@
+/* Блоки уроку — макети Lesson.dc.html (телефон) і LessonDesktop.dc.html. Кольори — лише токени. */
+
+.list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* Форматований текст */
+.rich {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 34em;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.rich p,
+.rich ul,
+.rich ol,
+.rich h3 {
+  margin: 0;
+}
+
+.rich h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.rich ul,
+.rich ol {
+  padding-left: 22px;
+}
+
+.simpleBox {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--ok-bg);
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+/* Терміни */
+.term {
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.termButton {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.termButton svg {
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.termButton[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.termDef {
+  margin: 0;
+  padding: 0 16px 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Відео: обкладинка-кнопка, iframe лише після натискання (SPEC 8.1, 12) */
+.videoCover {
+  position: relative;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--video-bg);
+  color: #fff;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.play {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.videoMeta {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.videoFrame {
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--video-bg);
+}
+
+/* Зображення */
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  background: var(--paper-tint);
+}
+
+.caption {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.credit {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+/* Виділений блок */
+.callout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.callout[data-variant='interesting'] {
+  background: var(--water-tint);
+}
+
+.callout[data-variant='attention'] {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.callout[data-variant='local'] {
+  background: var(--near-bg);
+  color: var(--near-fg);
+}
+
+.calloutTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* Таблиця */
+.tableScroll {
+  overflow-x: auto;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-top: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+
+.table thead th {
+  border-top: 0;
+  background: var(--surface-sunken);
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Файл і рядки рівнів */
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.linkRow:hover {
+  border-color: var(--line-strong);
+}
+
+.linkTitle {
+  flex-grow: 1;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.linkMeta {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.fileBadge {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--err-bg);
+  color: var(--err-fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ДЗ — синя картка (Lesson.dc.html) */
+.homework {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius-tile);
+  background: var(--water);
+  color: #fff;
+}
+
+.homework h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.homeworkMeta {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.homeworkAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--water-dark);
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.homeworkAction:hover {
+  color: var(--water-dark);
+  background: var(--water-tint);
+}
+
+.srOnlyCaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* Комп'ютер: терміни сіткою у дві колонки (SPEC 13.4) */
+.termGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+@media (min-width: $bp-desktop) {
+  .termGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,261 @@
+/*
+ * Розмітка сторінки уроку (макети Lesson.dc.html, LessonSkeleton.dc.html).
+ * Спільна для готової сторінки і її скелетона — однакові розміри, нульовий зсув (SPEC 13.7).
+ */
+.page {
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+.header {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-tint);
+  padding: 20px var(--page-x) 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main {
+  padding: 24px var(--page-x);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 760px;
+  box-sizing: border-box;
+}
+
+/* Колонки: на телефоні — одна; на комп'ютері — список уроків розділу ліворуч (LessonDesktop.dc.html) */
+.columns {
+  display: block;
+}
+
+.aside {
+  display: none;
+}
+
+.content {
+  min-width: 0;
+}
+
+.headerTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.back {
+  position: relative;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--water);
+}
+
+.kicker {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.textbook {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.badge {
+  font-size: 13px;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+/* Перемикач «Спрощений режим» — пігулка з повзунком (Lesson.dc.html) */
+.switch {
+  position: relative;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  padding: 0 14px 0 6px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.switchTrack {
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--switch-off);
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  box-sizing: border-box;
+}
+
+.switchTrack::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.switch[aria-checked='true'] .switchTrack {
+  background: var(--grade-6);
+  justify-content: flex-end;
+}
+
+.asideTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0 12px 8px;
+}
+
+.asideLink {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 6px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--ink-2);
+}
+
+.asideLink[aria-current='page'] {
+  background: var(--water);
+  color: #fff;
+  font-weight: 600;
+}
+
+.asideNum {
+  width: 20px;
+  font-weight: 700;
+}
+
+@media (min-width: $bp-desktop) {
+  .columns {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .header {
+    padding: 32px;
+    border-radius: 20px;
+  }
+
+  .h1 {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+
+  .main {
+    padding: 36px 0 0;
+    gap: 36px;
+    max-width: none;
+  }
+
+  .h2 {
+    font-size: 22px;
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTight {
+  composes: section;
+  gap: 10px;
+}
+
+.h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Рядок терміна (згорнутий) — 52 px */
+.termRow {
+  height: 52px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+/* Рядок рівня завдань — 60 px */
+.levelRow {
+  height: 60px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+/* Обкладинка відео: 196 px на телефоні, 16:9 на ширших */
+.video {
+  height: 196px;
+  border-radius: var(--radius-card);
+}
+
+@media (min-width: $bp-tablet) {
+  .video {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+}

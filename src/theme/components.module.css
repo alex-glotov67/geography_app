@@ -1,0 +1,14 @@
+/* Перевизначення компонентів Mantine під макети (SPEC 13.6): підключаються через theme.components. */
+
+/* Skeleton: кольори з токенів; без підкладки кольору сторінки, щоб на білих картках не було плям */
+.skeleton::before {
+  background-color: transparent !important;
+}
+
+.skeleton::after {
+  background-color: var(--track) !important;
+}
+
+.skeleton[data-tone='tint']::after {
+  background-color: var(--track-tint) !important;
+}

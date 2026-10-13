@@ -2,6 +2,9 @@
  * Шрифти — локальні woff2 з пакетів @fontsource (SIL OFL 1.1), Vite кладе їх у збірку. Без CDN.
  * Лише кирилиця й латиниця і лише потрібні накреслення (SPEC 13.2).
  */
+/* Fallback-шрифти з метриками веб-шрифтів — менше зсуву макета під час завантаження (SPEC 13.7) */
+@import './font-metrics.css';
+
 @import '@fontsource/golos-text/cyrillic-400.css';
 @import '@fontsource/golos-text/latin-400.css';
 @import '@fontsource/golos-text/cyrillic-500.css';

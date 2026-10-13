@@ -33,6 +33,14 @@ npm run dev
 | `npm run deploy` | збірка + перевірка `dist/` + `wrangler deploy` (ручний деплой; основний — Workers Builds з `main`) |
 | `npm run check:dist` | у `dist/` немає секретів (service role, `sb_secret_`, приватні ключі) |
 | `npm run db:start` / `db:reset` / `db:stop` | локальний Supabase (потрібен Docker) |
+| `npm run db:test` | pgTAP: RLS і версії змісту |
+| `npm run db:types` | типи БД → `src/types/database.types.ts` |
+| `npm run seed` | демо-довідник і демо-урок у локальний Supabase (лише локально) |
+| `npm run validate` | перевірка пакетів `.geo.zip` / тек-джерел у `seed/` |
+| `npm run import:outcomes -- файл.csv` | довідник розділів і результатів з CSV (формат SPEC 10.6) у локальний Supabase |
+| `npm run test:coverage` | Vitest + 100 % покриття `@shared/scoring` |
+| `npm run perf -- / /lesson/<slug>` | Lighthouse на телефоні → `docs/perf.md` |
+| `npm run fonts:metrics` | метрики fallback-шрифтів (після оновлення `@fontsource`) |
 
 ## Структура
 
@@ -50,7 +58,17 @@ e2e/                          Playwright
 wrangler.jsonc                Cloudflare Workers static assets: dist/ + SPA-fallback
 ```
 
-## Що вже є (Фаза 0)
+Prod: **https://geography-app.alexglotov67.workers.dev/**
+
+## Фаза 1 — модель змісту, рушій і публічні уроки
+
+- Зміст у Postgres: робочі копії вчителя й знімки публікації (`lesson_versions`, `task_versions`), які лише й бачать гість і учень; RLS + явні GRANT, pgTAP.
+- zod-схеми уроку, блоків, 8 типів завдань; `@shared/scoring` (100 % гілок).
+- Екрани без входу: класи, урок (телефон і комп'ютер), тренування за рівнями, спрощений режим; скелетони, splash, fallback-шрифти — без зсуву макета.
+- Пакети `.geo.zip` (формат v1), довідник програми з CSV, демо-зміст у `seed/` — лише локально й у CI.
+- Заміри — `docs/perf.md`.
+
+## Фаза 0 — закрито 12.10.2026
 
 - Каркас застосунку, тема Mantine з дизайн-токенів (палітри, шрифти, висоти елементів ≥ 44 px, без тіней).
 - Шрифти Golos Text, Unbounded, JetBrains Mono (латиниця, одна вага — логіни й паролі) — з пакетів `@fontsource` у бандлі (OFL), без CDN.

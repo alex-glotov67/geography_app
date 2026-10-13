@@ -12,6 +12,7 @@ export default tseslint.config(
       'playwright-report',
       'test-results',
       'docs/design',
+      'src/types/database.types.ts', // генерується: npm run db:types
       'supabase/functions/**/!(_shared)/**',
     ],
   },
@@ -29,6 +30,19 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // SPEC 13.7: замість спінерів — скелетони тієї ж форми (src/components/Skeletons.tsx)
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@mantine/core',
+              importNames: ['Loader', 'LoadingOverlay'],
+              message: 'Спінери заборонено (SPEC 13.7) — використовуй скелетони з src/components/Skeletons.tsx',
+            },
+          ],
+        },
+      ],
     },
   },
 )
