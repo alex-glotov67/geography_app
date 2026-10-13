@@ -40,59 +40,69 @@ const TERM_WIDTHS = ['36%', '44%', '40%', '28%']
 const TEXT_WIDTHS = ['100%', '96%', '92%', '100%', '88%', '60%']
 const LEVEL_WIDTHS = ['30%', '34%', '38%', '30%']
 
-/** Сторінка уроку, що вантажиться (макет LessonSkeleton.dc.html). */
+/** Сторінка уроку, що вантажиться (макет LessonSkeleton.dc.html); та сама розмітка, що й LessonPage. */
 export function LessonPageSkeleton() {
   return (
     <SkeletonRegion label="Урок завантажується" className={layout.page}>
-      <header className={layout.header}>
-        <SkeletonLine width={96} height={44} tone="tint" radius={10} />
-        <div className={layout.headerText}>
-          <SkeletonLine width={64} tone="tint" />
-          <SkeletonLine width={260} height={34} tone="tint" radius={8} />
-          <SkeletonLine width={200} tone="tint" />
+      <div className={layout.columns}>
+        <div className={layout.aside}>
+          <SkeletonLine width="80%" height={16} />
+          {[0, 1, 2, 3, 4].map((i) => (
+            <SkeletonLine key={i} width="100%" height={44} radius={10} />
+          ))}
         </div>
-        <SkeletonLine width={196} height={44} tone="tint" radius={999} />
-      </header>
-
-      <main className={layout.main}>
-        <section className={layout.section}>
-          <h2 className={layout.h2}>Що ти дізнаєшся</h2>
-          {['88%', '76%', '82%'].map((w) => (
-            <SkeletonLine key={w} width={w} />
-          ))}
-        </section>
-
-        <section className={layout.sectionTight}>
-          <h2 className={layout.h2}>Ключові терміни</h2>
-          {TERM_WIDTHS.map((w) => (
-            <div key={w} className={layout.termRow}>
-              <SkeletonLine width={w} />
+        <div className={layout.content}>
+          <header className={layout.header}>
+            <SkeletonLine width={96} height={44} tone="tint" radius={10} />
+            <div className={layout.headerText}>
+              <SkeletonLine width={64} tone="tint" />
+              <SkeletonLine width={260} height={34} tone="tint" radius={8} />
+              <SkeletonLine width={200} tone="tint" />
             </div>
-          ))}
-        </section>
+            <SkeletonLine width={196} height={44} tone="tint" radius={999} />
+          </header>
 
-        <section className={layout.sectionTight}>
-          <h2 className={layout.h2}>Пояснення</h2>
-          {TEXT_WIDTHS.map((w, i) => (
-            <SkeletonLine key={i} width={w} height={17} />
-          ))}
-        </section>
+          <main className={layout.main}>
+            <section className={layout.section}>
+              <h2 className={layout.h2}>Що ти дізнаєшся</h2>
+              {['88%', '76%', '82%'].map((w) => (
+                <SkeletonLine key={w} width={w} />
+              ))}
+            </section>
 
-        <section className={layout.section}>
-          <h2 className={layout.h2}>Відео</h2>
-          <Skeleton className={layout.video} radius={16} />
-        </section>
+            <section className={layout.sectionTight}>
+              <h2 className={layout.h2}>Ключові терміни</h2>
+              {TERM_WIDTHS.map((w) => (
+                <div key={w} className={layout.termRow}>
+                  <SkeletonLine width={w} />
+                </div>
+              ))}
+            </section>
 
-        <section className={layout.section}>
-          <h2 className={layout.h2}>Завдання</h2>
-          {LEVEL_WIDTHS.map((w, i) => (
-            <div key={i} className={layout.levelRow}>
-              <SkeletonLine width={34} height={24} radius={4} />
-              <SkeletonLine width={w} />
-            </div>
-          ))}
-        </section>
-      </main>
+            <section className={layout.sectionTight}>
+              <h2 className={layout.h2}>Пояснення</h2>
+              {TEXT_WIDTHS.map((w, i) => (
+                <SkeletonLine key={i} width={w} height={17} />
+              ))}
+            </section>
+
+            <section className={layout.section}>
+              <h2 className={layout.h2}>Відео</h2>
+              <Skeleton className={layout.video} radius={16} />
+            </section>
+
+            <section className={layout.section}>
+              <h2 className={layout.h2}>Завдання</h2>
+              {LEVEL_WIDTHS.map((w, i) => (
+                <div key={i} className={layout.levelRow}>
+                  <SkeletonLine width={34} height={24} radius={4} />
+                  <SkeletonLine width={w} />
+                </div>
+              ))}
+            </section>
+          </main>
+        </div>
+      </div>
     </SkeletonRegion>
   )
 }

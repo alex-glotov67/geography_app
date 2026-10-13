@@ -50,6 +50,8 @@ npm run db:start       # Postgres, Auth, Storage, Realtime, Studio у Docker
 
 **Таблиці не відкриваються в API автоматично.** У `supabase/config.toml` стоїть `auto_expose_new_tables = false` — так само, як у хмарних проєктах, створених після 30.05.2026 ([changelog](https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically)). Тому кожна міграція з новою таблицею містить і `GRANT` для потрібних ролей (`anon`, `authenticated`), і `enable row level security` з політиками. `GRANT` вирішує, чи таблиця взагалі доступна через API, а RLS — які рядки. Перевірено локально: без `GRANT` — `401 permission denied`; з `GRANT` і RLS без політик — порожній результат. Після зміни цього параметра потрібен `npm run db:reset` (привілеї задаються при створенні бази).
 
+Демо-зміст (лише локально): `npm run db:reset && npm run seed` — довідник із `seed/demo-outcomes.csv` і урок із `seed/demo-lesson/` (пакується в `.geo.zip` і проходить той самий імпорт, що й справжні пакети). Відкрий http://localhost:5173/grade/8.
+
 Корисне:
 
 ```bash

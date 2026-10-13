@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react'
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
 /**
- * <link rel="preload"> для шрифтів першого екрана (SPEC 13.7): Golos Text 400 і Unbounded 700, кирилиця.
+ * <link rel="preload"> для шрифтів першого екрана (SPEC 13.7): Golos Text 400 і 600, Unbounded 700, кирилиця.
  * Імена файлів у збірці мають хеш, тому посилання додаються після збірки з бандла.
  */
 function preloadFonts(patterns: RegExp[]): Plugin {
@@ -36,6 +36,8 @@ export default defineConfig({
     react(),
     preloadFonts([
       /^assets\/golos-text-cyrillic-400-normal-[\w-]+\.woff2$/,
+      // 600 — заголовки секцій, кнопки, питання завдань: без preload пізня підміна зсувала вміст (CLS)
+      /^assets\/golos-text-cyrillic-600-normal-[\w-]+\.woff2$/,
       /^assets\/unbounded-cyrillic-700-normal-[\w-]+\.woff2$/,
     ]),
   ],

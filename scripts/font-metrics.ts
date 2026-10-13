@@ -26,25 +26,36 @@ interface Metrics {
 
 /**
  * Системні fallback-шрифти. Значення виміряні @capsizecss/unpack 13.10.2026:
- * Arial — /System/Library/Fonts/Supplemental/Arial.ttf (є на iOS, macOS, Windows);
- * Roboto — @fontsource/roboto 5, latin 400 (системний шрифт Android).
+ * Arial — /System/Library/Fonts/Supplemental/Arial.ttf і Arial Bold.ttf (є на iOS, macOS, Windows);
+ * Roboto — @fontsource/roboto 5, latin 400 і 700 (системний шрифт Android).
  */
-const FALLBACKS: { name: string; local: Record<number, string[]>; metrics: Metrics }[] = [
+const FALLBACKS: { name: string; local: Record<400 | 700, string[]>; metrics: Record<400 | 700, Metrics> }[] = [
   {
     name: 'Arial',
     local: { 400: ['Arial', 'ArialMT'], 700: ['Arial Bold', 'Arial-BoldMT'] },
-    metrics: { unitsPerEm: 2048, ascent: 1854, descent: -434, lineGap: 67, xWidthAvg: 913 },
+    metrics: {
+      400: { unitsPerEm: 2048, ascent: 1854, descent: -434, lineGap: 67, xWidthAvg: 913 },
+      700: { unitsPerEm: 2048, ascent: 1854, descent: -434, lineGap: 67, xWidthAvg: 983 },
+    },
   },
   {
     name: 'Roboto',
     local: { 400: ['Roboto', 'Roboto-Regular'], 700: ['Roboto Bold', 'Roboto-Bold'] },
-    metrics: { unitsPerEm: 2048, ascent: 1900, descent: -500, lineGap: 0, xWidthAvg: 911 },
+    metrics: {
+      400: { unitsPerEm: 2048, ascent: 1900, descent: -500, lineGap: 0, xWidthAvg: 911 },
+      700: { unitsPerEm: 2048, ascent: 1900, descent: -500, lineGap: 0, xWidthAvg: 926 },
+    },
   },
 ]
 
+/** Кожна вага — свій файл веб-шрифту і відповідне накреслення fallback (500 — звичайне, 600/700 — жирне) */
 const FONTS = [
-  { family: 'Golos Text', weights: [400, 500, 600, 700], file: '@fontsource/golos-text/files/golos-text-latin-400-normal.woff2' },
-  { family: 'Unbounded', weights: [700], file: '@fontsource/unbounded/files/unbounded-latin-700-normal.woff2' },
+  ...[400, 500, 600, 700].map((weight) => ({
+    family: 'Golos Text',
+    weight,
+    file: `@fontsource/golos-text/files/golos-text-latin-${weight}-normal.woff2`,
+  })),
+  { family: 'Unbounded', weight: 700, file: '@fontsource/unbounded/files/unbounded-latin-700-normal.woff2' },
 ]
 
 const pct = (n: number) => `${(n * 100).toFixed(2)}%`
@@ -53,20 +64,19 @@ const blocks: string[] = []
 for (const font of FONTS) {
   const m = await fromFile(join(ROOT, 'node_modules', font.file))
   for (const fb of FALLBACKS) {
-    const sizeAdjust = m.xWidthAvg / m.unitsPerEm / (fb.metrics.xWidthAvg / fb.metrics.unitsPerEm)
-    for (const weight of font.weights) {
-      const local = fb.local[weight >= 600 ? 700 : 400]!
-      blocks.push(`@font-face {
+    const bold = font.weight >= 600 ? 700 : 400
+    const f = fb.metrics[bold]
+    const sizeAdjust = m.xWidthAvg / m.unitsPerEm / (f.xWidthAvg / f.unitsPerEm)
+    blocks.push(`@font-face {
   font-family: '${font.family} Fallback ${fb.name}';
-  src: ${local.map((n) => `local('${n}')`).join(', ')};
-  font-weight: ${weight};
+  src: ${fb.local[bold].map((n) => `local('${n}')`).join(', ')};
+  font-weight: ${font.weight};
   font-style: normal;
   size-adjust: ${pct(sizeAdjust)};
   ascent-override: ${pct(m.ascent / m.unitsPerEm / sizeAdjust)};
   descent-override: ${pct(Math.abs(m.descent) / m.unitsPerEm / sizeAdjust)};
   line-gap-override: ${pct(m.lineGap / m.unitsPerEm / sizeAdjust)};
 }`)
-    }
   }
 }
 

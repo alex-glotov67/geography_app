@@ -15,39 +15,6 @@
 }
 
 @font-face {
-  font-family: 'Golos Text Fallback Arial';
-  src: local('Arial'), local('ArialMT');
-  font-weight: 500;
-  font-style: normal;
-  size-adjust: 108.57%;
-  ascent-override: 90.27%;
-  descent-override: 20.26%;
-  line-gap-override: 0.00%;
-}
-
-@font-face {
-  font-family: 'Golos Text Fallback Arial';
-  src: local('Arial Bold'), local('Arial-BoldMT');
-  font-weight: 600;
-  font-style: normal;
-  size-adjust: 108.57%;
-  ascent-override: 90.27%;
-  descent-override: 20.26%;
-  line-gap-override: 0.00%;
-}
-
-@font-face {
-  font-family: 'Golos Text Fallback Arial';
-  src: local('Arial Bold'), local('Arial-BoldMT');
-  font-weight: 700;
-  font-style: normal;
-  size-adjust: 108.57%;
-  ascent-override: 90.27%;
-  descent-override: 20.26%;
-  line-gap-override: 0.00%;
-}
-
-@font-face {
   font-family: 'Golos Text Fallback Roboto';
   src: local('Roboto'), local('Roboto-Regular');
   font-weight: 400;
@@ -59,13 +26,35 @@
 }
 
 @font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial'), local('ArialMT');
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 108.79%;
+  ascent-override: 90.08%;
+  descent-override: 20.22%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
   font-family: 'Golos Text Fallback Roboto';
   src: local('Roboto'), local('Roboto-Regular');
   font-weight: 500;
   font-style: normal;
-  size-adjust: 108.81%;
-  ascent-override: 90.07%;
-  descent-override: 20.22%;
+  size-adjust: 109.03%;
+  ascent-override: 89.88%;
+  descent-override: 20.18%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 101.46%;
+  ascent-override: 96.59%;
+  descent-override: 21.68%;
   line-gap-override: 0.00%;
 }
 
@@ -74,9 +63,20 @@
   src: local('Roboto Bold'), local('Roboto-Bold');
   font-weight: 600;
   font-style: normal;
-  size-adjust: 108.81%;
-  ascent-override: 90.07%;
-  descent-override: 20.22%;
+  size-adjust: 107.71%;
+  ascent-override: 90.99%;
+  descent-override: 20.43%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 102.09%;
+  ascent-override: 96.00%;
+  descent-override: 21.55%;
   line-gap-override: 0.00%;
 }
 
@@ -85,9 +85,9 @@
   src: local('Roboto Bold'), local('Roboto-Bold');
   font-weight: 700;
   font-style: normal;
-  size-adjust: 108.81%;
-  ascent-override: 90.07%;
-  descent-override: 20.22%;
+  size-adjust: 108.37%;
+  ascent-override: 90.43%;
+  descent-override: 20.30%;
   line-gap-override: 0.00%;
 }
 
@@ -96,9 +96,9 @@
   src: local('Arial Bold'), local('Arial-BoldMT');
   font-weight: 700;
   font-style: normal;
-  size-adjust: 141.99%;
-  ascent-override: 70.07%;
-  descent-override: 17.25%;
+  size-adjust: 131.88%;
+  ascent-override: 75.45%;
+  descent-override: 18.58%;
   line-gap-override: 0.00%;
 }
 
@@ -107,8 +107,8 @@
   src: local('Roboto Bold'), local('Roboto-Bold');
   font-weight: 700;
   font-style: normal;
-  size-adjust: 142.30%;
-  ascent-override: 69.92%;
-  descent-override: 17.22%;
+  size-adjust: 140.00%;
+  ascent-override: 71.07%;
+  descent-override: 17.50%;
   line-gap-override: 0.00%;
 }

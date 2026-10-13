@@ -160,7 +160,7 @@ select is((select count(*)::int from public.lesson_versions where is_demo), 0, '
 reset role;
 update private.settings set show_demo = true where id;
 set local role anon;
-select is((select count(*)::int from public.lesson_versions where is_demo), 1, 'з show_demo (seed) демо-урок видно');
+select is((select count(*)::int from public.lesson_versions where slug = 'demo-lesson'), 1, 'з show_demo (seed) демо-урок видно');
 
 select * from finish();
 rollback;

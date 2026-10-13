@@ -11,6 +11,7 @@ export function TermsView({ block }: { block: z.infer<typeof TermsBlock> }) {
   return (
     <section className={layout.sectionTight}>
       <h2 className={layout.h2}>Ключові терміни</h2>
+      <div className={classes.termGrid}>
       {block.items.map((t, i) => (
         <div key={t.term} className={classes.term}>
           <button
@@ -30,6 +31,7 @@ export function TermsView({ block }: { block: z.infer<typeof TermsBlock> }) {
           </p>
         </div>
       ))}
+      </div>
     </section>
   )
 }

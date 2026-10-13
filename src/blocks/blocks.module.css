@@ -338,3 +338,17 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+/* Комп'ютер: терміни сіткою у дві колонки (SPEC 13.4) */
+.termGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+@media (min-width: $bp-desktop) {
+  .termGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
