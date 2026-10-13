@@ -25,6 +25,8 @@ jobs:
       - run: npm run typecheck
       - name: Vitest + 100 % покриття @shared/scoring
         run: npm run test:coverage
+      - name: Демо-пакети проходять валідацію
+        run: npm run validate
       - name: Збірка
         run: npm run build
         env:
