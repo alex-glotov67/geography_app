@@ -52,13 +52,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.120.0 # як у package.json (devDependencies.supabase); оновлювати разом
       - name: Запуск Postgres
         run: supabase db start
+      - name: Міграції без seed — демо-рядків немає, show_demo вимкнено
+        run: |
+          supabase db reset --no-seed
+          supabase db query --local -f supabase/checks/no-demo-in-migrations.sql
       - name: Міграції з нуля + seed
         run: supabase db reset
       - name: Лінт схеми
         run: supabase db lint --level warning
       - name: Advisors (безпека й продуктивність)
         run: supabase db advisors --local --type all
-      # З Фази 1: RLS-тести (pgTAP) — supabase test db
+      - name: RLS і версії змісту (pgTAP)
+        run: supabase test db
+      - name: Типи БД актуальні
+        run: |
+          supabase gen types typescript --local --schema public > /tmp/database.types.ts
+          diff -u src/types/database.types.ts /tmp/database.types.ts

@@ -12,6 +12,7 @@ export default tseslint.config(
       'playwright-report',
       'test-results',
       'docs/design',
+      'src/types/database.types.ts', // генерується: npm run db:types
       'supabase/functions/**/!(_shared)/**',
     ],
   },
