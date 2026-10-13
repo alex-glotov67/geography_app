@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Початковий екран</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+@keyframes geoContour{0%{opacity:.18}50%{opacity:.55}100%{opacity:.18}}
+@keyframes geoBar{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+.geo-c1{animation:geoContour 2.4s ease-in-out infinite}
+.geo-c2{animation:geoContour 2.4s ease-in-out .3s infinite}
+.geo-c3{animation:geoContour 2.4s ease-in-out .6s infinite}
+.geo-c4{animation:geoContour 2.4s ease-in-out .9s infinite}
+.geo-bar{animation:geoBar 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.geo-c1,.geo-c2,.geo-c3,.geo-c4,.geo-bar{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #E4ECEA; color: #1E2A2F; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; position: relative; overflow: hidden">
+
+<svg width="220" height="160" viewBox="0 0 220 160" fill="none" stroke="#1D5E8C" stroke-width="1.5" role="img" aria-label="Горизонталі, як на топографічній карті">
+<path class="geo-c1" d="M20 84 C 28 30, 170 14, 202 64 S 196 148, 112 148 S 14 136, 20 84 Z"></path>
+<path class="geo-c2" d="M48 86 C 56 48, 160 38, 182 74 S 176 128, 112 128 S 42 120, 48 86 Z"></path>
+<path class="geo-c3" d="M76 88 C 82 66, 148 60, 162 82 S 156 110, 112 110 S 70 104, 76 88 Z"></path>
+<path class="geo-c4" d="M100 90 C 104 80, 130 78, 136 88 S 132 98, 116 98 S 98 96, 100 90 Z"></path>
+</svg>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.3px">Географія</span>
+<span style="font-size: 15px; color: #34444B">6–9 класи</span>
+</div>
+
+<div role="progressbar" aria-label="Завантаження" style="width: 120px; height: 4px; border-radius: 2px; background: #C9D3CF; overflow: hidden">
+<div class="geo-bar" style="width: 40%; height: 4px; border-radius: 2px; background: #1D5E8C"></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

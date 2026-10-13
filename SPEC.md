@@ -1,7 +1,8 @@
 # SPEC: «Географія 6–9» — інтерактивний ресурс уроків
 
 > Технічне завдання для ШІ-агента в IDE (Claude Code, Cursor, Kiro тощо).
-> **Версія 2.3.3** · жовтень 2026 · навчальний рік 2026–2027.
+> **Версія 2.4** · жовтень 2026 · навчальний рік 2026–2027.
+> Зміни 2.4: Фазу 0 закрито; модель змісту для Фази 1 — учні читають знімок публікації (`lesson_versions`), усі завдання версіонуються (`task_versions`), знімок уроку посилається на `(task_id, version)`; стабільний `code` результату програми; `lesson_outcomes`; `is_demo` і прихований демо-зміст на prod; `quizzes` — у Фазі 6; «Завантаження без стрибків» (13.7); довідник у Фазі 1 — лише CSV, XLSX — з Фази 2 через офіційний тарбол SheetJS.
 > Зміни 2.3.3: фронтенд — Cloudflare Workers зі статичними ресурсами (assets-only, `wrangler.jsonc`, SPA через `not_found_handling`) замість Pages; `public/_redirects` прибрано; publishable key у клієнті.
 > Зміни 2.3.2: шрифти з пакетів `@fontsource` у бандлі; JetBrains Mono — латиниця, одна вага, лише логіни й паролі; формат імпорту довідника розділів і результатів (10.6); демо-розділи й демо-результати у Фазі 1; перший крок Фази 1 — стилі Mantine по компонентах і замір Lighthouse; з Фази 1 кожна фаза — окрема гілка і PR.
 > Зміни 2.3.1: стабільний `slug` уроку для адрес і QR; `school_id` в основних таблицях; видимість `secure`-змісту (призначення, поточне питання квізу через `quiz_sessions.current_question`); довідник `program_outcomes`; `sections.owner_id`; версії в `assignments` і `quiz_sessions`; бали квізу «частка × швидкість» і `coordinates` у квізі; `max_players`, гості в `quiz_players`; бекапи і keepalive — з Фази 2; `short_text` лише `secure`; без стовпця «Пароль»; моноширинний шрифт логінів; «Увійти» на головній; цілі дотику ≥ 44 px і в конструкторі.
@@ -83,7 +84,7 @@
 | Таблиці | TanStack Table + стилі Mantine | матриця результатів, списки учнів (сортування, фільтри, віртуалізація за потреби) |
 | Перетягування | dnd-kit | дотик і клавіатура: відповідність, порядок, групи |
 | PWA | vite-plugin-pwa | офлайн-кеш уроків, черга ДЗ, встановлення |
-| Імпорт/експорт | SheetJS | списки учнів, експорт результатів, імпорт/експорт завдань таблицею — **на клієнті** |
+| Імпорт/експорт | SheetJS — **офіційний тарбол `cdn.sheetjs.com` із зафіксованою версією** (пакет `xlsx` на npm застарів і має відому вразливість); з Фази 2 | списки учнів, експорт результатів, імпорт/експорт завдань таблицею — **на клієнті**. Довідник програми у Фазі 1 — лише CSV (без SheetJS) |
 | Realtime | Supabase Realtime | квіз |
 | Типи БД | `supabase gen types typescript` | типи таблиць генеруються з бази |
 | Шрифти | Unbounded (заголовки, цифри), Golos Text (текст), JetBrains Mono (логіни й паролі, чітка різниця l / I / 1) — пакети `@fontsource/*`: woff2 потрапляють у бандл Vite (локально, без CDN); лише потрібні підмножини й ваги (13.2) | SIL OFL 1.1 (перевірено) |
@@ -205,7 +206,7 @@ Postgres + Auth + RLS + Realtime + Edge Functions (Deno, TypeScript) + **Storage
 **Урок** = метадані + впорядкований список **блоків** (розділ 10.2):
 ```ts
 Lesson { id, slug, grade, sectionId, number, title, textbookRef { paragraph, pages }, ktpRef,
-         outcomes: { group: 'ГР1'|'ГР2'|'ГР3', text }[], status: 'draft'|'published'|'archived',
+         outcomeCodes: string[] /* посилання на program_outcomes.code */, status: 'draft'|'published'|'archived',
          blocks: Block[], homework: { taskIds: string[], showAnswersDefault } | null,
          simplified: { blocks?: Block[], homeworkTaskIds?: string[] } | null,
          quizPool: string[], reviewedByTeacher: boolean, version: number }
@@ -233,7 +234,15 @@ Quiz { id, ownerId, title, grade, lessonIds[], defaultTimeSec,
 ```
 «Квіз з уроку» = тимчасовий квіз із `quizPool` уроку. На старті сесії список питань фіксується в `quiz_sessions.questions` з версіями завдань.
 
-**Версії.** Публікація уроку робить знімок (`lesson_versions`). `assignments.lesson_version` і `quiz_sessions.questions` (з `taskVersion`) фіксують версію, тож правка уроку не ламає вже зданих ДЗ. Так само `task_versions` для завдань, що використовуються в ДЗ/квізах.
+**Версії й знімки.**
+- `lessons` — робоча копія вчителя (чернетка, автозбереження). **Гість і учень читають лише знімок публікації** — `lesson_versions` з `is_current = true`; правка чернетки не змінює того, що бачать учні, до наступної публікації.
+- **Усі завдання версіонуються** (`task_versions`: зміст + ключ + видимість). Будь-яка зміна змісту чи ключа в банку збільшує `tasks.version`; знімок цієї версії створюється не пізніше публікації уроку, що її використовує.
+- Знімок уроку посилається на завдання парами `(task_id, version)` — для тренування, ДЗ і квіз-пулу (`lesson_version_tasks`). **Версія фіксується при публікації**, тож автозбереження банку у Фазі 3 не змінює опублікованих уроків.
+- `assignments.lesson_version` і `quiz_sessions.questions` (з `taskVersion`) посилаються на ті самі знімки, тож правка уроку не ламає вже зданих ДЗ.
+
+**Довідник програми.** `sections` і `program_outcomes`; кожен результат має **стабільний `code`** виду `8-1-ГР2-03` (клас-№ розділу-ГР-порядковий номер), унікальний у межах вчителя. Уроки (`lesson_outcomes`), пакети `.geo.zip` і імпорт посилаються на `code`, не на `uuid`.
+
+**Демо-зміст.** Кожна таблиця змісту має `is_demo`. Демо-рядки існують лише в локальному Supabase і в CI (seed); на prod їх немає і учням вони не показуються (політики читання відсіюють `is_demo`, поки не ввімкнено `private.settings.show_demo`, а він увімкнений лише в seed). CI перевіряє, що міграції не вставляють демо-рядків.
 
 ### 6.2 База даних (Supabase / Postgres)
 
@@ -249,21 +258,33 @@ submissions     (id, assignment_id, student_id, attempt, answers jsonb, scores j
                  total numeric, max numeric, late bool, mode ('standard'|'simplified'),
                  client_submission_id uuid unique, submitted_at default now())
 manual_grades   (submission_id, task_id, points, comment, graded_at)        -- для short_text
-sections        (id, owner_id, school_id, grade, number, title, order)       -- розділи програми; заповнює вчитель
-program_outcomes (id, owner_id, school_id, grade, section_id, grp ('ГР1'|'ГР2'|'ГР3'), text, source) -- довідник очікуваних результатів; імпорт таблицею
+sections        (id, owner_id, school_id, grade 6–9, number ≥ 1, title, is_demo, updated_at)
+                 -- розділи програми; unique (owner_id, grade, number)
+program_outcomes (id, owner_id, school_id, code, grade, section_id, grp ('ГР1'|'ГР2'|'ГР3'), text,
+                 text_norm generated, source, archived bool, is_demo, updated_at)
+                 -- довідник; code '8-1-ГР2-03' unique (owner_id, code); unique (section_id, grp, text_norm)
 lessons         (id, owner_id, school_id, slug, grade, section_id, number, title, textbook_ref jsonb, ktp_ref,
-                 outcomes jsonb, blocks jsonb, homework jsonb, simplified jsonb, quiz_pool text[],
-                 status, reviewed_by_teacher bool, version int, updated_at)   -- unique (owner_id, slug)
-lesson_versions (lesson_id, version, snapshot jsonb, published_at)
+                 blocks jsonb, homework jsonb, simplified jsonb, quiz_pool uuid[],
+                 status, reviewed_by_teacher bool, published_version int null, is_demo, updated_at)
+                 -- робоча копія; unique (owner_id, slug); учні не читають
+lesson_outcomes (lesson_id, outcome_id)                                      -- результати уроку з довідника
+lesson_versions (lesson_id, version, is_current bool, owner_id, school_id, slug, grade, section_id, number,
+                 title, snapshot jsonb, media_ids uuid[], video_ids uuid[], homework_count int,
+                 is_demo, published_at)                                      -- знімок публікації; читають гість і учень
+lesson_version_tasks (lesson_id, lesson_version, role ('practice'|'homework'|'quiz_pool'), position,
+                 task_id, task_version)                                      -- версія завдання фіксується при публікації
 tasks           (id, owner_id, school_id, type, level, grp, points, tags jsonb, content jsonb, hint, feedback jsonb,
-                 print_override jsonb, visibility ('open'|'secure'), version int, updated_at)
-task_keys       (task_id, key jsonb)                                          -- окрема таблиця
-task_versions   (task_id, version, content jsonb, key jsonb, created_at)
-quizzes         (id, owner_id, school_id, title, grade, lesson_ids text[], default_time_sec, questions jsonb, updated_at)
+                 print_override jsonb, visibility ('open'|'secure'), version int, archived, is_demo, updated_at)
+                 -- робоча копія банку
+task_keys       (task_id, owner_id, key jsonb)                                -- ключ робочої копії; лише власник
+task_versions   (task_id, version, owner_id, type, visibility, content jsonb, key jsonb, hint, feedback jsonb,
+                 points, level, grp, is_demo, created_at)                    -- незмінні знімки всіх завдань
 media           (id, owner_id, school_id, bucket_path, kind ('image'|'pdf'), alt, caption, source, license,
-                 width, height, bytes, created_at)
+                 width, height, bytes, is_demo, created_at)
 videos          (id, owner_id, school_id, youtube_id, title, channel, duration_sec, start_sec, end_sec,
-                 lang, approved bool, checked_at)
+                 lang, approved bool, checked_at, is_demo)
+quizzes         (id, owner_id, school_id, title, grade, lesson_ids uuid[], default_time_sec, questions jsonb, updated_at)
+                 -- створюється у Фазі 6 разом із quiz_sessions
 lesson_progress (student_id, lesson_id, opened_at, practice_best jsonb)      -- тренувальні завдання
 quiz_sessions   (id, teacher_id, quiz_id null, lesson_id null, class_id null, pin char(6),
                  status ('lobby'|'question'|'reveal'|'finished'),
@@ -281,13 +302,13 @@ audit_log       (id, teacher_id, action, details jsonb, at)                  -- 
 **RLS (обов'язково, тестами):**
 - `students`, `submissions`, `lesson_progress`, `quiz_answers` — учень читає лише рядки, де `auth.uid()` = його `auth_user_id`; вчитель — рядки своїх класів.
 - **Анонімні користувачі** (гості квізу, `is_anonymous = true`) явно виключені з усіх політик для даних учнів і вчителя: `coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = false`. Анонім бачить лише свій рядок `quiz_players`, свої `quiz_answers` і публічний стан своєї сесії.
-- `lessons`, `media`, `videos`, `sections`, `program_outcomes` — читання опублікованого для всіх (включно з гостями) через view `public_lessons`; чернетки й запис — лише власник-вчитель.
-- **Зміст завдань (`tasks.content`):**
-  - `open` — читання для всіх через view `public_tasks` (лише завдання тренувальних блоків опублікованих уроків);
+- **Зміст для гостя й учня — лише знімки:** `lesson_versions` з `is_current`; `task_versions` лише `open`, і лише ті `(task_id, version)`, що стоять у ролі `practice` поточного знімка (`lesson_version_tasks`); `media` і `videos` — лише ті, що є в `media_ids` / `video_ids` поточного знімка (відео — ще й `approved`); `sections` і `program_outcomes` — для всіх. Скрізь `is_demo` відсіюється, якщо не ввімкнено `private.settings.show_demo`. Робочі копії (`lessons`, `tasks`, `task_keys`) і всі знімки `secure` — **лише власник-вчитель**; запис — лише власник. Політики без `SECURITY DEFINER`: денормалізовані масиви й `lesson_version_tasks` роблять перевірки простими.
+- **Зміст завдань:**
+  - `open` — читання для всіх лише зі знімків `task_versions` тренувальних блоків опублікованих уроків (ключ `open` потрібен клієнту для миттєвої перевірки);
   - `secure` — бачить **власник**; **учень** — лише завдання призначень свого класу з `opens_at <= now()` (і після терміну — для розбору), через view/RPC `my_assignment_tasks`; **гість** — нічого (у блоці ДЗ уроку бачить лише кількість завдань);
   - **учасники квізу не мають select на `tasks`**: поточне питання без ключа роздається через `quiz_sessions.current_question` (Realtime), наступні питання наперед недоступні — ні учням, ні гостям;
   - друкована версія ДЗ (PDF) генерується з тих самих даних, тож доступна лише учню з відкритим призначенням і вчителю.
-- `task_keys` — для `open`-завдань читання через view `open_task_keys` (лише завдання, що стоять у тренувальних блоках опублікованих уроків); для `secure` — **жодного читання з клієнта**, лише Edge Functions. Вчитель-власник читає й пише ключі своїх завдань (для редактора).
+- `task_keys` (робоча копія) — лише власник. Ключі `open` гість і учень отримують із `task_versions` за правилом вище; ключі `secure` — **жодного читання з клієнта**, лише Edge Functions.
 - Storage: бакет `lesson-media` — читання публічне (зображення в опублікованих уроках), запис лише вчителя у свою папку `<owner_id>/…`.
 - `submissions` — вставка лише через `submit-homework` (не напряму з клієнта).
 - `quiz_answers` — **жодного insert/update/delete з клієнта** (політик на запис немає); пише лише Edge Function `quiz-answer` сервісним ключем. Гравець читає лише свої відповіді; вчитель — відповіді своїх сесій.
@@ -364,7 +385,7 @@ audit_log       (id, teacher_id, action, details jsonb, at)                  -- 
 | Екран | Маршрут | Суть |
 |---|---|---|
 | Вибір класу | `/` | у шапці «Увійти» (для учня, що увійшов, — його ім'я з переходом у кабінет); 4 плитки класів у кольорах висот; картка «Живий квіз» (вхід за PIN, `/quiz`); «Продовжити, де зупинився» — лише для учня, що увійшов; примітка «Уроки відкриті без входу. Щоб виконувати домашні завдання, увійди з логіном від вчителя.» |
-| Уроки класу | `/grade/8` | розділи → уроки зі статусами «Пройдено / Сьогодні / Далі», позначка ДЗ і термін, пошук |
+| Уроки класу | `/grade/8` | розділи → уроки зі статусами «Пройдено / Сьогодні / Далі», позначка ДЗ і термін, пошук; поки опублікованих уроків немає — порожній стан «Уроки готуються» в стилі макетів |
 | Урок | `/lesson/<slug>`, напр. `/lesson/g8-u05` | шапка (клас, № уроку, тема, §), перемикач «Спрощений режим» (для учня з увімкненим режимом — увімкнений за замовчуванням), «Що ти дізнаєшся», терміни (розгортаються), пояснення, відео (iframe лише після кліку), рівні завдань, блок ДЗ («Виконати онлайн», «Завантажити для друку» — для учня з відкритим призначенням; гість бачить лише кількість завдань і пропозицію увійти) |
 | Тренування | `/lesson/<slug>/practice` | завдання за рівнями з миттєвою перевіркою |
 | Вхід | `/login` | логін, пароль (показати/сховати), «Увійти»; «Живий квіз» за PIN; «Переглянути уроки без входу» |
@@ -508,10 +529,11 @@ manifest.json      # formatVersion, створено, автор, перелік
 - **Експорт:** урок (з усіма завданнями й медіа), розділ, увесь клас; з ключами відповідей (позначка «містить відповіді — не передавати учням»).
 - **Імпорт:** перевірка `manifest.formatVersion` → валідація всіх файлів zod-схемами → екран підсумку: що буде створено, конфлікти (урок з таким `slug` уже є: «Замінити» — зберігає `slug`, «Створити копію» — `slug` із суфіксом `-2`, `-3`…, «Пропустити»), помилки й попередження → імпорт як **чернетка** (`status: draft`, `reviewedByTeacher: false`). Нові id генеруються, локальні посилання переписуються; `slug` переноситься з пакета.
 - **Завдання з Excel/CSV:** шаблон для завантаження з окремими аркушами для простих типів (`single_choice`, `multiple_choice`, `true_false`, `matching`, `ordering`, `fill_blanks`, `numeric`, `odd_one_out`): одне завдання — один рядок; колонки: тип, рівень, ГР, бали, текст, варіанти, правильні, підказка, теги. Імпорт у банк із тим самим екраном перевірки. Експорт банку в такий самий файл.
-- **Довідник розділів і очікуваних результатів** (`sections` + `program_outcomes`) — CSV або XLSX (перший аркуш), один рядок — один результат:
+- **Довідник розділів і очікуваних результатів** (`sections` + `program_outcomes`) — CSV (Фаза 1) або XLSX, перший аркуш (з Фази 2, SheetJS); один рядок — один результат:
 
   | Стовпець | Обов'язковий | Значення |
   |---|---|---|
+  | `Код` | ні | стабільний код результату `8-1-ГР2-03`; порожній — генерується при першому імпорті (клас-№ розділу-ГР-порядковий номер у межах розділу й ГР) і далі не змінюється |
   | `Клас` | так | 6, 7, 8 або 9 |
   | `№ розділу` | так | ціле число ≥ 1 (порядок розділів) |
   | `Назва розділу` | так | однакова в усіх рядках розділу |
@@ -519,7 +541,7 @@ manifest.json      # formatVersion, створено, автор, перелік
   | `Результат` | так | текст очікуваного результату з програми |
   | `Джерело` | так | документ і місце: напр. «Модельна програма НУШ, наказ МОН №795, 8 клас, розд. N» |
 
-  Рядок заголовків — обов'язковий, назви стовпців саме такі (регістр і пробіли навколо не важливі). CSV — UTF-8 або Windows-1251 (визначається автоматично), роздільник `,` або `;`. Розділ — унікальна пара «клас + № розділу»; різні назви одного розділу — помилка. Порожні рядки пропускаються. Повторний імпорт: розділ оновлюється за «клас + №», результат вважається тим самим за «розділ + ГР + текст» (без урахування регістру й зайвих пробілів) — дублів немає; результати, яких немає у файлі, не видаляються, а показуються на екрані перевірки з пропозицією архівувати. Перед записом — той самий екран перевірки, що й для пакетів: нові / змінені / без змін / помилки з номерами рядків.
+  Рядок заголовків — обов'язковий, назви стовпців саме такі (регістр і пробіли навколо не важливі). CSV — UTF-8 або Windows-1251 (визначається автоматично), роздільник `,` або `;`. Розділ — унікальна пара «клас + № розділу»; різні назви одного розділу — помилка. Порожні рядки пропускаються. Повторний імпорт: розділ оновлюється за «клас + №»; результат зіставляється за `Код`, а без коду — за «розділ + ГР + текст» (без урахування регістру й зайвих пробілів) — дублів немає; експорт довідника завжди містить `Код`; результати, яких немає у файлі, не видаляються, а показуються на екрані перевірки з пропозицією архівувати. Перед записом — той самий екран перевірки, що й для пакетів: нові / змінені / без змін / помилки з номерами рядків.
 - Формат пакета версіонується; при зміні схеми — міграція старих пакетів у коді імпорту (`importers/package/migrations`).
 
 ### 10.7 Чого не робимо
@@ -586,6 +608,11 @@ manifest.json      # formatVersion, створено, автор, перелік
 - Корисні готові компоненти: `Stepper` (майстер імпорту), `Dropzone` (файл), `PinInput` (PIN квізу), `Slider` (`slider_estimate`), `RingProgress` (таймер квізу), `Accordion` (терміни), `SegmentedControl` (вкладки, режими), `Switch` (спрощений режим), `Notifications`, `Modals`.
 - Студентська частина: код-сплітинг маршрутів, кабінет вчителя і квіз-хост — окремі чанки; бюджет першого завантаження уроку на телефоні — перевіряти Lighthouse (розділ 15).
 
+### 13.7 Завантаження без стрибків
+- **Splash у `index.html`:** інлайн HTML і CSS без мережевих шрифтів (системний шрифт), назва «Географія», «6–9 класи», мотив горизонталей і смужка прогресу (макет `Splash.dc.html`). **Завжди світлий**: `color-scheme: light`, тло `--paper-tint` на `<html>`, `<meta name="theme-color">` = `--paper-tint`. Ховається, коли застосунок змонтовано і `document.fonts.ready`, але **не пізніше ніж через 1,5 с**; анімації вимкнені при `prefers-reduced-motion`.
+- **Шрифти:** `preload` для Golos Text 400 і Unbounded 700 (кирилиця); fallback-шрифти (`local()` системного шрифту) з `size-adjust`, `ascent-override`, `descent-override`, `line-gap-override`, щоб заміна шрифту не зсувала макет. Метрики обчислює `npm run fonts:metrics` (`@capsizecss/unpack`), значення закомічені.
+- **Скелетони** (компонент на Mantine `Skeleton`): кожен маршрут або блок, що вантажить дані, показує скелетон **тієї ж форми й розмірів**, що й готовий екран (макет `LessonSkeleton.dc.html`); статичні заголовки секцій — справжні; `aria-busy="true"`. **Повноекранний спінер заборонено**; Suspense-фолбеки lazy-маршрутів — теж скелетони.
+
 ---
 
 ## 14. Персональні дані та безпека (`docs/privacy.md`)
@@ -608,7 +635,9 @@ manifest.json      # formatVersion, створено, автор, перелік
 - [ ] Квіз: 35 гравців одночасно, відповідь в останню секунду, повторна відповідь, вигнаний гравець, перевищення `max_players`; наступне питання недоступне до `quiz_advance()`; анонімні акаунти видалені після `finished`.
 - [ ] Імпорт: порожні рядки, дублікати, по батькові, кілька класів в одному файлі.
 - [ ] Друк: ДЗ A5, ключ, картки входу (A4, 10 шт.), попередній перегляд PDF.
-- [ ] Lighthouse на телефоні: Accessibility ≥ 90, Performance ≥ 85.
+- [ ] Lighthouse на телефоні: Accessibility ≥ 90, Performance ≥ 85; **CLS ≤ 0,05** на головній і сторінці уроку.
+- [ ] Splash ховається не пізніше 1,5 с, зокрема на Slow 3G; без `prefers-reduced-motion`-анімацій, якщо вони вимкнені.
+- [ ] Міграції не вставляють демо-рядків (`is_demo`), `show_demo` на prod вимкнено (CI: міграції без seed → нуль демо-рядків).
 - [ ] Конструктор: кожен тип завдання створюється з нуля, зберігається, відкривається знову без втрат, проходить «Спробувати як учень».
 - [ ] Імпорт → експорт → імпорт пакета дає ідентичний урок (round-trip тест); пошкоджений пакет дає зрозумілу помилку.
 - [ ] Клієнт гостя/учня не отримує ключів `secure`-завдань ні з view, ні з Storage, ні з кешу PWA.
@@ -620,13 +649,14 @@ manifest.json      # formatVersion, створено, автор, перелік
 
 ## 16. Фази робіт і критерії приймання
 
-### Фаза 0 — Каркас
+### Фаза 0 — Каркас ✅ закрито 12.10.2026
 React + Vite + TS, TanStack Router/Query, Zustand, Mantine з темою з токенів (13.6), шрифти локально, базові компоненти (LevelIcon, GradeTile, ContourBackground), Vitest + Playwright, CI, Cloudflare Workers static assets (`wrangler.jsonc`, prod + preview), локальний Supabase для розробки і CI, хмарний prod, `docs/setup.md`.
 **Приймання:** сайт відкривається на телефоні і ПК; прямі адреси працюють після оновлення сторінки; головна збігається з макетом `Main.dc.html`; CI зелений; у збірці нема секретів.
+**Результат:** prod — https://geography-app.alexglotov67.workers.dev/; перевірено вчителем 12.10.2026 (телефон, прямі адреси після оновлення, без зовнішніх запитів, CI і `deploy-prod` зелені). Окремо лишається перевірка зі шкільної мережі.
 
 ### Фаза 1 — Модель змісту, рушій і публічні уроки
-**Перший крок:** стилі Mantine по компонентах замість повного `@mantine/core/styles.css` і базовий замір Lighthouse головної на телефоні (результат — у звіт фази). Далі: таблиці змісту (6.2) з RLS і view; демо-розділи й демо-результати (`sections`, `program_outcomes`) з позначкою «ДЕМО» і імпорт довідника за форматом 10.6 (поки скриптом, без UI); zod-схеми уроку, блоків, завдань; рендер блоків (10.2) і типів завдань 1–8; екрани 8.1 без входу; імпорт пакета `.geo.zip` (поки без UI — скриптом `seed-local`) і демо-пакет у `seed/`.
-**Приймання:** демо-урок з усіма блоками й 8 типами завдань відкривається гостем на телефоні і ПК; демо-довідник імпортується з CSV і XLSX, повторний імпорт не дублює рядків; ключі `secure` не доступні клієнту (тест); макети збігаються з полотном.
+**Перший крок:** стилі Mantine по компонентах замість повного `@mantine/core/styles.css`, замір Lighthouse головної на телефоні до і після (результат — у `docs/perf.md` і звіт фази) і «Завантаження без стрибків» (13.7: splash, preload і fallback-шрифти, скелетони). Далі: таблиці змісту (6.2) з RLS і pgTAP-тестами; демо-розділи й демо-результати (`sections`, `program_outcomes`) з позначкою «ДЕМО» і імпорт довідника з CSV за форматом 10.6 (поки скриптом, без UI); zod-схеми уроку, блоків, завдань; рендер блоків (10.2) і типів завдань 1–8; екрани 8.1 без входу; імпорт пакета `.geo.zip` (поки без UI — скриптом `seed-local`) і демо-пакет у `seed/`.
+**Приймання:** демо-урок з усіма блоками й 8 типами завдань відкривається гостем на телефоні і ПК (локально й у CI; на prod — порожній стан «Уроки готуються»); демо-довідник імпортується з CSV, повторний імпорт не дублює рядків і зберігає коди; правка завдання в банку не змінює опублікованого уроку до повторної публікації (тест); CLS ≤ 0,05; ключі `secure` не доступні клієнту (тест); макети збігаються з полотном.
 
 ### Фаза 2 — Акаунти, класи, імпорт учнів
 Вхід вчителя, класи, імпорт (5.2), `manage-students`, картки входу, вхід учня, вихід, «Спрощений режим» на рівні учня, `audit_log`. З появою реальних учнів у prod — `backup.yml` (БД + Storage, зашифровано) і `keepalive.yml`.

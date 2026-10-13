@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Урок завантажується</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1D5E8C}a:hover{color:#123F60}
+@keyframes geoShimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.sk{background:linear-gradient(90deg,#E1E5DE 0%,#E1E5DE 40%,#ECEFE9 50%,#E1E5DE 60%,#E1E5DE 100%);background-size:200% 100%;animation:geoShimmer 1.6s linear infinite}
+.sk-tint{background:linear-gradient(90deg,#D3DDDA 0%,#D3DDDA 40%,#DFE7E4 50%,#D3DDDA 60%,#D3DDDA 100%);background-size:200% 100%;animation:geoShimmer 1.6s linear infinite}
+@media (prefers-reduced-motion: reduce){.sk,.sk-tint{animation:none}}
+</style>
+</helmet>
+<div aria-busy="true" aria-label="Урок завантажується" style="width: 390px; height: 1200px; box-sizing: border-box; background: #F2F4EF; color: #1E2A2F; font-family: 'Golos Text', 'Segoe UI', sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+<header style="padding: 20px 24px 28px 24px; background: #E4ECEA; display: flex; flex-direction: column; gap: 14px">
+<a href="Class.dc.html" style="display: flex; align-items: center; gap: 6px; min-height: 44px; text-decoration: none; font-size: 16px; font-weight: 500">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D5E8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+8 клас
+</a>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div class="sk-tint" style="width: 64px; height: 18px; border-radius: 6px"></div>
+<div class="sk-tint" style="width: 260px; height: 34px; border-radius: 8px"></div>
+<div class="sk-tint" style="width: 200px; height: 18px; border-radius: 6px"></div>
+</div>
+<div class="sk-tint" style="width: 196px; height: 44px; border-radius: 999px"></div>
+</header>
+
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 32px">
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Що ти дізнаєшся</h2>
+<div class="sk" style="width: 88%; height: 18px; border-radius: 6px"></div>
+<div class="sk" style="width: 76%; height: 18px; border-radius: 6px"></div>
+<div class="sk" style="width: 82%; height: 18px; border-radius: 6px"></div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Ключові терміни</h2>
+<sc-for list="{{terms}}" as="t" hint-placeholder-count="4">
+<div style="height: 52px; box-sizing: border-box; display: flex; align-items: center; padding: 0 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div class="sk" style="width: {{t.w}}; height: 18px; border-radius: 6px"></div>
+</div>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Пояснення</h2>
+<sc-for list="{{lines}}" as="l" hint-placeholder-count="6">
+<div class="sk" style="width: {{l.w}}; height: 17px; border-radius: 6px"></div>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Відео</h2>
+<div class="sk" style="height: 196px; border-radius: 16px"></div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 600">Завдання</h2>
+<sc-for list="{{levels}}" as="v" hint-placeholder-count="4">
+<div style="height: 60px; box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 0 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #D5DAD0">
+<div class="sk" style="width: 34px; height: 24px; border-radius: 4px"></div>
+<div class="sk" style="width: {{v.w}}; height: 18px; border-radius: 6px"></div>
+</div>
+</sc-for>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+renderVals() {
+const w = (a) => a.map((x) => ({ w: x }));
+return {
+terms: w(['36%', '44%', '40%', '28%']),
+lines: w(['100%', '96%', '92%', '100%', '88%', '60%']),
+levels: w(['30%', '34%', '38%', '30%'])
+};
+}
+}
+</script>
+</body>
+</html>

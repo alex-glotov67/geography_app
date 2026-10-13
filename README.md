@@ -50,7 +50,9 @@ e2e/                          Playwright
 wrangler.jsonc                Cloudflare Workers static assets: dist/ + SPA-fallback
 ```
 
-## Що вже є (Фаза 0)
+Prod: **https://geography-app.alexglotov67.workers.dev/**
+
+## Фаза 0 — закрито 12.10.2026
 
 - Каркас застосунку, тема Mantine з дизайн-токенів (палітри, шрифти, висоти елементів ≥ 44 px, без тіней).
 - Шрифти Golos Text, Unbounded, JetBrains Mono (латиниця, одна вага — логіни й паролі) — з пакетів `@fontsource` у бандлі (OFL), без CDN.

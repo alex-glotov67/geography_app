@@ -2,6 +2,8 @@
 
 Покроково: локальна розробка, GitHub, Supabase (prod), Cloudflare Workers (статичні ресурси). Секрети — лише в `.env.local`, секретах GitHub і Supabase; у git і в клієнтський код вони не потрапляють.
 
+**Prod:** https://geography-app.alexglotov67.workers.dev/ (Worker `geography-app`, деплой з `main` через Workers Builds). Фаза 0 прийнята 12.10.2026; перевірка зі шкільної мережі — окремо (TODO: результат дописати сюди).
+
 ## 0. Умови безкоштовних планів (перевірено 12.10.2026)
 
 **Supabase Free** ([supabase.com/pricing](https://supabase.com/pricing)):
@@ -57,6 +59,10 @@ npx supabase migration new <назва>   # нова міграція в supabas
 npx supabase db lint --level warning  # помилки в SQL-функціях
 npx supabase db advisors --local      # безпека й продуктивність (RLS, індекси, security definer)
 ```
+
+**Залежності з ручним оновленням:**
+- **SheetJS** (з Фази 2, XLSX): ставиться не з npm (пакет `xlsx` там застарів і має відому вразливість), а офіційним тарболом із зафіксованою версією: `https://cdn.sheetjs.com/xlsx-<версія>/xlsx-<версія>.tgz`. `npm update` його не оновлює — раз на семестр перевір [cdn.sheetjs.com](https://cdn.sheetjs.com/) і [список змін](https://docs.sheetjs.com/docs/miscellany/changelog), заміни URL у `package.json`, `npm install`, прожени тести імпорту.
+- **Метрики fallback-шрифтів** (`src/theme/font-metrics.css`): після оновлення `@fontsource/*` — `npm run fonts:metrics` і закомітити результат.
 
 > Що таке Supabase: Postgres + готові Auth, Storage, Realtime і Edge Functions (серверні функції на Deno). Фронт ходить у базу напряму через `supabase-js`, а що кому можна — вирішують політики Row Level Security у самій базі. Тому кожна таблиця — з RLS і тестами.
 
