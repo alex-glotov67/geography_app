@@ -56,5 +56,12 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'supabase/functions/_shared/**/*.test.ts'],
     css: true,
+    coverage: {
+      provider: 'v8',
+      // SPEC 15: 100 % гілок модуля перевірки відповідей
+      include: ['supabase/functions/_shared/scoring/**/*.ts'],
+      exclude: ['**/*.test.ts', '**/types.ts'],
+      thresholds: { branches: 100, functions: 100, lines: 100, statements: 100 },
+    },
   },
 })
