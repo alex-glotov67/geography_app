@@ -3,12 +3,127 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#E4ECEA" />
     <meta name="description" content="Уроки, завдання і домашні роботи з географії для 6–9 класів" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Географія 6–9</title>
+    <!--
+      Splash (SPEC 13.7, макет Splash.dc.html): інлайн, без мережевих шрифтів, завжди світлий.
+      Кольори — копія токенів з src/theme/tokens.css (CSS ще не завантажений); відповідність перевіряє
+      src/lib/splash.test.ts.
+    -->
+    <style>
+      :root {
+        color-scheme: light;
+        --s-paper-tint: #e4ecea;
+        --s-ink: #1e2a2f;
+        --s-ink-2: #34444b;
+        --s-water: #1d5e8c;
+        --s-splash-track: #c9d3cf;
+      }
+      html {
+        background: var(--s-paper-tint);
+      }
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        background: var(--s-paper-tint);
+        color: var(--s-ink);
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        transition: opacity 0.2s ease-out;
+      }
+      #splash.is-hiding {
+        opacity: 0;
+      }
+      #splash .t {
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      #splash .s {
+        margin-top: 8px;
+        font-size: 15px;
+        color: var(--s-ink-2);
+        text-align: center;
+      }
+      #splash .bar {
+        width: 120px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--s-splash-track);
+        overflow: hidden;
+      }
+      #splash .bar > i {
+        display: block;
+        width: 40%;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--s-water);
+        animation: s-bar 1.4s ease-in-out infinite;
+      }
+      #splash svg {
+        stroke: var(--s-water);
+      }
+      #splash path {
+        animation: s-contour 2.4s ease-in-out infinite;
+      }
+      #splash path:nth-child(2) { animation-delay: 0.3s; }
+      #splash path:nth-child(3) { animation-delay: 0.6s; }
+      #splash path:nth-child(4) { animation-delay: 0.9s; }
+      @keyframes s-contour {
+        0%, 100% { opacity: 0.18; }
+        50% { opacity: 0.55; }
+      }
+      @keyframes s-bar {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(250%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash, #splash path, #splash .bar > i {
+          animation: none;
+          transition: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash" aria-hidden="true">
+      <svg width="220" height="160" viewBox="0 0 220 160" fill="none" stroke-width="1.5">
+        <path d="M20 84 C 28 30, 170 14, 202 64 S 196 148, 112 148 S 14 136, 20 84 Z" />
+        <path d="M48 86 C 56 48, 160 38, 182 74 S 176 128, 112 128 S 42 120, 48 86 Z" />
+        <path d="M76 88 C 82 66, 148 60, 162 82 S 156 110, 112 110 S 70 104, 76 88 Z" />
+        <path d="M100 90 C 104 80, 130 78, 136 88 S 132 98, 116 98 S 98 96, 100 90 Z" />
+      </svg>
+      <div>
+        <div class="t">Географія</div>
+        <div class="s">6–9 класи</div>
+      </div>
+      <div class="bar"><i></i></div>
+    </div>
+    <script>
+      // Ховає splash; застосунок кличе hide() після монтування і шрифтів (src/lib/splash.ts).
+      // Межа — 1,5 с від початку навігації, навіть якщо бандл ще вантажиться.
+      ;(function () {
+        var el = document.getElementById('splash')
+        var done = false
+        function hide() {
+          if (done || !el) return
+          done = true
+          var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches
+          el.classList.add('is-hiding')
+          setTimeout(function () { el.remove() }, reduce ? 0 : 200)
+        }
+        window.__geoSplash = { hide: hide }
+        setTimeout(hide, Math.max(0, 1500 - performance.now()))
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

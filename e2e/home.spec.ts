@@ -53,3 +53,20 @@ test.describe('чисті адреси (history-режим, SPA-fallback Workers
     await expect(page.getByRole('heading', { name: '8 клас' })).toBeVisible()
   })
 })
+
+test.describe('завантаження без стрибків (SPEC 13.7)', () => {
+  test('splash зникає не пізніше ніж через 1,5 с і світлий', async ({ page }) => {
+    await page.goto('/')
+    const bg = await page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor)
+    expect(bg).toBe('rgb(228, 236, 234)') // --paper-tint
+    await expect(page.locator('#splash')).toHaveCount(0, { timeout: 1700 })
+    await expect(page.getByRole('heading', { level: 1, name: 'Географія' })).toBeVisible()
+  })
+
+  test('preload шрифтів першого екрана', async ({ page }) => {
+    await page.goto('/')
+    const preloads = await page.$$eval('link[rel="preload"][as="font"]', (ls) => ls.map((l) => l.getAttribute('href')))
+    expect(preloads.some((h) => /golos-text-cyrillic-400/.test(h ?? ''))).toBe(true)
+    expect(preloads.some((h) => /unbounded-cyrillic-700/.test(h ?? ''))).toBe(true)
+  })
+})

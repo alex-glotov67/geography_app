@@ -29,6 +29,19 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // SPEC 13.7: замість спінерів — скелетони тієї ж форми (src/components/Skeletons.tsx)
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@mantine/core',
+              importNames: ['Loader', 'LoadingOverlay'],
+              message: 'Спінери заборонено (SPEC 13.7) — використовуй скелетони з src/components/Skeletons.tsx',
+            },
+          ],
+        },
+      ],
     },
   },
 )

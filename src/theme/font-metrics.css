@@ -1,0 +1,114 @@
+/*
+ * Згенеровано scripts/font-metrics.ts (npm run fonts:metrics) — не редагувати вручну.
+ * Fallback-шрифти з метриками Golos Text і Unbounded (SPEC 13.7): системний шрифт займає стільки ж
+ * місця, поки вантажиться веб-шрифт. Порядок у --font-* (tokens.css): Arial, далі Roboto (Android).
+ */
+@font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial'), local('ArialMT');
+  font-weight: 400;
+  font-style: normal;
+  size-adjust: 108.57%;
+  ascent-override: 90.27%;
+  descent-override: 20.26%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial'), local('ArialMT');
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 108.57%;
+  ascent-override: 90.27%;
+  descent-override: 20.26%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 108.57%;
+  ascent-override: 90.27%;
+  descent-override: 20.26%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Arial';
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 108.57%;
+  ascent-override: 90.27%;
+  descent-override: 20.26%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Roboto';
+  src: local('Roboto'), local('Roboto-Regular');
+  font-weight: 400;
+  font-style: normal;
+  size-adjust: 108.81%;
+  ascent-override: 90.07%;
+  descent-override: 20.22%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Roboto';
+  src: local('Roboto'), local('Roboto-Regular');
+  font-weight: 500;
+  font-style: normal;
+  size-adjust: 108.81%;
+  ascent-override: 90.07%;
+  descent-override: 20.22%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Roboto';
+  src: local('Roboto Bold'), local('Roboto-Bold');
+  font-weight: 600;
+  font-style: normal;
+  size-adjust: 108.81%;
+  ascent-override: 90.07%;
+  descent-override: 20.22%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Golos Text Fallback Roboto';
+  src: local('Roboto Bold'), local('Roboto-Bold');
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 108.81%;
+  ascent-override: 90.07%;
+  descent-override: 20.22%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Unbounded Fallback Arial';
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 141.99%;
+  ascent-override: 70.07%;
+  descent-override: 17.25%;
+  line-gap-override: 0.00%;
+}
+
+@font-face {
+  font-family: 'Unbounded Fallback Roboto';
+  src: local('Roboto Bold'), local('Roboto-Bold');
+  font-weight: 700;
+  font-style: normal;
+  size-adjust: 142.30%;
+  ascent-override: 69.92%;
+  descent-override: 17.22%;
+  line-gap-override: 0.00%;
+}

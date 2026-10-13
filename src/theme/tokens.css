@@ -38,7 +38,9 @@
 
   /* Нейтральні заливки */
   --neutral-bg: #eceeea; /* «Далі», «не здано», фон перемикачів */
-  --track: #e1e5de; /* доріжки прогрес-барів */
+  --track: #e1e5de; /* доріжки прогрес-барів, скелетони на білому й папері */
+  --track-tint: #d3ddda; /* скелетони в шапках з --paper-tint */
+  --splash-track: #c9d3cf; /* доріжка смужки прогресу на splash */
   --switch-off: #9aa5a0;
   --video-bg: #2b3d44;
 
@@ -79,8 +81,9 @@
   --quiz-d: #6e4a2e; /* ◇ */
 
   /* Шрифти */
-  --font-display: 'Unbounded', 'Golos Text', sans-serif;
-  --font-text: 'Golos Text', 'Segoe UI', sans-serif;
+  /* Fallback-шрифти — font-metrics.css (npm run fonts:metrics): Arial, далі Roboto (Android) */
+  --font-display: 'Unbounded', 'Unbounded Fallback Arial', 'Unbounded Fallback Roboto', sans-serif;
+  --font-text: 'Golos Text', 'Golos Text Fallback Arial', 'Golos Text Fallback Roboto', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace; /* логіни й паролі: чітка різниця l / I / 1 */
 
   /* Форма */

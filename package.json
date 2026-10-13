@@ -17,6 +17,8 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "check:dist": "tsx scripts/check-dist.ts",
+    "perf": "tsx scripts/lighthouse.ts",
+    "fonts:metrics": "tsx scripts/font-metrics.ts",
     "deploy": "npm run build && npm run check:dist && wrangler deploy",
     "validate": "echo \"validate-package з'явиться у Фазі 1\"",
     "db:start": "supabase start",
@@ -37,6 +39,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@capsizecss/unpack": "^4.0.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.0",
     "@testing-library/dom": "^10.4.2",
