@@ -2,6 +2,7 @@ import { Outlet, createRootRoute, createRoute, createRouter, notFound } from '@t
 import { HomePage } from '@/features/home/HomePage'
 import { PlaceholderPage } from '@/features/placeholder/PlaceholderPage'
 import { isGrade } from '@/lib/grades'
+import { LEVELS, type Level } from '@/lib/levels'
 
 /*
  * Маршрути — history-режим, чисті адреси (SPEC 3.2): вони друкуються в QR і на картках входу.
@@ -37,6 +38,9 @@ const lessonRoute = createRoute({
 const practiceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/lesson/$slug/practice',
+  // ?level=base — тренування одного рівня (з блоку «Завдання» на сторінці уроку)
+  validateSearch: (search: Record<string, unknown>): { level?: Level } =>
+    LEVELS.includes(search.level as Level) ? { level: search.level as Level } : {},
   component: () => <PlaceholderPage title="Перевір себе">Тренування з'явиться незабаром.</PlaceholderPage>,
 })
 
