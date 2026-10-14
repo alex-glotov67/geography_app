@@ -71,7 +71,8 @@ test('тренування: фільтр рівня і миттєва перев
 
 test('невідомий урок — «Урок не знайдено»', async ({ page }) => {
   await page.goto('/lesson/nema-takoho')
-  await expect(page.getByRole('heading', { name: 'Урок не знайдено' })).toBeVisible()
+  // Без повторів запиту: «не знайдено» — одразу, а не після 6–8 с скелетона
+  await expect(page.getByRole('heading', { name: 'Урок не знайдено' })).toBeVisible({ timeout: 2000 })
 })
 
 test('урок без стрибків: CLS ≤ 0,05 (SPEC 15)', async ({ page }) => {
