@@ -1,12 +1,13 @@
 import type { EnsureQueryDataOptions, QueryClient, QueryKey } from '@tanstack/react-query'
 import {
-  Outlet,
   createRootRouteWithContext,
   createRoute,
   createRouter,
   lazyRouteComponent,
   notFound,
+  redirect,
 } from '@tanstack/react-router'
+import { currentMe, type Me } from '@/api/auth'
 import { gradeLessonsQuery, lessonQuery } from '@/api/content'
 import { LessonPageSkeleton } from '@/components/Skeletons'
 import { GradePage, GradePageSkeleton } from '@/features/grade/GradePage'
@@ -14,9 +15,12 @@ import { HomePage } from '@/features/home/HomePage'
 import { PracticePageSkeleton } from '@/features/lesson/PracticePageSkeleton'
 import { ErrorPage } from '@/features/placeholder/ErrorPage'
 import { PlaceholderPage } from '@/features/placeholder/PlaceholderPage'
+import { TeacherPageSkeleton } from '@/features/teacher/TeacherSkeletons'
 import { isGrade } from '@/lib/grades'
+import { safeRedirect } from '@/lib/links'
 import { LEVELS, type Level } from '@/lib/levels'
 import { queryClient } from '@/queryClient'
+import { Root } from './Root'
 
 /*
  * Маршрути — history-режим, чисті адреси (SPEC 3.2): вони друкуються в QR і на картках входу.
@@ -41,7 +45,7 @@ export interface RouterContext {
 }
 
 const rootRoute = createRootRouteWithContext<RouterContext>()({
-  component: Outlet,
+  component: Root,
   notFoundComponent: () => <PlaceholderPage title="Сторінку не знайдено">Перевір адресу або повернися до вибору класу.</PlaceholderPage>,
   errorComponent: ErrorPage,
 })
@@ -94,7 +98,67 @@ const practiceRoute = createRoute({
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  component: () => <PlaceholderPage title="Вхід">Вхід з логіном від вчителя з'явиться незабаром.</PlaceholderPage>,
+  // ?login=8b-07 — з QR на картці входу; ?redirect=/t/… — повернення після входу (лише внутрішні адреси)
+  validateSearch: (search: Record<string, unknown>): { login?: string; redirect?: string } => ({
+    ...(typeof search.login === 'string' && /^[a-z0-9-]{1,20}$/.test(search.login) ? { login: search.login } : {}),
+    ...(safeRedirect(search.redirect) ? { redirect: safeRedirect(search.redirect) } : {}),
+  }),
+  component: lazyRouteComponent(() => import('@/features/auth/LoginRoute'), 'LoginRoute'),
+})
+
+/** Вчитель або перенаправлення: гість — на вхід з поверненням, учень — у свій кабінет */
+async function requireTeacher(href: string): Promise<{ me: Extract<Me, { kind: 'teacher' }> }> {
+  const me = await currentMe()
+  if (!me) throw redirect({ to: '/login', search: { redirect: href } })
+  if (me.kind !== 'teacher') throw redirect({ to: me.kind === 'student' ? '/me' : '/' })
+  return { me }
+}
+
+const teacherRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/t',
+  beforeLoad: ({ location }) => requireTeacher(location.href),
+  pendingComponent: () => <TeacherPageSkeleton standalone />,
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'TeacherLayoutRoute'),
+})
+
+const teacherHomeRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'TeacherHomeRoute'),
+})
+
+const classesRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/classes',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'ClassesRoute'),
+})
+
+const classRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/classes/$classId',
+  // ?import=true — одразу відкрити майстер імпорту (кнопка «Імпортувати учнів» на огляді)
+  validateSearch: (search: Record<string, unknown>): { import?: boolean } => (search.import === true || search.import === 'true' ? { import: true } : {}),
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'ClassRoute'),
+})
+
+const settingsRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/settings',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'SettingsRoute'),
+})
+
+const meRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/me',
+  beforeLoad: async ({ location }) => {
+    const me = await currentMe()
+    if (!me) throw redirect({ to: '/login', search: { redirect: location.href } })
+    if (me.kind === 'teacher') throw redirect({ to: '/t' })
+    if (me.kind !== 'student') throw redirect({ to: '/' })
+    return { me }
+  },
+  component: lazyRouteComponent(() => import('@/features/auth/MeRoute'), 'MeRoute'),
 })
 
 const quizRoute = createRoute({
@@ -103,9 +167,18 @@ const quizRoute = createRoute({
   component: () => <PlaceholderPage title="Живий квіз">Вхід за PIN-кодом з'явиться незабаром.</PlaceholderPage>,
 })
 
-export const routeTree = rootRoute.addChildren([homeRoute, gradeRoute, lessonRoute, practiceRoute, loginRoute, quizRoute])
+export const routeTree = rootRoute.addChildren([
+  homeRoute,
+  gradeRoute,
+  lessonRoute,
+  practiceRoute,
+  loginRoute,
+  meRoute,
+  quizRoute,
+  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, settingsRoute]),
+])
 
-export { lessonRoute, practiceRoute }
+export { classRoute, lessonRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
 
 export const router = createRouter({
   routeTree,

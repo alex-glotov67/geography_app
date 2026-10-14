@@ -34,7 +34,7 @@ npm run dev
 | `npm run deploy` | збірка + перевірка `dist/` + `wrangler deploy` (ручний деплой; основний — Workers Builds з `main`) |
 | `npm run check:dist` | у `dist/` немає секретів (service role, `sb_secret_`, приватні ключі) |
 | `npm run db:start` / `db:reset` / `db:stop` | локальний Supabase (потрібен Docker) |
-| `npm run db:test` | pgTAP: RLS і версії змісту |
+| `npm run db:test` | pgTAP: RLS змісту й акаунтів (класи, учні, журнал дій, анонім) |
 | `npm run db:types` | типи БД → `src/types/database.types.ts` |
 | `npm run seed` | демо-довідник і демо-урок у локальний Supabase (лише локально) |
 | `npm run validate` | перевірка пакетів `.geo.zip` / тек-джерел у `seed/` |
@@ -42,6 +42,8 @@ npm run dev
 | `npm run test:coverage` | Vitest + 100 % покриття `@shared/scoring` |
 | `npm run perf -- / /lesson/<slug>` | Lighthouse на телефоні → `docs/perf.md` |
 | `npm run fonts:metrics` | метрики fallback-шрифтів (після оновлення `@fontsource`) |
+| `scripts/backup/roundtrip-local.sh` | бекап локальної БД і Storage → відновлення → звірка рядків і входу (як у CI) |
+| `scripts/backup/restore-local.sh <каталог>` | розшифрований бекап prod → локальний Supabase (docs/setup.md, 7.3) |
 
 ## Структура
 
@@ -51,15 +53,30 @@ src/
   supabase.ts, queryClient.ts клієнт Supabase (лише anon key), TanStack Query
   theme/                      tokens.css, fonts.css, mantine-theme.ts, palette.ts
   components/                 LevelIcon, GradeTile, ContourBackground
-  features/                   екрани (home, …)
+  api/                        запити: зміст, сесія (auth.ts), кабінет вчителя (teacher.ts)
+  features/                   екрани: home, lesson, auth (вхід, кабінет учня), teacher, import
+  stores/                     Zustand: відповіді, вигляд, щойно створені паролі (лише в пам'яті)
   lib/                        класи, рівні тощо
-supabase/                     config.toml, migrations/, functions/_shared/, seed.sql
+supabase/                     config.toml, migrations/, seed.sql, tests/ (pgTAP)
+  functions/manage-students/  Edge Function: акаунти учнів (service.ts — логіка, index.ts — Deno)
+  functions/_shared/          спільне з клієнтом: scoring, schemas, accounts (логіни, паролі), http
+scripts/backup/               дамп БД + Storage, відновлення в локальний Supabase
 scripts/check-dist.ts         перевірка збірки
 e2e/                          Playwright
 wrangler.jsonc                Cloudflare Workers static assets: dist/ + SPA-fallback
 ```
 
 Prod: **https://geography-app.alexglotov67.workers.dev/**
+
+## Фаза 2 — акаунти, класи, імпорт учнів (у роботі)
+
+- Вхід `/login`: учень — логін з картки (`8b-07`), вчитель — email; сесія лишається на пристрої, «Вийти» — у кабінетах. QR на картці відкриває вхід з підставленим логіном.
+- Кабінет вчителя `/t`: огляд, класи, учні (логін, «Спрощений режим», останній вхід, «Новий пароль», архів), налаштування (назва школи, префікс логінів).
+- Імпорт списку класу (.xlsx, .xls, .csv у UTF-8 чи Windows-1251): стовпці, по батькові відкидається, кілька класів в одному файлі, повторний імпорт без дублів, неоднозначні рядки — на вибір вчителя.
+- Edge Function `manage-students`: акаунти учнів, паролі `gora-step-47` (лише у відповіді, ніде не зберігаються), архів вимикає вхід; журнал дій `audit_log`.
+- Картки входу: A4, 10 на аркуш, JetBrains Mono, QR.
+- Учень: ім'я на головній, «Мій кабінет» (поки без ДЗ), «Спрощений режим» від вчителя за замовчуванням.
+- RLS-тести акаунтів (pgTAP), e2e приймання (імпорт 30 учнів → картки → вхід учня), бекап `backup.yml` (age) з перевіркою відновлення в CI, `keepalive.yml`.
 
 ## Фаза 1 — закрито 14.10.2026
 
