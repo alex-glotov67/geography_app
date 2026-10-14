@@ -1,81 +1,102 @@
-import { normGrp, parseOutcomes, planOutcomes, type ExistingOutcome } from './outcomes'
+import demoCsv from '../../seed/demo-outcomes.csv?raw'
+import { parseOutcomes, planOutcomes, type ExistingOutcome, type ExistingTopic } from './outcomes'
 
 const csv = (s: string) => new TextEncoder().encode(s)
-const HEAD = 'Клас;№ розділу;Назва розділу;ГР;Результат;Джерело\n'
+const HEAD = 'Код;Клас;№ розділу;Назва розділу;№ теми;Назва теми;Результат;Джерело\n'
 
-describe('довідник програми (SPEC 10.6)', () => {
-  it('ГР у різних записах', () => {
-    expect(['ГР1', 'гр 2', '3', 'ГР 3'].map(normGrp)).toEqual(['ГР1', 'ГР2', 'ГР3', 'ГР3'])
-    expect(normGrp('ГР4')).toBeNull()
+describe('довідник програми: розділ → тема → результат (SPEC 10.6)', () => {
+  it('демо-файл у новому форматі — без помилок, з позначкою ДЕМО', () => {
+    const { rows, errors } = parseOutcomes(csv(demoCsv))
+    expect(errors).toEqual([])
+    expect(rows.length).toBeGreaterThan(0)
+    expect(rows.every((r) => r.text.startsWith('ДЕМО'))).toBe(true)
   })
 
-  it('коректний файл; порожні рядки пропускаються', () => {
-    const { rows, errors } = parseOutcomes(csv(HEAD + '8;1;ДЕМО: розділ;ГР1;ДЕМО: результат;ДЕМО\n;;;;;\n8;1;ДЕМО: розділ;2;Ще один;ДЕМО\n'))
+  it('вступ — розділ 0, тема 0; порожні рядки пропускаються; «Код» необов\'язковий', () => {
+    const { rows, errors } = parseOutcomes(
+      csv(HEAD + '8-0-0-01;8;0;Вступ;0;Вступ;Результат вступу;Д\n;;;;;;;\n;8;2;Розділ;3;Тема;Без коду;Д\n'),
+    )
     expect(errors).toEqual([])
-    expect(rows.map((r) => [r.line, r.grp])).toEqual([[2, 'ГР1'], [4, 'ГР2']])
+    expect(rows.map((r) => [r.line, r.code, r.sectionNumber, r.topicNumber])).toEqual([
+      [2, '8-0-0-01', 0, 0],
+      [4, null, 2, 3],
+    ])
   })
 
   it('помилки з номерами рядків', () => {
     const { errors } = parseOutcomes(
       csv(
         HEAD +
-          '5;1;Р;ГР1;Т;Д\n' +
-          '8;1;Розділ А;ГР1;Т;\n' +
-          '8;2;Розділ Б;ГР1;Т;Д\n' +
-          '8;2;Розділ В;ГР1;Т2;Д\n' +
-          '8;2;Розділ Б;ГР1;  т ;Д\n',
+          ';5;1;Р;1;Т;Текст;Д\n' + //            2: клас
+          ';8;1;Розділ А;1;Тема;Текст;\n' + //    3: джерело
+          ';8;2;Розділ Б;1;Тема 1;Т;Д\n' + //     4
+          ';8;2;Розділ В;2;Тема 2;Т2;Д\n' + //    5: інша назва розділу
+          ';8;2;Розділ Б;1;Тема інша;Т3;Д\n' + // 6: інша назва теми
+          ';8;2;Розділ Б;1;Тема 1;  т ;Д\n' + //  7: дубль результату
+          ';8;-1;Р;x;Т;Т;Д\n', //                  8: номери
       ),
     )
-    expect(errors.map((e) => e.line)).toEqual([2, 3, 5, 6])
-    expect(errors[0]!.message).toMatch(/Клас/)
-    expect(errors[1]!.message).toMatch(/Джерело/)
-    expect(errors[2]!.message).toMatch(/іншу назву в рядку 4/)
-    expect(errors[3]!.message).toMatch(/уже є в рядку 4/)
+    expect(errors.map((e) => e.line)).toEqual([2, 3, 5, 6, 7, 8])
+    expect(errors[0]!.message).toMatch(/«Клас»/)
+    expect(errors[1]!.message).toMatch(/«Джерело»: не заповнено/)
+    expect(errors[2]!.message).toMatch(/Розділ 2 .* іншу назву в рядку 4/)
+    expect(errors[3]!.message).toMatch(/Тема 1 розділу 2 уже має іншу назву в рядку 4/)
+    expect(errors[4]!.message).toMatch(/уже є в рядку 4/)
+    expect(errors[5]!.message).toMatch(/№ розділу.*№ теми|№ теми.*№ розділу/)
   })
 
-  it('немає обов\'язкових стовпців', () => {
-    expect(parseOutcomes(csv('Клас,ГР\n8,1\n')).errors[0]!.message).toMatch(/№ розділу/)
+  it('немає обов\'язкових стовпців; старий формат з «ГР» — зрозуміла помилка', () => {
+    expect(parseOutcomes(csv('Клас;№ розділу\n8;1\n')).errors[0]!.message).toMatch(/№ теми/)
+    const old = 'Код;Клас;№ розділу;Назва розділу;№ теми;Назва теми;ГР;Результат;Джерело\n'
+    expect(parseOutcomes(csv(old)).errors[0]!.message).toMatch(/«ГР» більше не потрібен/)
   })
 
-  it('код: формат, відповідність рядку, дублікати', () => {
+  it('код: формат клас-розділ-тема-номер, відповідність рядку, дублікати', () => {
     const { errors } = parseOutcomes(
-      csv('Код;' + HEAD + '8-1-ГР1;8;1;Р;ГР1;А;Д\n8-2-ГР1-01;8;1;Р;ГР1;Б;Д\n8-1-ГР1-01;8;1;Р;ГР1;В;Д\n8-1-ГР1-01;8;1;Р;ГР1;Г;Д\n'),
+      csv(HEAD + '8-1-ГР1-01;8;1;Р;1;Т;А;Д\n8-2-1-01;8;1;Р;1;Т;Б;Д\n8-1-1-01;8;1;Р;1;Т;В;Д\n8-1-1-01;8;1;Р;1;Т;Г;Д\n'),
     )
-    expect(errors.map((e) => [e.line, e.message.slice(0, 12)])).toEqual([
-      [2, '«Код» має ви'],
-      [3, '«Код» 8-2-ГР'],
-      [5, 'Код 8-1-ГР1-'],
+    expect(errors.map((e) => [e.line, e.message.slice(0, 16)])).toEqual([
+      [2, '«Код»: Код резул'],
+      [3, 'Код 8-2-1-01 не '],
+      [5, 'Код 8-1-1-01 уже'],
     ])
   })
 
-  it('план: нові коди, повторний імпорт не дублює і зберігає коди, відсутні — не видаляються', () => {
-    const first = parseOutcomes(csv(HEAD + '8;1;Розділ;ГР2;Перший;Д\n8;1;Розділ;ГР2;Другий;Д\n'))
-    const p1 = planOutcomes(first.rows, [], [])
+  it('план: нові розділи й теми, коди в межах теми, повторний імпорт без дублів', () => {
+    const first = parseOutcomes(csv(HEAD + ';8;1;Розділ;2;Тема;Перший;Д\n;8;1;Розділ;2;Тема;Другий;Д\n;8;1;Розділ;3;Інша;Третій;Д\n'))
+    const p1 = planOutcomes(first.rows, [], [], [])
     expect(p1.sections.create).toEqual([{ grade: 8, number: 1, title: 'Розділ' }])
-    expect(p1.outcomes.create.map((c) => c.code)).toEqual(['8-1-ГР2-01', '8-1-ГР2-02'])
+    expect(p1.topics.create.map((t) => [t.number, t.title])).toEqual([[2, 'Тема'], [3, 'Інша']])
+    expect(p1.outcomes.create.map((c) => c.code)).toEqual(['8-1-2-01', '8-1-2-02', '8-1-3-01'])
 
-    const db: ExistingOutcome[] = p1.outcomes.create.map((c, i) => ({
-      id: `id${i}`, code: c.code, grade: 8, sectionNumber: 1, grp: c.grp, text: c.text, source: c.source, archived: false,
-    }))
     const sections = [{ id: 's1', grade: 8, number: 1, title: 'Розділ' }]
-    // Другий імпорт: регістр/пробіли інші, нове джерело, «Другий» прибрано, «Третій» додано
-    const second = parseOutcomes(csv(HEAD + '8;1;Розділ (нова назва);ГР2;  перший ;Д2\n8;1;Розділ (нова назва);ГР2;Третій;Д\n'))
-    const p2 = planOutcomes(second.rows, sections, db)
-    expect(p2.sections.rename).toEqual([{ id: 's1', title: 'Розділ (нова назва)' }])
-    expect(p2.outcomes.update).toEqual([{ id: 'id0', code: '8-1-ГР2-01', text: 'перший', source: 'Д2', unarchive: false }])
-    expect(p2.outcomes.create.map((c) => c.code)).toEqual(['8-1-ГР2-03'])
-    expect(p2.outcomes.missing.map((m) => m.code)).toEqual(['8-1-ГР2-02'])
+    const topics: ExistingTopic[] = [
+      { id: 't2', grade: 8, sectionNumber: 1, number: 2, title: 'Тема' },
+      { id: 't3', grade: 8, sectionNumber: 1, number: 3, title: 'Інша' },
+    ]
+    const db: ExistingOutcome[] = p1.outcomes.create.map((c, i) => ({
+      id: `o${i}`, code: c.code, grade: 8, sectionNumber: 1, topicNumber: c.topicNumber, text: c.text, source: c.source, archived: false,
+    }))
 
-    // Третій імпорт того самого файлу з кодами — без змін
-    const p3 = planOutcomes(first.rows.map((r, i) => ({ ...r, code: db[i]!.code })), sections, db)
-    expect(p3.outcomes.unchanged).toEqual(['8-1-ГР2-01', '8-1-ГР2-02'])
+    // Другий імпорт: інший регістр/пробіли й джерело, нова назва теми, «Другий» прибрано, «Четвертий» додано
+    const second = parseOutcomes(csv(HEAD + ';8;1;Розділ;2;Тема (нова);  перший ;Д2\n;8;1;Розділ;2;Тема (нова);Четвертий;Д\n'))
+    const p2 = planOutcomes(second.rows, sections, topics, db)
+    expect(p2.sections.rename).toEqual([])
+    expect(p2.topics.rename).toEqual([{ id: 't2', title: 'Тема (нова)' }])
+    expect(p2.outcomes.update).toEqual([{ id: 'o0', code: '8-1-2-01', text: 'перший', source: 'Д2', unarchive: false }])
+    expect(p2.outcomes.create.map((c) => c.code)).toEqual(['8-1-2-03'])
+    expect(p2.outcomes.missing.map((m) => m.code)).toEqual(['8-1-2-02', '8-1-3-01'])
+
+    // Той самий файл з кодами — без змін
+    const p3 = planOutcomes(first.rows.map((r, i) => ({ ...r, code: db[i]!.code })), sections, topics, db)
+    expect(p3.outcomes.unchanged).toEqual(['8-1-2-01', '8-1-2-02', '8-1-3-01'])
     expect(p3.outcomes.create).toEqual([])
   })
 
   it('архівований результат, що знову є у файлі, повертається', () => {
-    const rows = parseOutcomes(csv(HEAD + '8;1;Р;ГР1;А;Д\n')).rows
-    const p = planOutcomes(rows, [{ id: 's', grade: 8, number: 1, title: 'Р' }], [
-      { id: 'o', code: '8-1-ГР1-01', grade: 8, sectionNumber: 1, grp: 'ГР1', text: 'А', source: 'Д', archived: true },
+    const rows = parseOutcomes(csv(HEAD + ';8;1;Р;1;Т;А;Д\n')).rows
+    const p = planOutcomes(rows, [{ id: 's', grade: 8, number: 1, title: 'Р' }], [{ id: 't', grade: 8, sectionNumber: 1, number: 1, title: 'Т' }], [
+      { id: 'o', code: '8-1-1-01', grade: 8, sectionNumber: 1, topicNumber: 1, text: 'А', source: 'Д', archived: true },
     ])
     expect(p.outcomes.update[0]).toMatchObject({ id: 'o', unarchive: true })
   })

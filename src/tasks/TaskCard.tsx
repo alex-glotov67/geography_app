@@ -5,7 +5,6 @@ import type { Level } from '@shared/schemas/common.ts'
 import { LevelIcon } from '@/components/LevelIcon'
 import { LEVEL_LABEL } from '@/lib/levels'
 import { TASKS } from './registry'
-import { shuffled } from './shuffle'
 import classes from './tasks.module.css'
 
 /** Відкрите завдання тренування — зі знімка task_versions (SPEC 6.1): ключ доступний клієнту. */
@@ -62,7 +61,9 @@ export function TaskCard({ task, number }: Props) {
     // Упорядкування: стартовий порядок не має збігатися з правильним
     const correctOrder = (parsed.key as { correctOrder?: string[] }).correctOrder
     if (empty.order && correctOrder && empty.order.join() === correctOrder.join()) {
-      return { order: shuffled([...empty.order].reverse(), 7) }
+      // Зсув на одну позицію — для різних елементів завжди інший порядок (повторне тасування могло знову
+      // дати правильний, і учень бачив би вже розв'язане завдання)
+      return { order: [...empty.order.slice(1), empty.order[0]!] }
     }
     return empty
   })
