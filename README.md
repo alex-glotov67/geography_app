@@ -60,7 +60,7 @@ wrangler.jsonc                Cloudflare Workers static assets: dist/ + SPA-fall
 
 Prod: **https://geography-app.alexglotov67.workers.dev/**
 
-## Фаза 1 — модель змісту, рушій і публічні уроки
+## Фаза 1 — закрито 14.10.2026
 
 - Зміст у Postgres: робочі копії вчителя й знімки публікації (`lesson_versions`, `task_versions`), які лише й бачать гість і учень; RLS + явні GRANT, pgTAP.
 - zod-схеми уроку, блоків, 8 типів завдань; `@shared/scoring` (100 % гілок).

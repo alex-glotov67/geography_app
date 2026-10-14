@@ -352,3 +352,29 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Пара «текст + відео»: на телефоні — одне під одним (той самий проміжок, що й між секціями),
+   на комп'ютері — поруч (SPEC 13.4, LessonDesktop.dc.html); заголовок «Відео» там лише для читачів екрана */
+.pair {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+@media (min-width: $bp-desktop) {
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    align-items: start;
+  }
+
+  .pair .videoHeading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}

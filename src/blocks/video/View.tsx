@@ -22,7 +22,7 @@ export function VideoView({ block }: { block: z.infer<typeof VideoBlock> }) {
   const meta = [v.channel, v.durationSec ? duration(v.durationSec) : null].filter(Boolean).join(', ')
   return (
     <section className={layout.section}>
-      <h2 className={layout.h2}>Відео</h2>
+      <h2 className={`${layout.h2} ${classes.videoHeading}`}>Відео</h2>
       {playing ? (
         <iframe
           className={`${classes.videoFrame} ${layout.video}`}

@@ -61,6 +61,12 @@ describe('ordering', () => {
     expect(check('ordering', { prompt: 'П', items, scoring: 'pairs' }, key, { order: ['a', 'b', 'c', 'd'] }).fraction).toBe(1)
     expect(check('ordering', { prompt: 'П', items, scoring: 'pairs' }, key, { order: ['b', 'c'] }).details.correctPairs).toBe(1)
   })
+  it('без режиму: 4 елементи — exact, 5 — pairs', () => {
+    expect(check('ordering', { prompt: 'П', items } as never, key, { order: ['a', 'b', 'd', 'c'] }).fraction).toBe(0)
+    const five = [...items, { id: 'e', text: 'E' }]
+    const r = check('ordering', { prompt: 'П', items: five } as never, { correctOrder: ['a', 'b', 'c', 'd', 'e'] }, { order: ['a', 'b', 'c', 'e', 'd'] })
+    expect(r.fraction).toBe(0.5)
+  })
   it('exact: бал лише за повністю правильний порядок', () => {
     const c = { prompt: 'П', items, scoring: 'exact' as const }
     expect(check('ordering', c, key, { order: ['a', 'b', 'c', 'd'] }).fraction).toBe(1)
