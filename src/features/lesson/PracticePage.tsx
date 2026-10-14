@@ -38,7 +38,7 @@ export function PracticePage({ slug, level }: { slug: string; level?: Level }) {
       <main className={classes.main}>
         <div className={classes.list}>
           {shown.map((t, i) => (
-            <TaskCard key={t.id} task={t} number={i + 1} />
+            <TaskCard key={t.id} task={t} number={i + 1} scope={`${data.lessonId}@${data.version}`} />
           ))}
         </div>
       </main>

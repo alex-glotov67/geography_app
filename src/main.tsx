@@ -26,3 +26,9 @@ createRoot(root).render(
 )
 
 hideSplashWhenReady()
+
+// Лише у збірці для e2e (npm run build:e2e): доступ до кешу запитів, щоб імітувати інвалідацію.
+// У звичайній збірці умова стала на етапі збірки — код вирізається; check:dist це перевіряє.
+if (import.meta.env.VITE_E2E_HOOKS === '1') {
+  ;(window as unknown as { __geoQueryClient: typeof queryClient }).__geoQueryClient = queryClient
+}

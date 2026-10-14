@@ -24,3 +24,10 @@ window.ResizeObserver = ResizeObserverStub
 
 // Відновлення прокрутки роутера викликає scrollTo, якого jsdom не реалізує
 window.scrollTo = () => {}
+
+// Відповіді учня зберігаються в sessionStorage (stores/answers) — кожен тест з чистого аркуша
+import { useAnswers } from '@/stores/answers'
+beforeEach(() => {
+  sessionStorage.clear()
+  useAnswers.setState({ answers: {} })
+})

@@ -43,6 +43,8 @@ const RULES: { name: string; test: (text: string) => string[] }[] = [
     test: (t) => t.match(/SUPABASE_SERVICE_ROLE(_KEY)?|SERVICE_ROLE_KEY|SUPABASE_DB_PASSWORD|SUPABASE_ACCESS_TOKEN/g) ?? [],
   },
   { name: 'приватний ключ', test: (t) => t.match(/-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----/g) ?? [] },
+  // Тестовий хук e2e не має потрапляти у звичайну збірку (npm run build:e2e — лише для CI e2e)
+  { name: 'тестовий хук e2e', test: (t) => t.match(/__geoQueryClient/g) ?? [] },
 ]
 
 let found = 0

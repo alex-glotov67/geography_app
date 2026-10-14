@@ -24,9 +24,26 @@ export interface LessonListItem {
   section: { id: string; number: number; title: string } | null
 }
 
+/**
+ * Політика оновлення (зауваження до Фази 2): скелетон — лише коли даних ще немає; фонові
+ * оновлення не підміняють вміст. Список уроків класу змінюється рідко (вчитель публікує) —
+ * оновлюється не частіше ніж раз на 5 хв і лише при переході, не від фокуса чи мережі.
+ */
+const LIST_POLICY = { staleTime: 5 * 60_000, refetchOnWindowFocus: false, refetchOnReconnect: false } as const
+
+/** Опублікований знімок незмінний (нова публікація — нова версія): ніколи не перезапитуємо. */
+const SNAPSHOT_POLICY = {
+  staleTime: Infinity,
+  gcTime: 30 * 60_000,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+  refetchOnMount: false,
+} as const
+
 /** Опубліковані уроки класу, за розділами й номерами */
 export const gradeLessonsQuery = (grade: number) =>
   queryOptions({
+    ...LIST_POLICY,
     queryKey: ['grade-lessons', grade],
     queryFn: async (): Promise<LessonListItem[]> => {
       const db = await getSupabase()
@@ -51,6 +68,9 @@ export const gradeLessonsQuery = (grade: number) =>
   })
 
 export interface LessonData {
+  lessonId: string
+  /** Версія знімка — частина ключа збережених відповідей учня */
+  version: number
   snapshot: LessonSnapshot
   isDemo: boolean
   homeworkCount: number
@@ -62,6 +82,7 @@ export interface LessonData {
 /** Опублікований урок за адресою /lesson/<slug> з усім, що потрібно блокам */
 export const lessonQuery = (slug: string) =>
   queryOptions({
+    ...SNAPSHOT_POLICY,
     queryKey: ['lesson', slug],
     queryFn: async (): Promise<LessonData> => {
       const db = await getSupabase()
@@ -113,6 +134,6 @@ export const lessonQuery = (slug: string) =>
       for (const v of videosRes.data ?? []) {
         videos[v.id] = { id: v.id, youtubeId: v.youtube_id, title: v.title, channel: v.channel, durationSec: v.duration_sec, startSec: v.start_sec, endSec: v.end_sec }
       }
-      return { snapshot, isDemo: lv.is_demo, homeworkCount: lv.homework_count, practiceTasks, media, videos }
+      return { lessonId: lv.lesson_id, version: lv.version, snapshot, isDemo: lv.is_demo, homeworkCount: lv.homework_count, practiceTasks, media, videos }
     },
   })
