@@ -1,5 +1,9 @@
 name: CI
 
+# Перевірки на кожен PR і push у main. Усе — на локальному Supabase (staging, SPEC 3.4).
+# Фронт на prod публікує Cloudflare Workers Builds з main сам; базу на prod — лише вручну
+# через «Деплой БД і функцій на prod» (deploy-prod.yml). Порядок релізу — docs/setup.md, розділ 6.
+
 on:
   pull_request:
   push:
@@ -10,6 +14,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Лише на PR: якщо змінено міграції чи Edge Functions — нагадування про ручний деплой бази
+  release-notice:
+    name: Нагадування про деплой БД
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Чи змінено supabase/migrations або supabase/functions
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE...$HEAD" -- supabase/migrations supabase/functions)
+          if [ -z "$changed" ]; then
+            echo "Міграції й Edge Functions не змінено — після злиття досить автоматичного деплою фронту."
+            exit 0
+          fi
+          echo "::warning title=Після злиття — деплой БД::Після злиття запусти «Деплой БД і функцій на prod» (Actions → Run workflow → main, confirm = prod). Змінено: $(echo "$changed" | tr '\n' ' ')"
+          {
+            echo "## Після злиття запусти «Деплой БД і функцій на prod»"
+            echo
+            echo "Фронт з main публікує Workers Builds одразу, а база на prod оновиться лише після ручного запуску."
+            echo "Actions → «Деплой БД і функцій на prod» → Run workflow → гілка main, confirm = prod. Порядок — docs/setup.md, розділ 6."
+            echo
+            echo "Змінено:"
+            echo "$changed" | sed 's/^/- `/; s/$/`/'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   web:
     name: Фронт — lint, типи, тести, збірка
     runs-on: ubuntu-latest
@@ -30,7 +65,7 @@ jobs:
       - name: Збірка
         run: npm run build
         env:
-          # Лише публічні значення; справжні задаються в Cloudflare Pages
+          # Лише публічні значення-заглушки; справжні — змінні збірки в Cloudflare Workers Builds
           VITE_SUPABASE_URL: http://127.0.0.1:54321
           VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci-placeholder
       - name: У dist/ немає секретів
