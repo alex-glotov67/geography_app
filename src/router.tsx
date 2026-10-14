@@ -1,4 +1,4 @@
-import type { QueryClient } from '@tanstack/react-query'
+import type { EnsureQueryDataOptions, QueryClient, QueryKey } from '@tanstack/react-query'
 import {
   Outlet,
   createRootRouteWithContext,
@@ -24,6 +24,18 @@ import { queryClient } from '@/queryClient'
  * вантажиться — скелетон тієї ж форми (SPEC 13.7), сторінки уроку й тренування — окремі чанки.
  */
 
+/**
+ * Дані вже в кеші — повертаємо синхронно, тож роутер не показує pendingComponent і навігація без
+ * миготіння; інакше — запит (скелетон, лише якщо він довший за defaultPendingMs).
+ */
+function cachedOrFetch<TData, TKey extends QueryKey>(
+  qc: QueryClient,
+  q: EnsureQueryDataOptions<TData, Error, TData, TKey>,
+): TData | Promise<TData> {
+  const cached = qc.getQueryData<TData>(q.queryKey)
+  return cached !== undefined ? cached : qc.ensureQueryData(q)
+}
+
 export interface RouterContext {
   queryClient: QueryClient
 }
@@ -42,7 +54,8 @@ const gradeRoute = createRoute({
   beforeLoad: ({ params }) => {
     if (!isGrade(Number(params.grade))) throw notFound()
   },
-  loader: ({ context, params }) => context.queryClient.ensureQueryData(gradeLessonsQuery(Number(params.grade))),
+  // Дані в кеші — повертаємо одразу (без pending-скелетона); інакше чекаємо запит
+  loader: ({ context, params }) => cachedOrFetch(context.queryClient, gradeLessonsQuery(Number(params.grade))),
   pendingComponent: function GradePending() {
     return <GradePageSkeleton grade={Number(gradeRoute.useParams().grade)} />
   },
@@ -55,7 +68,7 @@ const lessonRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/lesson/$slug',
   loader: async ({ context, params }) => {
-    const lesson = await context.queryClient.ensureQueryData(lessonQuery(params.slug))
+    const lesson = await cachedOrFetch(context.queryClient, lessonQuery(params.slug))
     // Список уроків розділу для бокової колонки на комп'ютері — не блокує показ уроку
     void context.queryClient.prefetchQuery(gradeLessonsQuery(lesson.snapshot.grade))
   },
@@ -70,7 +83,7 @@ const practiceRoute = createRoute({
   // ?level=base — тренування одного рівня (з блоку «Завдання» на сторінці уроку)
   validateSearch: (search: Record<string, unknown>): { level?: Level } =>
     LEVELS.includes(search.level as Level) ? { level: search.level as Level } : {},
-  loader: ({ context, params }) => context.queryClient.ensureQueryData(lessonQuery(params.slug)),
+  loader: ({ context, params }) => cachedOrFetch(context.queryClient, lessonQuery(params.slug)),
   pendingComponent: function PracticePending() {
     return <PracticePageSkeleton slug={practiceRoute.useParams().slug} />
   },

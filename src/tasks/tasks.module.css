@@ -460,3 +460,107 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* ── Перетягування (dnd-kit) ─────────────────────────────────────────────────────────── */
+/* «Привид» під пальцем / курсором */
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--water);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: grabbing;
+}
+
+/* Оригінал на місці, поки його тягнуть */
+[data-dragging] {
+  opacity: 0.35;
+}
+
+/* Під час перетягування зони скидання видно; над якою картка — підсвічена */
+[data-droppable] {
+  outline: 2px dashed var(--line-strong);
+  outline-offset: 2px;
+}
+
+[data-over] {
+  outline: 2px solid var(--water);
+  background: var(--water-tint);
+}
+
+/* Елементи, які можна тягнути: не виділяти текст при утриманні пальцем */
+.draggable {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: grab;
+}
+
+.grip {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.plainList {
+  list-style: none;
+}
+
+/* Відповідність: рядок зліва + зона скидання */
+.matchRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.matchRow:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.slotLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slot {
+  flex-grow: 1;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: var(--radius-control);
+  border: 1px dashed var(--line-strong);
+  background: var(--surface-sunken);
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.slot:disabled {
+  cursor: default;
+}
+
+.slot[data-filled] {
+  border: 2px solid var(--water);
+  background: var(--water-tint);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.slot[data-result='ok'] {
+  border-color: var(--ok-fg);
+  background: var(--ok-bg);
+}
+
+.slot[data-result='err'] {
+  border-color: var(--err-fg);
+  background: var(--err-bg);
+}

@@ -50,7 +50,7 @@ function SearchField({ value, onChange, disabled }: { value: string; onChange?: 
 function Empty() {
   return (
     <section className={classes.empty}>
-      <ContourBackground shape="peak" width={300} height={220} color="var(--water)" style={{ right: -90, bottom: -80 }} />
+      <ContourBackground color="var(--water)" />
       <h2>Уроки готуються</h2>
       <p>Вчитель саме додає уроки цього класу. Зазирни трохи згодом — або повернись до вибору класу.</p>
     </section>

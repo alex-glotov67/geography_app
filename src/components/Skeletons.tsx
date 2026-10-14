@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { Skeleton } from '@mantine/core'
+import blocks from '@/blocks/blocks.module.css'
 import layout from '@/features/lesson/lessonLayout.module.css'
 import classes from './Skeletons.module.css'
 
@@ -79,17 +80,20 @@ export function LessonPageSkeleton() {
               ))}
             </section>
 
-            <section className={layout.sectionTight}>
-              <h2 className={layout.h2}>Пояснення</h2>
-              {TEXT_WIDTHS.map((w, i) => (
-                <SkeletonLine key={i} width={w} height={17} />
-              ))}
-            </section>
+            {/* Та сама пара «текст + відео», що й у BlockList: поруч на комп'ютері */}
+            <div className={blocks.pair}>
+              <section className={layout.sectionTight}>
+                <h2 className={layout.h2}>Пояснення</h2>
+                {TEXT_WIDTHS.map((w, i) => (
+                  <SkeletonLine key={i} width={w} height={17} />
+                ))}
+              </section>
 
-            <section className={layout.section}>
-              <h2 className={layout.h2}>Відео</h2>
-              <Skeleton className={layout.video} radius={16} />
-            </section>
+              <section className={layout.section}>
+                <h2 className={`${layout.h2} ${blocks.videoHeading}`}>Відео</h2>
+                <Skeleton className={layout.video} radius={16} />
+              </section>
+            </div>
 
             <section className={layout.section}>
               <h2 className={layout.h2}>Завдання</h2>

@@ -1,9 +1,10 @@
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { check, type Scored } from '@shared/scoring/index.ts'
 import { TASK_SCHEMAS, type TaskType } from '@shared/schemas/tasks/index.ts'
 import type { Level } from '@shared/schemas/common.ts'
 import { LevelIcon } from '@/components/LevelIcon'
 import { LEVEL_LABEL } from '@/lib/levels'
+import { answerKey, useAnswers } from '@/stores/answers'
 import { TASKS } from './registry'
 import classes from './tasks.module.css'
 
@@ -23,6 +24,8 @@ interface Props {
   task: PracticeTask
   /** Номер у межах сторінки тренування */
   number: number
+  /** `${lessonId}@${version}` — де зберігати відповідь (stores/answers); без нього — лише в пам'яті */
+  scope?: string
 }
 
 type Tone = 'ok' | 'partial' | 'err' | 'info'
@@ -44,7 +47,7 @@ function message(type: string, r: Scored, task: PracticeTask): { tone: Tone; tex
 }
 
 /** Картка тренувального завдання (Tasks.dc.html): рівень, питання, відповідь, «Перевірити», відгук. */
-export function TaskCard({ task, number }: Props) {
+export function TaskCard({ task, number, scope = 'local' }: Props) {
   const uid = useId()
   const parsed = useMemo(() => {
     if (!(task.type in TASK_SCHEMAS)) return null
@@ -55,7 +58,12 @@ export function TaskCard({ task, number }: Props) {
   }, [task])
 
   const mod = parsed ? TASKS[parsed.type] : null
-  const [value, setValue] = useState<unknown>(() => {
+  const key = answerKey(scope, task.id)
+  const saved = useAnswers((st) => st.answers[key])
+  const save = useAnswers((st) => st.save)
+  // Стартова відповідь (для упорядкування — перемішаний порядок) фіксується один раз і зберігається,
+  // щоб перемонтування не перемішувало заново
+  const [initial] = useState<unknown>(() => {
     if (!parsed || !mod) return null
     const empty = mod.empty(parsed.content as never) as { order?: string[] }
     // Упорядкування: стартовий порядок не має збігатися з правильним
@@ -67,7 +75,12 @@ export function TaskCard({ task, number }: Props) {
     }
     return empty
   })
-  const [result, setResult] = useState<Scored | null>(null)
+  useEffect(() => {
+    if (!saved && initial !== null) save(key, { value: initial, checked: false })
+  }, [saved, initial, key, save])
+  const value = saved?.value ?? initial
+  const result: Scored | null =
+    parsed && saved?.checked ? check(parsed.type, parsed.content as never, parsed.key as never, value as never, task.points) : null
   const [nudge, setNudge] = useState(false)
 
   if (!parsed || !mod) {
@@ -86,11 +99,11 @@ export function TaskCard({ task, number }: Props) {
   const onCheck = () => {
     if (!mod.isAnswered(value as never, parsed.content as never)) {
       setNudge(true)
-      setResult(null)
+      save(key, { value, checked: false })
       return
     }
     setNudge(false)
-    setResult(check(parsed.type, parsed.content as never, parsed.key as never, value as never, task.points))
+    save(key, { value, checked: true })
   }
 
   return (
@@ -107,8 +120,7 @@ export function TaskCard({ task, number }: Props) {
         content={parsed.content}
         value={value}
         onChange={(v: unknown) => {
-          setValue(v)
-          setResult(null)
+          save(key, { value: v, checked: false })
           setNudge(false)
         }}
         details={result?.details ?? null}

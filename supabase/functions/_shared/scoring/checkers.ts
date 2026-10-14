@@ -1,3 +1,4 @@
+import { orderingMode } from '../schemas/tasks/ordering.ts'
 import type { Checker } from './types.ts'
 import { clamp01, normalizeText, share } from './util.ts'
 
@@ -26,7 +27,7 @@ export const matching: Checker<'matching'> = (content, key, answer) => {
   return { fraction: share(Object.values(items)), details: { items } }
 }
 
-/** `exact` — 1 лише за повністю правильний порядок; `pairs` — частка правильних сусідніх пар. */
+/** `exact` — 1 лише за повністю правильний порядок; `pairs` — частка правильних сусідніх пар (orderingMode). */
 export const ordering: Checker<'ordering'> = (content, key, answer) => {
   const order = answer.order
   const exact = order.length === key.correctOrder.length && order.every((id, i) => id === key.correctOrder[i])
@@ -36,7 +37,7 @@ export const ordering: Checker<'ordering'> = (content, key, answer) => {
     const at = order.indexOf(key.correctOrder[i]!)
     if (at >= 0 && order[at + 1] === key.correctOrder[i + 1]) correctPairs++
   }
-  const fraction = content.scoring === 'exact' ? (exact ? 1 : 0) : correctPairs / total
+  const fraction = orderingMode(content) === 'exact' ? (exact ? 1 : 0) : correctPairs / total
   return { fraction, details: { exact, correctPairs, totalPairs: total } }
 }
 

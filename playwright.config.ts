@@ -19,6 +19,9 @@ export default defineConfig({
   projects: [
     { name: 'phone', use: { ...devices['Pixel 7'] } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    // Рушій Safari (локально: E2E_WEBKIT=1 npx playwright install webkit && E2E_WEBKIT=1 npm run e2e).
+    // Не заміна справжньому iPhone: дотик через WebKit емулювати не можна — тут лише миша.
+    ...(process.env.E2E_WEBKIT ? [{ name: 'webkit', use: { ...devices['Desktop Safari'] } }] : []),
   ],
   webServer: {
     command: 'npm run preview:worker',

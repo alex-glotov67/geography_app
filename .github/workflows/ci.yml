@@ -38,7 +38,8 @@ jobs:
           {
             echo "## Після злиття запусти «Деплой БД і функцій на prod»"
             echo
-            echo "Фронт з main публікує Workers Builds одразу, а база на prod оновиться лише після ручного запуску."
+            echo "Фронт з main публікує Workers Builds одразу після злиття, а база на prod оновиться лише після ручного запуску."
+            echo "Правило (SPEC 3.5): міграції — перед фронтом і зворотно сумісні. Якщо цей PR містить і фронт, що вже потребує нової схеми, — розбий: спершу міграції, деплой БД, потім фронт."
             echo "Actions → «Деплой БД і функцій на prod» → Run workflow → гілка main, confirm = prod. Порядок — docs/setup.md, розділ 6."
             echo
             echo "Змінено:"
@@ -105,10 +106,11 @@ jobs:
           diff -u src/types/database.types.ts /tmp/database.types.ts
       - name: Демо-зміст (довідник CSV + пакет .geo.zip → публікація)
         run: npm run seed
-      - name: Збірка з локальним Supabase
+      - name: Збірка з локальним Supabase (для e2e)
         run: |
           supabase status -o env | grep -E '^(API_URL|PUBLISHABLE_KEY)=' | sed -e 's/^API_URL=/VITE_SUPABASE_URL=/' -e 's/^PUBLISHABLE_KEY=/VITE_SUPABASE_PUBLISHABLE_KEY=/' > .env.local
-          npm run build
+          # build:e2e — з тестовим хуком доступу до кешу запитів (у prod-збірці його немає, див. job web)
+          npm run build:e2e
       - run: npx playwright install --with-deps chromium
       - name: e2e (wrangler dev — SPA-режим як на Workers)
         run: npm run e2e

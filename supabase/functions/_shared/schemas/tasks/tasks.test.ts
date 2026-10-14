@@ -32,7 +32,7 @@ describe('схеми завдань (SPEC 7)', () => {
 
   it('значення за замовчуванням: перемішування, підрахунок пар, допуск', () => {
     expect(TASK_SCHEMAS.single_choice.content.parse(VALID.single_choice![0]).shuffle).toBe(true)
-    expect(TASK_SCHEMAS.ordering.content.parse(VALID.ordering![0]).scoring).toBe('pairs')
+    expect(TASK_SCHEMAS.ordering.content.parse(VALID.ordering![0]).scoring).toBe('exact')
     expect(TASK_SCHEMAS.numeric.key.parse({ answer: 1 }).tolerance).toBe(0)
   })
 
@@ -57,6 +57,14 @@ describe('схеми завдань (SPEC 7)', () => {
       expect.arrayContaining([expect.stringMatching(/повторюються/), expect.stringMatching(/Немає варіантів/)]),
     )
     expect(keyIssues('numeric', { prompt: 'П' }, { answer: Number.NaN })[0]).toMatch(/^ключ\./)
+  })
+
+  it('ordering: за замовчуванням exact для ≤ 4 елементів, pairs від 5; явний режим має пріоритет', () => {
+    const items = (n: number) => o(...'abcdefgh'.slice(0, n).split(''))
+    const mode = (n: number, scoring?: string) => TASK_SCHEMAS.ordering.content.parse({ prompt: 'П', items: items(n), scoring }).scoring
+    expect([3, 4, 5, 8].map((n) => mode(n))).toEqual(['exact', 'exact', 'pairs', 'pairs'])
+    expect(mode(3, 'pairs')).toBe('pairs')
+    expect(mode(6, 'exact')).toBe('exact')
   })
 
   it('blankIds — у порядку появи', () => {

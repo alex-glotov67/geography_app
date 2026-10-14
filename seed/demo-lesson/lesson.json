@@ -4,54 +4,274 @@
   "sectionNumber": 1,
   "number": 1,
   "title": "ДЕМО: рельєф",
-  "textbookRef": { "paragraph": "ДЕМО", "pages": "—" },
-  "outcomeCodes": ["8-1-1-01", "8-1-1-02", "8-1-2-01"],
+  "textbookRef": {
+    "paragraph": "ДЕМО",
+    "pages": "—"
+  },
+  "outcomeCodes": [
+    "8-1-1-01",
+    "8-1-1-02",
+    "8-1-2-01"
+  ],
   "blocks": [
-    { "id": "goal", "type": "goal", "items": ["Які форми рельєфу бувають", "Як читати висоти на фізичній карті", "Чим низовина відрізняється від височини"] },
+    {
+      "id": "goal",
+      "type": "goal",
+      "items": [
+        "Які форми рельєфу бувають",
+        "Як читати висоти на фізичній карті",
+        "Чим низовина відрізняється від височини"
+      ]
+    },
+    {
+      "id": "terms",
+      "type": "terms",
+      "items": [
+        {
+          "term": "Рельєф",
+          "definition": "Сукупність усіх нерівностей земної поверхні: рівнин, гір, долин, ярів."
+        },
+        {
+          "term": "Низовина",
+          "definition": "Рівнина з висотами до 200 м над рівнем моря. На фізичній карті — зелена."
+        },
+        {
+          "term": "Височина",
+          "definition": "Рівнина з висотами від 200 до 500 м над рівнем моря. На карті — жовта."
+        },
+        {
+          "term": "Гори",
+          "definition": "Ділянки з висотами понад 500 м і великими перепадами висот. На карті — коричневі."
+        }
+      ]
+    },
     {
       "id": "explain",
       "type": "text",
-      "doc": { "type": "doc", "content": [
-        { "type": "paragraph", "content": [
-          { "type": "text", "text": "ДЕМО-урок для перевірки ресурсу. " },
-          { "type": "text", "text": "Рівнини", "marks": [{ "type": "bold" }] },
-          { "type": "text", "text": " бувають низькими й вищими: низовини і височини. На фізичній карті їх показують різними кольорами." }
-        ] },
-        { "type": "heading", "attrs": { "level": 3 }, "content": [{ "type": "text", "text": "Як читати висоти" }] },
-        { "type": "bulletList", "content": [
-          { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "знайди шкалу висот у легенді карти;" }] }] },
-          { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "порівняй колір місцевості з кольорами шкали;" }] }] },
-          { "type": "listItem", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "зроби висновок, рівнина це чи гори." }] }] }
-        ] }
-      ] },
-      "simplifiedDoc": { "type": "doc", "content": [
-        { "type": "paragraph", "content": [{ "type": "text", "text": "ДЕМО. Низькі рівнини — це низовини. Вищі рівнини — це височини." }] },
-        { "type": "paragraph", "content": [{ "type": "text", "text": "На карті їх показують різними кольорами." }] }
-      ] }
+      "doc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "ДЕМО-урок для перевірки ресурсу. "
+              },
+              {
+                "type": "text",
+                "text": "Рівнини",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " бувають низькими й вищими: низовини і височини. На фізичній карті їх показують різними кольорами."
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 3
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Як читати висоти"
+              }
+            ]
+          },
+          {
+            "type": "bulletList",
+            "content": [
+              {
+                "type": "listItem",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "знайди шкалу висот у легенді карти;"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "порівняй колір місцевості з кольорами шкали;"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "listItem",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "зроби висновок, рівнина це чи гори."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "simplifiedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "ДЕМО. Низькі рівнини — це низовини. Вищі рівнини — це височини."
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "На карті їх показують різними кольорами."
+              }
+            ]
+          }
+        ]
+      }
     },
-    { "id": "terms", "type": "terms", "items": [
-      { "term": "Рельєф", "definition": "Сукупність усіх нерівностей земної поверхні: рівнин, гір, долин, ярів." },
-      { "term": "Низовина", "definition": "Рівнина з висотами до 200 м над рівнем моря. На фізичній карті — зелена." },
-      { "term": "Височина", "definition": "Рівнина з висотами від 200 до 500 м над рівнем моря. На карті — жовта." },
-      { "term": "Гори", "definition": "Ділянки з висотами понад 500 м і великими перепадами висот. На карті — коричневі." }
-    ] },
-    { "id": "pic", "type": "image", "mediaId": "contours" },
-    { "id": "video", "type": "video", "videoId": "demo-video" },
-    { "id": "local", "type": "callout", "variant": "local", "simplified": false, "doc": { "type": "doc", "content": [
-      { "type": "paragraph", "content": [{ "type": "text", "text": "ДЕМО: тут вчитель розповість про рельєф свого краю." }] }
-    ] } },
-    { "id": "data", "type": "table", "simplified": false, "caption": "ДЕМО: умовні висоти трьох пунктів", "columns": ["Пункт", "Висота, м", "Форма рельєфу"],
-      "rows": [["Пункт А", "120", "низовина"], ["Пункт Б", "340", "височина"], ["Пункт В", "900", "гори"]],
-      "meta": { "source": "ДЕМО — вигадані дані для демонстрації", "asOf": "—" } },
-    { "id": "profiles", "type": "gallery", "simplified": false, "items": [
-      { "mediaId": "profile-low", "caption": "ДЕМО: профіль низовини" },
-      { "mediaId": "profile-high", "caption": "ДЕМО: профіль гір" }
-    ] },
-    { "id": "sheet", "type": "file", "mediaId": "worksheet", "title": "ДЕМО: робочий аркуш (PDF)" },
-    { "id": "practice", "type": "practice", "taskIds": ["t-forms", "t-plains", "t-colors", "t-match", "t-fill", "t-order", "t-groups", "t-scale"] },
-    { "id": "hw", "type": "homework" }
+    {
+      "id": "video",
+      "type": "video",
+      "videoId": "demo-video"
+    },
+    {
+      "id": "pic",
+      "type": "image",
+      "mediaId": "contours"
+    },
+    {
+      "id": "local",
+      "type": "callout",
+      "variant": "local",
+      "simplified": false,
+      "doc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "ДЕМО: тут вчитель розповість про рельєф свого краю."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "data",
+      "type": "table",
+      "simplified": false,
+      "caption": "ДЕМО: умовні висоти трьох пунктів",
+      "columns": [
+        "Пункт",
+        "Висота, м",
+        "Форма рельєфу"
+      ],
+      "rows": [
+        [
+          "Пункт А",
+          "120",
+          "низовина"
+        ],
+        [
+          "Пункт Б",
+          "340",
+          "височина"
+        ],
+        [
+          "Пункт В",
+          "900",
+          "гори"
+        ]
+      ],
+      "meta": {
+        "source": "ДЕМО — вигадані дані для демонстрації",
+        "asOf": "—"
+      }
+    },
+    {
+      "id": "profiles",
+      "type": "gallery",
+      "simplified": false,
+      "items": [
+        {
+          "mediaId": "profile-low",
+          "caption": "ДЕМО: профіль низовини"
+        },
+        {
+          "mediaId": "profile-high",
+          "caption": "ДЕМО: профіль гір"
+        }
+      ]
+    },
+    {
+      "id": "sheet",
+      "type": "file",
+      "mediaId": "worksheet",
+      "title": "ДЕМО: робочий аркуш (PDF)"
+    },
+    {
+      "id": "practice",
+      "type": "practice",
+      "taskIds": [
+        "t-forms",
+        "t-plains",
+        "t-colors",
+        "t-match",
+        "t-fill",
+        "t-order",
+        "t-groups",
+        "t-scale"
+      ]
+    },
+    {
+      "id": "hw",
+      "type": "homework"
+    }
   ],
-  "homework": { "taskIds": ["hw-1", "hw-2"] },
-  "simplified": { "homeworkTaskIds": ["hw-1"] },
-  "quizPool": ["q-1"]
+  "homework": {
+    "taskIds": [
+      "hw-1",
+      "hw-2"
+    ]
+  },
+  "simplified": {
+    "homeworkTaskIds": [
+      "hw-1"
+    ]
+  },
+  "quizPool": [
+    "q-1"
+  ]
 }

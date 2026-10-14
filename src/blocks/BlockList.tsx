@@ -1,6 +1,13 @@
 import type { Block } from '@shared/schemas/blocks.ts'
+import { groupBlocks } from './groupBlocks'
 import { BLOCK_VIEWS } from './registry'
 import { useLesson } from './lessonContext'
+import classes from './blocks.module.css'
+
+const render = (block: Block) => {
+  const View = BLOCK_VIEWS[block.type] as React.ComponentType<{ block: Block }>
+  return <View key={block.id} block={block} />
+}
 
 /**
  * Блоки уроку по порядку. Спрощений режим (SPEC 10.2): окремий список simplified.blocks, якщо є,
@@ -11,10 +18,15 @@ export function BlockList({ blocks, simplifiedBlocks }: { blocks: Block[]; simpl
   const list = simplified ? (simplifiedBlocks ?? blocks.filter((b) => b.simplified)) : blocks
   return (
     <>
-      {list.map((block) => {
-        const View = BLOCK_VIEWS[block.type] as React.ComponentType<{ block: Block }>
-        return <View key={block.id} block={block} />
-      })}
+      {groupBlocks(list).map((g) =>
+        g.length === 2 ? (
+          <div key={g.map((b) => b.id).join('+')} className={classes.pair}>
+            {g.map(render)}
+          </div>
+        ) : (
+          render(g[0]!)
+        ),
+      )}
     </>
   )
 }
