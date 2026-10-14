@@ -5,7 +5,53 @@ export type Database = {
   
   "public": {
           Tables: {
-            "lesson_outcomes": {
+            "audit_log": {
+                  Row: {
+                    "action": string,"at": string,"details": NonNullable<Json>,"id": number,"teacher_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"at"?: string,"details"?: NonNullable<Json>,"id"?: never,"teacher_id": string
+                  }
+                  Update: {
+                    "action"?: string,"at"?: string,"details"?: NonNullable<Json>,"id"?: never,"teacher_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "audit_log_teacher_id_fkey"
+      columns: ["teacher_id"]
+isOneToOne: false
+      referencedRelation: "teachers"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"classes": {
+                  Row: {
+                    "archived": boolean,"created_at": string,"grade": number,"id": string,"login_prefix": string,"name": string,"school_id": string,"school_year": string,"teacher_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "archived"?: boolean,"created_at"?: string,"grade": number,"id"?: string,"login_prefix": string,"name": string,"school_id"?: string,"school_year": string,"teacher_id"?: string
+                  }
+                  Update: {
+                    "archived"?: boolean,"created_at"?: string,"grade"?: number,"id"?: string,"login_prefix"?: string,"name"?: string,"school_id"?: string,"school_year"?: string,"teacher_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "classes_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "classes_teacher_id_fkey"
+      columns: ["teacher_id"]
+isOneToOne: false
+      referencedRelation: "teachers"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"lesson_outcomes": {
                   Row: {
                     "lesson_id": string,"outcome_id": string
                   }
@@ -225,6 +271,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"students": {
+                  Row: {
+                    "archived": boolean,"auth_user_id": string | null,"class_id": string,"created_at": string,"display_name": string | null,"first_initial": string,"id": string,"last_login_at": string | null,"last_name": string,"login": string,"name_key": string | null,"number": number,"school_id": string,"simplified_mode": boolean
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "archived"?: boolean,"auth_user_id"?: string | null,"class_id": string,"created_at"?: string,"display_name"?: never,"first_initial": string,"id"?: string,"last_login_at"?: string | null,"last_name": string,"login": string,"name_key"?: never,"number": number,"school_id": string,"simplified_mode"?: boolean
+                  }
+                  Update: {
+                    "archived"?: boolean,"auth_user_id"?: string | null,"class_id"?: string,"created_at"?: string,"display_name"?: never,"first_initial"?: string,"id"?: string,"last_login_at"?: string | null,"last_name"?: string,"login"?: string,"name_key"?: never,"number"?: number,"school_id"?: string,"simplified_mode"?: boolean
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "students_class_id_fkey"
+      columns: ["class_id"]
+isOneToOne: false
+      referencedRelation: "classes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "students_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"task_keys": {
                   Row: {
                     "key": NonNullable<Json>,"owner_id": string,"task_id": string
@@ -305,14 +377,14 @@ isOneToOne: false
                   ]
                 },"teachers": {
                   Row: {
-                    "created_at": string,"display_name": string,"id": string,"school_id": string
+                    "created_at": string,"display_name": string,"id": string,"login_prefix": string,"school_id": string,"students_can_change_password": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"display_name"?: string,"id": string,"school_id": string
+                    "created_at"?: string,"display_name"?: string,"id": string,"login_prefix"?: string,"school_id": string,"students_can_change_password"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string,"id"?: string,"school_id"?: string
+                    "created_at"?: string,"display_name"?: string,"id"?: string,"login_prefix"?: string,"school_id"?: string,"students_can_change_password"?: boolean
                   }
                   Relationships: [
                     {
@@ -389,6 +461,9 @@ isOneToOne: false
           Functions: {
             "publish_lesson":
 { Args: { "p_lesson_id": string }; Returns: number
+                           },
+"touch_last_login":
+{ Args: Record<PropertyKey, never>; Returns: undefined
                            }
           }
           Enums: {

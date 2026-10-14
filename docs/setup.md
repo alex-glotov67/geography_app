@@ -52,6 +52,10 @@ npm run db:start       # Postgres, Auth, Storage, Realtime, Studio у Docker
 
 Демо-зміст (лише локально): `npm run db:reset && npm run seed` — довідник із `seed/demo-outcomes.csv` і урок із `seed/demo-lesson/` (пакується в `.geo.zip` і проходить той самий імпорт, що й справжні пакети). Відкрий http://localhost:5173/grade/8.
 
+**Вхід локально:** демо-вчитель `demo-teacher@example.invalid` / `demo-teacher-2026` (лише в `supabase/seed.sql`, на prod його немає) → http://localhost:5173/login → «Класи й учні» → створи клас → «Імпортувати список» (тестові файли — `e2e/fixtures/class-8b.*.csv`, вигадані учні). Edge Function `manage-students` локально запускає сам `npm run db:start` (Edge Runtime); логи — `npx supabase functions logs` або Docker Desktop → `supabase_edge_runtime_*`.
+
+> Edge Functions — серверні функції Supabase на Deno (TypeScript, як Node, але імпорти — з `deno.json`, напр. `npm:zod@4`). Наша єдина поки що — `manage-students`: лише вона має сервісний ключ і створює акаунти учнів. Логіка — `supabase/functions/manage-students/service.ts` (тести у Vitest), `index.ts` — тонка обгортка з доступом до БД і Auth.
+
 Корисне:
 
 ```bash
@@ -104,7 +108,8 @@ Workflows:
 
 ### 3.2 Auth
 - **Authentication → URL Configuration**: Site URL — адреса сайту на Cloudflare (розділ 4), у Redirect URLs додай її ж.
-- **Authentication → Providers → Email**: вимкни підтвердження email (учні мають фіктивні адреси `@students.invalid`, SPEC 5.1). Самостійну реєстрацію вимкнемо у Фазі 2, коли з'явиться вхід вчителя.
+- **Authentication → Providers → Email**: вимкни підтвердження email (учні мають фіктивні адреси `@students.invalid`, SPEC 5.1).
+- **Authentication → Sign In / Providers → User Signups**: **вимкни «Allow new users to sign up»**. Вчителя створюєш вручну (розділ 7.1), учнів — `manage-students` через адмін-API, на яке це налаштування не впливає. Інакше будь-хто міг би створити собі акаунт (даних він би не побачив — RLS, — але й акаунт зайвий).
 - Anonymous sign-ins — **вимкнено** до Фази 6 (гості квізу).
 
 ### 3.3 Міграції
@@ -175,8 +180,8 @@ npm run deploy         # збірка + check:dist + wrangler deploy
 ### 4.5 Домен
 За бажанням — власний короткий домен (**Settings → Domains & Routes → Add → Custom domain**) для карток входу й QR (SPEC 19.8).
 
-## 5. Моніторинг (Фаза 2)
-Безкоштовна перевірка доступності сайту й функцій з повідомленням вчителю — налаштовується разом із появою реальних учнів.
+## 5. Моніторинг
+Безкоштовна перевірка доступності сайту й функцій з повідомленням вчителю — налаштуємо перед появою реальних учнів на prod (TODO: обрати сервіс без реєстрації учнів, напр. UptimeRobot Free; потрібне погодження вчителя як нового сервісу).
 
 ## 6. Порядок релізу
 
@@ -207,3 +212,43 @@ https://geography-app.alexglotov67.workers.dev/
 - **Фронт** — Cloudflare → Deployments → попередня версія → **Rollback**. Оскільки міграції зворотно сумісні, стара версія фронту працює з новою базою.
 - **База** — лише новою міграцією тим самим шляхом (PR → CI → злиття → деплой БД); відкатів схеми вручну в панелі не робимо.
 - **Несумісна зміна** (перейменувати / прибрати стовпець) — у два релізи: спершу додати нове й перевести на нього фронт, і лише наступним релізом прибрати старе.
+
+## 7. Акаунти, бекапи й keepalive (Фаза 2)
+
+### 7.1 Акаунт вчителя на prod (один раз)
+Реєстрацію на prod вимкнено (розділ 3.2), тож вчителя створюєш сам:
+1. Supabase → **Authentication → Users → Add user → Create new user**: твій email і надійний пароль, **Auto Confirm User** — увімкнено.
+2. **SQL Editor** → вистав (заміни назву школи й email) → Run:
+   ```sql
+   with s as (insert into public.schools (name) values ('Назва школи') returning id)
+   insert into public.teachers (id, school_id, display_name)
+   select u.id, s.id, 'Прізвище І. Б.' from auth.users u, s where u.email = 'твій@email';
+   ```
+3. Увійди на сайті: `/login` → email і пароль → «Кабінет вчителя». Назву школи для карток входу можна змінити в «Налаштування».
+
+Пароль вчителя забув — Supabase → Authentication → Users → твій користувач → **Send password recovery** (лист піде на справжній email).
+
+### 7.2 Секрети для функцій і бекапу
+- Edge Function `manage-students` бере `SUPABASE_URL` і сервісний ключ із середовища Supabase автоматично — нічого додавати не треба. Деплой — разом із міграціями (`deploy-prod.yml`).
+- Для бекапу файлів Storage: GitHub → Settings → Environments → `production` → **Add secret** `SUPABASE_SERVICE_ROLE_KEY` = Supabase → Project Settings → API Keys → **secret key** (`sb_secret_…`). Він є лише в секретах GitHub, ніде в коді.
+
+### 7.3 Бекапи (обов'язково, щойно на prod з'являться справжні учні)
+Щонеділі `backup.yml` робить дамп БД (ролі, схема, дані) і копію файлів Storage, шифрує архів **age** твоїм публічним ключем і кладе в артефакти GitHub на 90 днів. Розшифрувати може лише власник приватного ключа — навіть доступ до репозиторію його не дає.
+
+> age — проста утиліта шифрування файлів (як gpg, але з одним коротким ключем). Встановлення: `brew install age` (macOS) або [github.com/FiloSottile/age](https://github.com/FiloSottile/age/releases).
+
+1. Один раз: `age-keygen -o geo-backup-key.txt`. Файл — **приватний ключ**: збережи в менеджері паролів і ще в одному місці (без нього бекап не відкрити). Рядок `# public key: age1…` — публічний.
+2. GitHub → Settings → Secrets and variables → Actions → **Variables**: `BACKUP_AGE_RECIPIENT` = публічний ключ `age1…`, `BACKUPS_ENABLED` = `true`.
+3. Actions → «Бекап prod» → **Run workflow** — перший бекап вручну, далі щотижня. Завантаж артефакт `geo-prod-<дата>.tar.gz.age` і збережи у своєму сховищі (напр. Google Drive) — артефакти GitHub живуть 90 днів.
+4. Перед канікулами — ще й ручний запуск і копія.
+
+**Відновлення:**
+```bash
+age -d -i geo-backup-key.txt -o backup.tar.gz geo-prod-2026-10-18.tar.gz.age
+tar -xzf backup.tar.gz            # каталог backup/: roles.sql, schema.sql, data.sql, storage/
+```
+- **Перевірити / подивитися локально** (prod не чіпає): `npm run db:start && scripts/backup/restore-local.sh backup` — локальна база з міграцій + дані + файли Storage. CI щоразу перевіряє цей шлях на демо-даних (`scripts/backup/roundtrip-local.sh`).
+- **У новий хмарний проєкт** (якщо prod втрачено): створи проєкт (розділ 3.1), потім за [інструкцією Supabase](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore) — `psql` з `roles.sql`, `schema.sql`, `data.sql` (з `session_replication_role = replica`), і `npx tsx scripts/backup/storage.ts upload backup/storage` з `SUPABASE_URL` і `SUPABASE_SERVICE_ROLE_KEY` нового проєкту.
+
+### 7.4 Keepalive на канікули
+Supabase Free призупиняє проєкт після тижня без активності. Якщо на канікулах не хочеш його будити вручну (розділ 3.5): GitHub → Variables: `PROD_SUPABASE_URL` = Project URL, `PROD_SUPABASE_PUBLISHABLE_KEY` = publishable key (обидва публічні), `KEEPALIVE_ENABLED` = `true`. `keepalive.yml` двічі на тиждень читає довідник через Data API. Вимкнути — `KEEPALIVE_ENABLED` = `false`.

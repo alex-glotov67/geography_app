@@ -61,6 +61,11 @@ jobs:
       - run: npm run typecheck
       - name: Vitest + 100 % покриття @shared/scoring
         run: npm run test:coverage
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Типи Edge Functions (Deno)
+        run: deno check supabase/functions/*/index.ts
       - name: Демо-пакети проходять валідацію
         run: npm run validate
       - name: Збірка
@@ -86,8 +91,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Запуск Supabase (без Studio, пошти, функцій і логів)
-        run: supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor
+      - name: Запуск Supabase з Edge Functions (без Studio, пошти й логів)
+        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,supavisor
       - name: Міграції без seed — демо-рядків немає, show_demo вимкнено
         run: |
           supabase db reset --no-seed
@@ -116,6 +121,10 @@ jobs:
         run: npm run e2e
         env:
           WRANGLER_SEND_METRICS: 'false'
+      - name: Бекап → відновлення в локальний Supabase (age, Storage, вхід)
+        run: |
+          sudo apt-get install -y -qq age
+          scripts/backup/roundtrip-local.sh
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
