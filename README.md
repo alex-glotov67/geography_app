@@ -7,7 +7,7 @@
 
 ## Стек
 
-React 19 + Vite + TypeScript · TanStack Router / Query · Zustand · Mantine (тема з токенів дизайну) · Supabase (Postgres, Auth, RLS, Storage, Realtime, Edge Functions) · Cloudflare Workers (static assets) · GitHub Actions.
+React 19 + Vite + TypeScript · TanStack Router / Query · Zustand · Mantine (тема з токенів дизайну) · dnd-kit (перетягування) · Supabase (Postgres, Auth, RLS, Storage, Realtime, Edge Functions) · Cloudflare Workers (static assets) · GitHub Actions.
 
 ## Швидкий старт
 
@@ -28,7 +28,8 @@ npm run dev
 | `npm run preview` | віддати `dist/` на http://localhost:4173 |
 | `npm run lint` / `typecheck` | ESLint / TypeScript |
 | `npm test` | Vitest (компоненти, тема) |
-| `npm run e2e` | Playwright: телефон і комп'ютер проти збірки (через `wrangler dev`) |
+| `npm run build:e2e` | збірка для e2e з тестовим хуком кешу запитів (у prod-збірку не потрапляє — перевіряє `check:dist`) |
+| `npm run e2e` | Playwright: телефон (емуляція дотику) і комп'ютер проти збірки `build:e2e` (через `wrangler dev`); `E2E_WEBKIT=1` — ще й рушій Safari |
 | `npm run preview:worker` | віддати `dist/` через `wrangler dev` — як на Cloudflare (SPA-fallback) |
 | `npm run deploy` | збірка + перевірка `dist/` + `wrangler deploy` (ручний деплой; основний — Workers Builds з `main`) |
 | `npm run check:dist` | у `dist/` немає секретів (service role, `sb_secret_`, приватні ключі) |
@@ -66,6 +67,7 @@ Prod: **https://geography-app.alexglotov67.workers.dev/**
 - zod-схеми уроку, блоків, 8 типів завдань; `@shared/scoring` (100 % гілок).
 - Екрани без входу: класи, урок (телефон і комп'ютер), тренування за рівнями, спрощений режим; скелетони, splash, fallback-шрифти — без зсуву макета.
 - Пакети `.geo.zip` (формат v1), довідник програми з CSV, демо-зміст у `seed/` — лише локально й у CI.
+- Після прийняття (PR #7): перетягування мишею й пальцем у відповідності, порядку й групах (запасний режим — кнопки); робота в завданні не перебивається фоновим оновленням; горизонталі — замкнені контури.
 - Заміри — `docs/perf.md`.
 
 ## Фаза 0 — закрито 12.10.2026

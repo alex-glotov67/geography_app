@@ -6,7 +6,8 @@ const o = (...pairs: [string, string][]) => pairs.map(([id, text]) => ({ id, tex
 const task = (type: string, content: unknown, key: unknown, extra: Partial<PracticeTask> = {}): PracticeTask => ({
   id: type, type, level: 'base', points: 1, content, key, ...extra,
 })
-const status = () => screen.findByRole('status')
+/** Відгук завдання (dnd-kit має ще власну живу область role=status) */
+const status = async () => (await screen.findAllByRole('status')).find((e) => e.tagName === 'P' && !!e.textContent)!
 const checkBtn = () => screen.getByRole('button', { name: 'Перевірити' })
 
 describe('TaskCard — тренування (SPEC 7)', () => {
@@ -50,11 +51,18 @@ describe('TaskCard — тренування (SPEC 7)', () => {
     expect(await status()).toHaveTextContent('Правильно!')
     unmount()
     render(<TaskCard number={4} task={task('matching', { prompt: 'Висоти', left: o(['l1', 'Низовина'], ['l2', 'Височина']), right: o(['r1', 'до 200 м'], ['r2', '200–500 м']) }, { pairs: { l1: 'r1', l2: 'r2' } })} />)
-    const low = screen.getByRole('group', { name: 'Низовина' })
-    await u.click(within(low).getByRole('radio', { name: 'до 200 м' }))
-    await u.click(within(screen.getByRole('group', { name: 'Височина' })).getByRole('radio', { name: 'до 200 м' }))
+    // «Торкнись варіанта → торкнись рядка» (запасний режим для клавіатури й читачів екрана)
+    const bank = () => within(screen.getByRole('group', { name: 'Варіанти' }))
+    await u.click(bank().getByRole('button', { name: 'до 200 м' }))
+    await u.click(screen.getByRole('button', { name: 'Покласти «до 200 м» у «Низовина»' }))
+    await u.click(bank().getByRole('button', { name: 'до 200 м' }))
+    await u.click(screen.getByRole('button', { name: 'Покласти «до 200 м» у «Височина»' }))
     await u.click(checkBtn())
     expect(await status()).toHaveTextContent('Правильно 1 з 2')
+    expect(screen.getByRole('button', { name: 'Низовина: до 200 м' })).toBeInTheDocument()
+    // Значення в рядку можна прибрати
+    await u.click(screen.getByRole('button', { name: 'Прибрати «до 200 м» з «Височина»' }))
+    expect(screen.getByRole('button', { name: 'Височина: порожньо' })).toBeDisabled()
   })
 
   it('ordering: кнопки «вище/нижче», старт не збігається з правильним порядком', async () => {
