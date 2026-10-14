@@ -26,5 +26,7 @@
       "@shared/*": ["./supabase/functions/_shared/*"]
     }
   },
-  "include": ["src", "supabase/functions/_shared"]
+  "include": ["src", "supabase/functions"],
+  // Точки входу функцій — Deno (Deno.serve, імпорти з deno.json); логіка поруч у service.ts перевіряється тут
+  "exclude": ["supabase/functions/*/index.ts"]
 }

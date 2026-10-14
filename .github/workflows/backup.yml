@@ -1,0 +1,73 @@
+name: Бекап prod
+
+# Щотижневий бекап prod (SPEC 3.5, обов'язковий з появою реальних учнів — на Free бекапів немає):
+# дамп БД (ролі, схема, дані) + файли Storage → архів, зашифрований age публічним ключем вчителя →
+# артефакт приватного репозиторію на 90 днів. Розшифрувати може лише власник приватного ключа.
+# Вмикається змінною репозиторію BACKUPS_ENABLED = true (docs/setup.md, розділ 7).
+# Відновлення перевіряє CI на локальному Supabase (scripts/backup/roundtrip-local.sh).
+
+on:
+  schedule:
+    - cron: '30 2 * * 0' # неділя, 02:30 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Дамп БД і Storage → зашифрований архів
+    if: vars.BACKUPS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      AGE_RECIPIENT: ${{ vars.BACKUP_AGE_RECIPIENT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.120.0 # як у package.json (devDependencies.supabase); оновлювати разом
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Публічний ключ age задано
+        run: |
+          if [[ "$AGE_RECIPIENT" != age1* ]]; then
+            echo "::error::Змінна BACKUP_AGE_RECIPIENT має містити публічний ключ age (age1…), docs/setup.md розділ 7"; exit 1
+          fi
+          sudo apt-get install -y -qq age
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Дамп БД
+        run: scripts/backup/dump.sh "$RUNNER_TEMP/backup" --linked
+      - name: Файли Storage
+        env:
+          SUPABASE_URL: https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npx tsx scripts/backup/storage.ts download "$RUNNER_TEMP/backup/storage"
+      - name: Архів і шифрування (відкритий архів не зберігається)
+        run: |
+          name="geo-prod-$(date -u +%Y-%m-%d)"
+          tar -C "$RUNNER_TEMP" -czf - backup | age -r "$AGE_RECIPIENT" -o "$RUNNER_TEMP/$name.tar.gz.age"
+          rm -rf "$RUNNER_TEMP/backup"
+          echo "NAME=$name" >> "$GITHUB_ENV"
+          ls -lh "$RUNNER_TEMP/$name.tar.gz.age"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: ${{ runner.temp }}/${{ env.NAME }}.tar.gz.age
+          retention-days: 90
+          compression-level: 0
+      - name: Підсумок
+        run: |
+          {
+            echo "## Бекап $NAME"
+            echo "Зашифровано age. Завантаж артефакт і збережи у своєму сховищі (напр. Google Drive)."
+            echo "Відновлення — docs/setup.md, розділ 7."
+          } >> "$GITHUB_STEP_SUMMARY"

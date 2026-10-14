@@ -1,0 +1,31 @@
+name: Keepalive prod
+
+# Supabase Free призупиняє проєкт після тижня без активності (SPEC 3.4). На канікули — простий
+# запит до prod двічі на тиждень. Вмикається змінною репозиторію KEEPALIVE_ENABLED = true;
+# альтернатива — свідоме призупинення (docs/setup.md, розділ 3.5).
+
+on:
+  schedule:
+    - cron: '0 6 * * 1,4' # понеділок і четвер, 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Запит до prod
+    if: vars.KEEPALIVE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      # Публічні значення (як у змінних збірки Cloudflare): адреса проєкту й publishable key
+      SUPABASE_URL: ${{ vars.PROD_SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.PROD_SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - name: Читання довідника через Data API (запит доходить до Postgres)
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' \
+            "$SUPABASE_URL/rest/v1/sections?select=id&limit=1" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY")
+          echo "HTTP $code"
+          if [ "$code" != 200 ]; then
+            echo "::error::Prod відповів $code — перевір, чи проєкт не призупинено (docs/setup.md, розділ 3.5)"; exit 1
+          fi

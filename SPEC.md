@@ -1,7 +1,8 @@
 # SPEC: «Географія 6–9» — інтерактивний ресурс уроків
 
 > Технічне завдання для ШІ-агента в IDE (Claude Code, Cursor, Kiro тощо).
-> **Версія 2.4.2** · жовтень 2026 · навчальний рік 2026–2027.
+> **Версія 2.4.3** · жовтень 2026 · навчальний рік 2026–2027.
+> Зміни 2.4.3 (Фаза 2): вчитель на prod створюється вручну (реєстрацію вимкнено), вхід через Google — пізніше; бекапи — артефакт GitHub, зашифрований age; `teachers.login_prefix`, `students_can_change_password`; `students.number`, `name_key`; QR на картці входу — `/login?login=<логін>`.
 > Зміни 2.4.2: Фазу 1 закрито; перетягування (dnd-kit) — уже зараз; робота в завданні не перебивається (скелетон лише без даних, знімки з кешу, відповіді в Zustand); горизонталі — замкнені контури без кінців ліній; формат типів 1–8 затверджено (ordering: exact для ≤ 4 елементів, pairs від 5; multiple_choice не нижче 0; numeric — кома або крапка); пояснення й відео поруч на комп'ютері; preconnect до Supabase; збірка без `VITE_SUPABASE_*` падає; правило релізу «міграції перед фронтом, зворотно сумісні».
 > Зміни 2.4.1: довідник програми — розділ → **тема** → результат (таблиця `topics`); код результату клас-розділ-тема-номер (`8-2-3-07`), вступ — розділ 0, тема 0; ГР прибрано з довідника — лишається лише тегом завдань; формат CSV 10.6 з № і назвою теми; справжній довідник 8 класу (`seed/outcomes-g8.csv`) імпортується лише явною командою.
 > Зміни 2.4: Фазу 0 закрито; модель змісту для Фази 1 — учні читають знімок публікації (`lesson_versions`), усі завдання версіонуються (`task_versions`), знімок уроку посилається на `(task_id, version)`; стабільний `code` результату програми; `lesson_outcomes`; `is_demo` і прихований демо-зміст на prod; `quizzes` — у Фазі 6; «Завантаження без стрибків» (13.7); довідник у Фазі 1 — лише CSV, XLSX — з Фази 2 через офіційний тарбол SheetJS.
@@ -112,7 +113,7 @@ Postgres + Auth + RLS + Realtime + Edge Functions (Deno, TypeScript) + **Storage
 | Хостинг фронту | **Cloudflare Workers зі статичними ресурсами** (assets-only, без коду Worker): `wrangler.jsonc` у корені — ім'я `geography-app`, `assets.directory: "./dist"`, `not_found_handling: "single-page-application"`. Деплой — Workers Builds з приватного репозиторію GitHub: `main` → production, інші гілки → preview-URL. Запити до статичних ресурсів безкоштовні й без ліміту. Pages Cloudflare позначає як legacy, тому не використовуємо |
 | Міграції/функції | CI проганяє їх на локальному Supabase; деплой на prod — вручну (`deploy-prod.yml`). **Міграції — перед фронтом і зворотно сумісні**: нова схема мусить працювати з фронтом, що вже на prod; фронт, якому потрібна нова схема, зливається в `main` лише після деплою БД (Workers Builds публікує фронт одразу після злиття). Несумісні зміни — у два релізи: додати нове → перевести фронт → прибрати старе. Порядок — `docs/setup.md`, розділ 6 |
 | Секрети | GitHub Secrets, секрети Supabase; у клієнті лише publishable key (`sb_publishable_…`) |
-| Резервні копії | **обов'язкові з Фази 2** (на Free їх немає): щотижневий `pg_dump` і копія Storage з CI → зашифрований архів (age/gpg) → сховище вчителя (напр., Google Drive); ручне вивантаження з кабінету перед канікулами; відновлення перевіряється в локальний Supabase |
+| Резервні копії | **обов'язкові з Фази 2** (на Free їх немає): щотижневий дамп БД (`supabase db dump`) і копія Storage з CI (`backup.yml`) → архів, зашифрований **age** публічним ключем вчителя → артефакт GitHub на 90 днів → вчитель зберігає у своєму сховищі (напр., Google Drive); ручне вивантаження з кабінету перед канікулами; відновлення перевіряється в локальний Supabase |
 | Моніторинг | безкоштовна перевірка доступності сайту і функцій з повідомленням вчителю |
 | Домен | опційно, власний короткий домен для карток входу і QR |
 
@@ -184,7 +185,7 @@ Postgres + Auth + RLS + Realtime + Edge Functions (Deno, TypeScript) + **Storage
 - **Пароль:** два прості слова + дві цифри, латиницею, через дефіс: `gora-step-47`. Словник географічних слів у транслітерації (`gora, richka, ozero, step, lis, more, pole, dolyna, khvylia, skelia…`), **лише малі літери**. Цифри — **тільки 2–9** (без 0 і 1, які плутають з o і l). Логін і пароль показуються шрифтом JetBrains Mono з чіткою різницею l / I / 1 (13.2).
 - **Технічно:** Edge Function `manage-students` (дія `create`, лише для вчителя цього класу) створює користувачів Supabase Auth із фіктивною адресою `<login>@students.invalid` (агент перевіряє, що Supabase приймає такий формат; підтвердження email вимкнено), записує рядок у `students`, повертає вчителю логіни й паролі **один раз**.
 - Пароль у відкритому вигляді **ніде не зберігається**. Забув — вчитель натискає «Новий пароль» (`manage-students`, дія `reset-password`), отримує новий.
-- **Картки входу для друку:** A4, 10 карток на аркуш (2×5), на кожній: прізвище й ініціал, клас, адреса сайту, логін, пароль (JetBrains Mono), QR-код на сторінку входу (`/login`). Генеруються одразу після створення/скидання.
+- **Картки входу для друку:** A4, 10 карток на аркуш (2×5), на кожній: прізвище й ініціал, клас, адреса сайту, логін, пароль (JetBrains Mono), QR-код на сторінку входу з підставленим логіном (`/login?login=8b-07`; логін не секрет, пароль — лише на картці). Генеруються одразу після створення/скидання.
 - Учень може змінити пароль сам — вимкнено за замовчуванням (налаштування вчителя).
 - Сесія учня зберігається на пристрої; кнопка «Вийти» помітна (спільні шкільні комп'ютери).
 
@@ -250,10 +251,12 @@ Quiz { id, ownerId, title, grade, lessonIds[], defaultTimeSec,
 
 ```
 schools         (id, name, created_at)                                       -- підготовка до кількох вчителів; на старті одна школа
-teachers        (id = auth.uid, school_id, display_name, school_name, created_at)
+teachers        (id = auth.uid, school_id, display_name, login_prefix, students_can_change_password, created_at)
+                 -- назва школи — schools.name (на картках входу); вчитель створюється вручну (docs/setup.md 7.1)
 classes         (id, teacher_id, school_id, name '8-Б', grade, school_year '2026-2027', login_prefix, archived)
-students        (id, class_id, auth_user_id, last_name, first_initial, display_name 'Коваль О.',
-                 login, simplified_mode bool, archived bool, last_login_at, created_at)
+students        (id, class_id, school_id, auth_user_id, number (№ у списку), last_name, first_initial,
+                 display_name 'Коваль О.' generated, name_key generated (збіг при імпорті),
+                 login unique, simplified_mode bool, archived bool, last_login_at, created_at)
 assignments     (id, class_id, lesson_id, lesson_version int, opens_at, due_at, attempts_allowed, allow_late,
                  show_answers ('never'|'after_submit'|'after_due'), created_at)
 submissions     (id, assignment_id, student_id, attempt, answers jsonb, scores jsonb,
