@@ -34,8 +34,9 @@ describe('урок і блоки (SPEC 6.1, 10.2)', () => {
 
   it('slug і код результату — як у БД', () => {
     expect(LessonDraft.safeParse({ ...draft, slug: 'Урок 5' }).success).toBe(false)
-    expect(LessonDraft.safeParse({ ...draft, outcomeCodes: ['8-1-ГР2-03'] }).success).toBe(true)
-    expect(LessonDraft.safeParse({ ...draft, outcomeCodes: ['8-1-GR2-3'] }).success).toBe(false)
+    expect(LessonDraft.safeParse({ ...draft, outcomeCodes: ['8-2-3-07', '8-0-0-01'] }).success).toBe(true)
+    expect(LessonDraft.safeParse({ ...draft, outcomeCodes: ['8-1-ГР2-03'] }).success).toBe(false)
+    expect(LessonDraft.safeParse({ ...draft, outcomeCodes: ['8-2-3-7'] }).success).toBe(false)
   })
 
   it('таблиця даних — лише з джерелом і датою, рядки рівної довжини', () => {

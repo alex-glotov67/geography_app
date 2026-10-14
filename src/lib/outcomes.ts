@@ -1,95 +1,102 @@
+import { OutcomeRow as RowSchema, type OutcomeRow as Row } from '@shared/schemas/outcomes.ts'
 import { readTable } from './csv'
 
 /**
- * Імпорт довідника розділів і очікуваних результатів (SPEC 10.6). Чиста логіка: розбір, перевірка,
- * план змін. Запис у БД робить виклик (scripts/import-outcomes.ts зараз, конструктор — у Фазі 3).
+ * Імпорт довідника розділів, тем і очікуваних результатів (SPEC 10.6). Чиста логіка: розбір,
+ * перевірка (zod), план змін. Запис у БД — src/lib/outcomesDb.ts (зараз скрипт, у Фазі 3 — конструктор).
+ * Формат: Код;Клас;№ розділу;Назва розділу;№ теми;Назва теми;Результат;Джерело — код 8-2-3-07,
+ * вступ — розділ 0, тема 0.
  */
 
-export type Grp = 'ГР1' | 'ГР2' | 'ГР3'
-
-export interface OutcomeRow {
-  line: number
-  code: string | null
-  grade: number
-  sectionNumber: number
-  sectionTitle: string
-  grp: Grp
-  text: string
-  source: string
-}
+export type OutcomeRow = Row & { line: number }
 
 export interface RowError {
   line: number
   message: string
 }
 
-const REQUIRED = ['клас', '№ розділу', 'назва розділу', 'гр', 'результат', 'джерело'] as const
-const CODE = /^([6-9])-([1-9][0-9]*)-(ГР[1-3])-([0-9]{2,})$/
+/** Стовпець файлу → поле рядка. «Код» — необов'язковий (порожній — згенерується). */
+const COLUMNS = {
+  'клас': 'grade',
+  '№ розділу': 'sectionNumber',
+  'назва розділу': 'sectionTitle',
+  '№ теми': 'topicNumber',
+  'назва теми': 'topicTitle',
+  'результат': 'text',
+  'джерело': 'source',
+} as const
+const NAMES: Record<string, string> = {
+  code: 'Код', grade: 'Клас', sectionNumber: '№ розділу', sectionTitle: 'Назва розділу',
+  topicNumber: '№ теми', topicTitle: 'Назва теми', text: 'Результат', source: 'Джерело',
+}
 
 /** Як text_norm у БД: без регістру, крайніх і подвійних пробілів. */
 export const normText = (s: string) => s.trim().replace(/\s+/g, ' ').toLocaleLowerCase('uk')
 
-/** «ГР1», «ГР 1», «гр1», «1» → «ГР1» */
-export function normGrp(raw: string): Grp | null {
-  const m = /^(?:гр\s*)?([1-3])$/i.exec(raw.trim())
-  return m ? (`ГР${m[1]}` as Grp) : null
-}
+const topicKey = (r: { grade: number; sectionNumber: number; topicNumber: number }) => `${r.grade}-${r.sectionNumber}-${r.topicNumber}`
 
 export function parseOutcomes(bytes: Uint8Array): { rows: OutcomeRow[]; errors: RowError[]; encoding: string } {
   const { header, records, encoding } = readTable(bytes)
-  const missing = REQUIRED.filter((h) => !header.includes(h))
+  const missing = Object.keys(COLUMNS).filter((h) => !header.includes(h))
   if (missing.length) {
     return { rows: [], encoding, errors: [{ line: 1, message: `Немає стовпців: ${missing.map((m) => `«${m}»`).join(', ')}` }] }
   }
+  if (header.includes('гр')) {
+    return { rows: [], encoding, errors: [{ line: 1, message: 'Стовпець «ГР» більше не потрібен: ГР — тег завдань, а не довідника (SPEC 10.6)' }] }
+  }
+
   const rows: OutcomeRow[] = []
   const errors: RowError[] = []
-  const titles = new Map<string, { title: string; line: number }>()
   for (const r of records) {
     if (r.empty) continue
-    const v = r.values
-    const problems: string[] = []
-    const grade = Number(v['клас'])
-    if (![6, 7, 8, 9].includes(grade)) problems.push('«Клас» — 6, 7, 8 або 9')
-    const sectionNumber = Number(v['№ розділу'])
-    if (!Number.isInteger(sectionNumber) || sectionNumber < 1) problems.push('«№ розділу» — ціле число від 1')
-    const grp = normGrp(v['гр'] ?? '')
-    if (!grp) problems.push('«ГР» — ГР1, ГР2 або ГР3')
-    for (const [col, name] of [['назва розділу', 'Назва розділу'], ['результат', 'Результат'], ['джерело', 'Джерело']] as const) {
-      if (!v[col]) problems.push(`«${name}» не заповнено`)
-    }
-    const code = v['код'] || null
-    if (code) {
-      const m = CODE.exec(code)
-      if (!m) problems.push('«Код» має вигляд 8-1-ГР2-03')
-      else if (Number(m[1]) !== grade || Number(m[2]) !== sectionNumber || m[3] !== grp)
-        problems.push(`«Код» ${code} не відповідає класу, розділу або ГР рядка`)
-    }
-    if (problems.length) {
-      errors.push({ line: r.line, message: problems.join('; ') })
+    const raw: Record<string, unknown> = { code: r.values['код'] || null }
+    for (const [col, field] of Object.entries(COLUMNS)) raw[field] = r.values[col] === '' ? undefined : r.values[col]
+    const parsed = RowSchema.safeParse(raw)
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map((i) => {
+        const field = String(i.path[0] ?? '')
+        return i.code === 'custom' ? i.message : `«${NAMES[field] ?? field}»: ${raw[field] == null ? 'не заповнено' : i.message}`
+      })
+      errors.push({ line: r.line, message: [...new Set(msgs)].join('; ') })
       continue
     }
-    const key = `${grade}-${sectionNumber}`
-    const seen = titles.get(key)
-    if (seen && normText(seen.title) !== normText(v['назва розділу']!)) {
-      errors.push({ line: r.line, message: `Розділ ${sectionNumber} (${grade} клас) уже має іншу назву в рядку ${seen.line}` })
-      continue
-    }
-    if (!seen) titles.set(key, { title: v['назва розділу']!, line: r.line })
-    rows.push({ line: r.line, code, grade, sectionNumber, sectionTitle: v['назва розділу']!, grp: grp!, text: v['результат']!, source: v['джерело']! })
+    rows.push({ ...parsed.data, line: r.line })
   }
-  // Дублікати в межах файлу
-  const seenRows = new Map<string, number>()
-  const seenCodes = new Map<string, number>()
+
+  // Однакові назви розділу й теми в усіх рядках; без дублів результатів і кодів
+  const sectionTitle = new Map<string, OutcomeRow>()
+  const topicTitle = new Map<string, OutcomeRow>()
+  const seenText = new Map<string, number>()
+  const seenCode = new Map<string, number>()
+  const ok: OutcomeRow[] = []
   for (const row of rows) {
-    const k = `${row.grade}-${row.sectionNumber}-${row.grp}-${normText(row.text)}`
-    if (seenRows.has(k)) errors.push({ line: row.line, message: `Той самий результат уже є в рядку ${seenRows.get(k)}` })
-    else seenRows.set(k, row.line)
-    if (row.code) {
-      if (seenCodes.has(row.code)) errors.push({ line: row.line, message: `Код ${row.code} уже є в рядку ${seenCodes.get(row.code)}` })
-      else seenCodes.set(row.code, row.line)
+    const sk = `${row.grade}-${row.sectionNumber}`
+    const tk = topicKey(row)
+    const s = sectionTitle.get(sk)
+    const t = topicTitle.get(tk)
+    const textKey = `${tk}-${normText(row.text)}`
+    const problem =
+      s && normText(s.sectionTitle) !== normText(row.sectionTitle)
+        ? `Розділ ${row.sectionNumber} (${row.grade} клас) уже має іншу назву в рядку ${s.line}`
+        : t && normText(t.topicTitle) !== normText(row.topicTitle)
+          ? `Тема ${row.topicNumber} розділу ${row.sectionNumber} уже має іншу назву в рядку ${t.line}`
+          : seenText.has(textKey)
+            ? `Той самий результат цієї теми уже є в рядку ${seenText.get(textKey)}`
+            : row.code && seenCode.has(row.code)
+              ? `Код ${row.code} уже є в рядку ${seenCode.get(row.code)}`
+              : null
+    if (problem) {
+      errors.push({ line: row.line, message: problem })
+      continue
     }
+    if (!s) sectionTitle.set(sk, row)
+    if (!t) topicTitle.set(tk, row)
+    seenText.set(textKey, row.line)
+    if (row.code) seenCode.set(row.code, row.line)
+    ok.push(row)
   }
-  return { rows, errors, encoding }
+  errors.sort((a, b) => a.line - b.line)
+  return { rows: ok, errors, encoding }
 }
 
 export interface ExistingSection {
@@ -99,12 +106,20 @@ export interface ExistingSection {
   title: string
 }
 
+export interface ExistingTopic {
+  id: string
+  grade: number
+  sectionNumber: number
+  number: number
+  title: string
+}
+
 export interface ExistingOutcome {
   id: string
   code: string
   grade: number
   sectionNumber: number
-  grp: Grp
+  topicNumber: number
   text: string
   source: string
   archived: boolean
@@ -112,6 +127,10 @@ export interface ExistingOutcome {
 
 export interface OutcomePlan {
   sections: { create: { grade: number; number: number; title: string }[]; rename: { id: string; title: string }[] }
+  topics: {
+    create: { grade: number; sectionNumber: number; number: number; title: string }[]
+    rename: { id: string; title: string }[]
+  }
   outcomes: {
     create: (OutcomeRow & { code: string })[]
     update: { id: string; code: string; text: string; source: string; unarchive: boolean }[]
@@ -121,32 +140,46 @@ export interface OutcomePlan {
   }
 }
 
-/** План змін: зіставлення за кодом, без коду — за «розділ + ГР + текст»; нові коди — наступні вільні. */
-export function planOutcomes(rows: OutcomeRow[], sections: ExistingSection[], outcomes: ExistingOutcome[]): OutcomePlan {
+/** План змін: зіставлення за кодом, без коду — за «тема + текст»; нові коди — наступні вільні в темі. */
+export function planOutcomes(
+  rows: OutcomeRow[],
+  sections: ExistingSection[],
+  topics: ExistingTopic[],
+  outcomes: ExistingOutcome[],
+): OutcomePlan {
   const plan: OutcomePlan = {
     sections: { create: [], rename: [] },
+    topics: { create: [], rename: [] },
     outcomes: { create: [], update: [], unchanged: [], missing: [] },
   }
-  const sectionByKey = new Map(sections.map((s) => [`${s.grade}-${s.number}`, s]))
+  const sectionBy = new Map(sections.map((s) => [`${s.grade}-${s.number}`, s]))
+  const topicBy = new Map(topics.map((t) => [`${t.grade}-${t.sectionNumber}-${t.number}`, t]))
+  const seenSection = new Set<string>()
+  const seenTopic = new Set<string>()
   for (const row of rows) {
-    const key = `${row.grade}-${row.sectionNumber}`
-    const s = sectionByKey.get(key)
-    if (!s) {
-      if (!plan.sections.create.some((c) => `${c.grade}-${c.number}` === key))
-        plan.sections.create.push({ grade: row.grade, number: row.sectionNumber, title: row.sectionTitle })
-    } else if (s.title !== row.sectionTitle && !plan.sections.rename.some((r) => r.id === s.id)) {
-      plan.sections.rename.push({ id: s.id, title: row.sectionTitle })
+    const sk = `${row.grade}-${row.sectionNumber}`
+    if (!seenSection.has(sk)) {
+      seenSection.add(sk)
+      const s = sectionBy.get(sk)
+      if (!s) plan.sections.create.push({ grade: row.grade, number: row.sectionNumber, title: row.sectionTitle })
+      else if (s.title !== row.sectionTitle) plan.sections.rename.push({ id: s.id, title: row.sectionTitle })
+    }
+    const tk = topicKey(row)
+    if (!seenTopic.has(tk)) {
+      seenTopic.add(tk)
+      const t = topicBy.get(tk)
+      if (!t) plan.topics.create.push({ grade: row.grade, sectionNumber: row.sectionNumber, number: row.topicNumber, title: row.topicTitle })
+      else if (t.title !== row.topicTitle) plan.topics.rename.push({ id: t.id, title: row.topicTitle })
     }
   }
 
   const byCode = new Map(outcomes.map((o) => [o.code, o]))
-  const byText = new Map(outcomes.map((o) => [`${o.grade}-${o.sectionNumber}-${o.grp}-${normText(o.text)}`, o]))
-  const usedCodes = new Set(outcomes.map((o) => o.code).concat(rows.flatMap((r) => (r.code ? [r.code] : []))))
+  const byText = new Map(outcomes.map((o) => [`${topicKey({ ...o, topicNumber: o.topicNumber })}-${normText(o.text)}`, o]))
+  const usedCodes = new Set([...outcomes.map((o) => o.code), ...rows.flatMap((r) => (r.code ? [r.code] : []))])
   const matched = new Set<string>()
-
   const nextCode = (row: OutcomeRow) => {
     for (let n = 1; ; n++) {
-      const code = `${row.grade}-${row.sectionNumber}-${row.grp}-${String(n).padStart(2, '0')}`
+      const code = `${topicKey(row)}-${String(n).padStart(2, '0')}`
       if (!usedCodes.has(code)) {
         usedCodes.add(code)
         return code
@@ -155,11 +188,10 @@ export function planOutcomes(rows: OutcomeRow[], sections: ExistingSection[], ou
   }
 
   for (const row of rows) {
-    const existing = (row.code && byCode.get(row.code)) || byText.get(`${row.grade}-${row.sectionNumber}-${row.grp}-${normText(row.text)}`)
+    const existing = (row.code && byCode.get(row.code)) || byText.get(`${topicKey(row)}-${normText(row.text)}`)
     if (existing) {
       matched.add(existing.id)
-      const same = existing.text === row.text && existing.source === row.source && !existing.archived
-      if (same) plan.outcomes.unchanged.push(existing.code)
+      if (existing.text === row.text && existing.source === row.source && !existing.archived) plan.outcomes.unchanged.push(existing.code)
       else plan.outcomes.update.push({ id: existing.id, code: existing.code, text: row.text, source: row.source, unarchive: existing.archived })
     } else {
       plan.outcomes.create.push({ ...row, code: row.code ?? nextCode(row) })

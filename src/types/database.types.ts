@@ -155,14 +155,14 @@ isOneToOne: false
                   ]
                 },"program_outcomes": {
                   Row: {
-                    "archived": boolean,"code": string,"grade": number,"grp": string,"id": string,"is_demo": boolean,"owner_id": string,"school_id": string,"section_id": string,"source": string,"text": string,"text_norm": string | null,"updated_at": string
+                    "archived": boolean,"code": string,"grade": number,"id": string,"is_demo": boolean,"owner_id": string,"school_id": string,"source": string,"text": string,"text_norm": string | null,"topic_id": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "archived"?: boolean,"code": string,"grade": number,"grp": string,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"school_id"?: string,"section_id": string,"source": string,"text": string,"text_norm"?: never,"updated_at"?: string
+                    "archived"?: boolean,"code": string,"grade": number,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"school_id"?: string,"source": string,"text": string,"text_norm"?: never,"topic_id": string,"updated_at"?: string
                   }
                   Update: {
-                    "archived"?: boolean,"code"?: string,"grade"?: number,"grp"?: string,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"school_id"?: string,"section_id"?: string,"source"?: string,"text"?: string,"text_norm"?: never,"updated_at"?: string
+                    "archived"?: boolean,"code"?: string,"grade"?: number,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"school_id"?: string,"source"?: string,"text"?: string,"text_norm"?: never,"topic_id"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -178,10 +178,10 @@ isOneToOne: false
       referencedRelation: "schools"
       referencedColumns: ["id"]
     },{
-      foreignKeyName: "program_outcomes_section_id_fkey"
-      columns: ["section_id"]
+      foreignKeyName: "program_outcomes_topic_id_fkey"
+      columns: ["topic_id"]
 isOneToOne: false
-      referencedRelation: "sections"
+      referencedRelation: "topics"
       referencedColumns: ["id"]
     }
                   ]
@@ -320,6 +320,38 @@ isOneToOne: false
       columns: ["school_id"]
 isOneToOne: false
       referencedRelation: "schools"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"topics": {
+                  Row: {
+                    "id": string,"is_demo": boolean,"number": number,"owner_id": string,"school_id": string,"section_id": string,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: string,"is_demo"?: boolean,"number": number,"owner_id"?: string,"school_id"?: string,"section_id": string,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "id"?: string,"is_demo"?: boolean,"number"?: number,"owner_id"?: string,"school_id"?: string,"section_id"?: string,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "topics_owner_id_fkey"
+      columns: ["owner_id"]
+isOneToOne: false
+      referencedRelation: "teachers"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "topics_school_id_fkey"
+      columns: ["school_id"]
+isOneToOne: false
+      referencedRelation: "schools"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "topics_section_id_fkey"
+      columns: ["section_id"]
+isOneToOne: false
+      referencedRelation: "sections"
       referencedColumns: ["id"]
     }
                   ]

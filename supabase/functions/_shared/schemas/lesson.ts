@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { Grade, Text } from './common.ts'
 import { Block, Ref } from './blocks.ts'
+import { OutcomeCode } from './outcomes.ts'
 
 /** Адреса уроку /lesson/<slug> (SPEC 6.1) — та сама перевірка, що й у БД. */
 export const Slug = z.string().max(64).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Лише малі латинські літери, цифри й дефіси')
-export const OutcomeCode = z.string().regex(/^[6-9]-[1-9][0-9]*-ГР[1-3]-[0-9]{2,}$/, 'Код результату виду 8-1-ГР2-03')
 
 export const TextbookRef = z.object({ paragraph: Text.optional(), pages: Text.optional() })
 
@@ -48,7 +48,15 @@ export const LessonSnapshot = z.object({
   textbookRef: TextbookRef.nullable(),
   ktpRef: z.string().nullable(),
   section: z.object({ number: z.number().int(), title: Text }).nullable(),
-  outcomes: z.array(z.object({ code: OutcomeCode, grp: z.enum(['ГР1', 'ГР2', 'ГР3']), text: Text })),
+  /** Результати уроку з довідника: розділ → тема → результат (SPEC 6.1) */
+  outcomes: z.array(
+    z.object({
+      code: OutcomeCode,
+      text: Text,
+      section: z.object({ number: z.number().int(), title: Text }),
+      topic: z.object({ number: z.number().int(), title: Text }),
+    }),
+  ),
   blocks: z.array(Block),
   homework: z.object({ count: z.number().int().min(0) }).nullable(),
   simplified: z.object({ blocks: z.array(Block).optional(), homeworkCount: z.number().int().min(0) }).nullable(),

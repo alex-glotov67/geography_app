@@ -2,7 +2,7 @@
 -- Кожен тест — у транзакції з rollback; ролі перемикаються через set local role + JWT-claims.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(33);
+select plan(39);
 
 -- ── Фікстури (як postgres) ───────────────────────────────────────────────────────────────
 update private.settings set show_demo = false where id;
@@ -22,8 +22,10 @@ set local request.jwt.claims = '{"sub":"10000000-0000-4000-8000-0000000000a1","r
 
 insert into public.sections (id, grade, number, title)
   values ('20000000-0000-4000-8000-000000000001', 8, 1, 'Розділ тест');
-insert into public.program_outcomes (code, grade, section_id, grp, text, source)
-  values ('8-1-ГР1-01', 8, '20000000-0000-4000-8000-000000000001', 'ГР1', 'Результат тест', 'Тест');
+insert into public.topics (id, section_id, number, title)
+  values ('21000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 1, 'Тема тест');
+insert into public.program_outcomes (code, grade, topic_id, text, source)
+  values ('8-1-1-01', 8, '21000000-0000-4000-8000-000000000001', 'Результат тест', 'Тест');
 insert into public.tasks (id, type, level, grp, content, visibility) values
   ('30000000-0000-4000-8000-00000000000a', 'single_choice', 'base', 'ГР1', '{"prompt":"Відкрите v1"}', 'open'),
   ('30000000-0000-4000-8000-00000000000b', 'single_choice', 'base', 'ГР1', '{"prompt":"Захищене"}', 'secure');
@@ -64,6 +66,11 @@ select throws_ok(
   $$ insert into public.sections (grade, number, title) values (8, 9, 'x') $$,
   '42501', null, 'гість не пише в довідник'
 );
+select is((select count(*)::int from public.topics), 1, 'гість бачить теми довідника');
+select throws_ok(
+  $$ insert into public.topics (section_id, number, title) values ('20000000-0000-4000-8000-000000000001', 9, 'x') $$,
+  '42501', null, 'гість не пише теми'
+);
 
 -- ── Учень / будь-який не-вчитель ────────────────────────────────────────────────────────
 reset role;
@@ -92,6 +99,15 @@ set local request.jwt.claims = '{"sub":"10000000-0000-4000-8000-0000000000a2","r
 select is((select count(*)::int from public.tasks), 0, 'T2 не бачить завдань T1');
 select is((select count(*)::int from public.lessons), 0, 'T2 не бачить уроків T1');
 select is((select count(*)::int from public.task_versions where visibility = 'secure'), 0, 'T2 не бачить secure-знімків T1');
+select throws_ok(
+  $$ insert into public.topics (section_id, number, title) values ('20000000-0000-4000-8000-000000000001', 5, 'чужа') $$,
+  '42501', null, 'T2 не додає тему в розділ T1'
+);
+select throws_ok(
+  $$ insert into public.program_outcomes (code, grade, topic_id, text, source)
+     values ('8-1-1-09', 8, '21000000-0000-4000-8000-000000000001', 'чужий', 'x') $$,
+  '42501', null, 'T2 не додає результат у тему T1'
+);
 update public.lessons set title = 'зламано' where id = '40000000-0000-4000-8000-000000000001';
 select throws_ok(
   $$ select public.publish_lesson('40000000-0000-4000-8000-000000000001') $$,
@@ -161,6 +177,19 @@ reset role;
 update private.settings set show_demo = true where id;
 set local role anon;
 select is((select count(*)::int from public.lesson_versions where slug = 'demo-lesson'), 1, 'з show_demo (seed) демо-урок видно');
+
+reset role;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"10000000-0000-4000-8000-0000000000a1","role":"authenticated"}';
+select throws_ok(
+  $$ insert into public.program_outcomes (code, grade, topic_id, text, source)
+     values ('8-1-ГР1-02', 8, '21000000-0000-4000-8000-000000000001', 'старий код', 'x') $$,
+  '23514', null, 'код результату — клас-розділ-тема-номер, без ГР'
+);
+select lives_ok(
+  $$ insert into public.sections (grade, number, title) values (8, 0, 'Вступ') $$,
+  'вступ — розділ 0'
+);
 
 select * from finish();
 rollback;
