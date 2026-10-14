@@ -1,0 +1,104 @@
+/* Картки входу: A4, 2×5, лінії для розрізання — пунктир. Друк чорно-білий, без фону. */
+.root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  :global(body).printing > :not([data-print-cards]) {
+    display: none !important;
+  }
+
+  :global(body).printing {
+    background: #fff !important;
+  }
+
+  .root {
+    display: block;
+    color: #000;
+    font-family: var(--font-text);
+  }
+}
+
+.printing {
+  /* маркер на <body> під час друку карток */
+}
+
+.sheet {
+  width: 190mm;
+  height: 277mm;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(5, 1fr);
+  break-after: page;
+  box-sizing: border-box;
+}
+
+.sheet:last-child {
+  break-after: auto;
+}
+
+.card {
+  box-sizing: border-box;
+  border: 0.3mm dashed #777;
+  margin: -0.15mm;
+  padding: 4mm 5mm;
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  overflow: hidden;
+  break-inside: avoid;
+}
+
+.text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2mm;
+}
+
+.school {
+  font-size: 8pt;
+  color: #333;
+}
+
+.name {
+  font-size: 12pt;
+  font-weight: 600;
+}
+
+.site {
+  font-size: 9pt;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 2mm;
+}
+
+.label {
+  font-size: 8pt;
+  width: 13mm;
+  flex-shrink: 0;
+  color: #333;
+}
+
+/* Логіни й паролі — JetBrains Mono: чітка різниця l / I / 1 (SPEC 13.2) */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13pt;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.qr {
+  width: 24mm;
+  height: 24mm;
+  flex-shrink: 0;
+}

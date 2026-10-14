@@ -1,0 +1,237 @@
+/* Вхід — за макетом docs/design/screens/Login.dc.html (телефон 390 px); на ширших — колонка 440 px по центру. */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+.header {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-tint);
+  padding: 64px 0 36px;
+}
+
+.headerInner,
+.main {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding-left: var(--page-x);
+  padding-right: var(--page-x);
+}
+
+.headerInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.input {
+  height: 52px;
+  box-sizing: border-box;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  padding: 0 14px;
+  font: inherit;
+  font-size: 18px;
+  color: var(--ink);
+  background: var(--surface);
+  min-width: 0;
+}
+
+.input::placeholder {
+  font-family: var(--font-text);
+  color: var(--muted);
+}
+
+/* Логіни й паролі — JetBrains Mono: чітка різниця l / I / 1 (SPEC 13.2) */
+.mono {
+  font-family: var(--font-mono);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--err-fg);
+}
+
+.passwordWrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding-right: 4px;
+}
+
+.passwordWrap:focus-within {
+  outline: 2px solid var(--water);
+  outline-offset: 1px;
+}
+
+.passwordInput {
+  flex-grow: 1;
+  height: 50px;
+  border: 0;
+  background: transparent;
+}
+
+.passwordInput:focus-visible {
+  outline: none;
+}
+
+.eye {
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.fieldError {
+  font-size: 15px;
+  color: var(--err-fg);
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  background: var(--err-bg);
+  color: var(--err-fg);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.submit {
+  min-height: 54px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--water);
+  color: #fff;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit:hover {
+  background: var(--water-dark);
+}
+
+.submit:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.hint {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 6px 0;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--line-strong);
+}
+
+.cardIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-control);
+  background: var(--grade-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardTitle {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.cardSub {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.guest {
+  align-self: center;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--water);
+}

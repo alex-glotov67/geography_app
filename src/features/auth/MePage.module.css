@@ -1,0 +1,113 @@
+/* Мій кабінет — за макетом Cabinet.dc.html (телефон); у Фазі 2 лише шапка, заглушка ДЗ і «Вийти». */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+.header,
+.main {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding-left: var(--page-x);
+  padding-right: var(--page-x);
+}
+
+.header {
+  padding-top: 16px;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.back {
+  align-self: flex-start;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--water);
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.name {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.cls {
+  margin: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 28px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.link {
+  align-self: flex-start;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--water);
+}
+
+.logout {
+  min-height: var(--tap-main);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--err-fg);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout:hover {
+  border-color: var(--err-fg);
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+}

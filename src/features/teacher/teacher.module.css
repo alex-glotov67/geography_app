@@ -1,0 +1,564 @@
+/*
+ * Кабінет вчителя — за макетами TeacherHome.dc.html і TeacherClass.dc.html (комп'ютер; на телефоні
+ * меню над вмістом, SPEC 8.2). Спільні елементи: кнопки, картки, таблиці, поля. Цілі дотику ≥ 44 px.
+ */
+
+.layout {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+@media (min-width: $bp-desktop) {
+  .layout {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.nav {
+  box-sizing: border-box;
+  padding: 16px var(--page-x) 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+@media (min-width: $bp-desktop) {
+  .nav {
+    flex: 0 0 220px;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    padding: 24px 16px;
+    border-bottom: 0;
+    border-right: 1px solid var(--line);
+  }
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  padding: 0 12px 0 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brandSub {
+  display: none;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 0 12px 18px;
+}
+
+@media (min-width: $bp-desktop) {
+  .brand {
+    padding: 0 12px 4px;
+  }
+
+  .brandSub {
+    display: block;
+  }
+}
+
+.navLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+@media (min-width: $bp-desktop) {
+  .navLinks {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+}
+
+.navLink {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.navLink:hover {
+  background: var(--surface-sunken);
+}
+
+.navLink[data-status='active'] {
+  background: var(--water);
+  color: #fff;
+  font-weight: 600;
+}
+
+.navFoot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.who {
+  display: none;
+  font-size: 14px;
+  color: var(--muted);
+  padding: 0 12px;
+}
+
+@media (min-width: $bp-desktop) {
+  .who {
+    display: block;
+  }
+}
+
+.content {
+  flex-grow: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 24px var(--page-x) 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1240px;
+}
+
+@media (min-width: $bp-desktop) {
+  .content {
+    padding: 32px 40px 48px;
+  }
+}
+
+.pageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.pageTitle {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.pageTitleNote {
+  font-family: var(--font-text);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Кнопки ─────────────────────────────────────────────────────────────── */
+.btn {
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--water);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btnPrimary {
+  composes: btn;
+  border-color: var(--water);
+  background: var(--water);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btnPrimary:hover {
+  background: var(--water-dark);
+}
+
+.btnSmall {
+  composes: btn;
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+.btnDanger {
+  composes: btn;
+  color: var(--err-fg);
+}
+
+.linkBtn {
+  min-height: var(--tap);
+  border: 0;
+  background: none;
+  padding: 0 4px;
+  color: var(--water);
+  font: inherit;
+  font-size: 15px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ── Картки й секції ────────────────────────────────────────────────────── */
+.card {
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cardAccent {
+  composes: card;
+  border: 2px solid var(--water);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--muted);
+  max-width: 460px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ── Поля ───────────────────────────────────────────────────────────────── */
+.fieldRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: flex-end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.input,
+.select {
+  height: var(--tap);
+  box-sizing: border-box;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  min-width: 0;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--err-fg);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.fieldError {
+  font-size: 14px;
+  color: var(--err-fg);
+}
+
+.check {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--water);
+}
+
+.alert {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  background: var(--err-bg);
+  color: var(--err-fg);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.success {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* ── Таблиці ────────────────────────────────────────────────────────────── */
+.tableWrap {
+  overflow-x: auto;
+  margin: 0 -8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  height: var(--tap);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.tableBoxed {
+  composes: table;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+.tableBoxed th {
+  background: var(--surface-sunken);
+}
+
+.num {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.statusNew {
+  color: var(--ok-fg);
+}
+
+.statusSkip {
+  color: var(--ink-2);
+}
+
+.statusError {
+  color: var(--err-fg);
+}
+
+.rowArchived td {
+  color: var(--muted);
+}
+
+/* Перемикач «Спрощений режим»: нативний чекбокс з роллю switch */
+.switch {
+  appearance: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  margin: 9px 0;
+  border-radius: 13px;
+  background: var(--switch-off);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 120ms;
+}
+
+.switch:checked {
+  background: var(--water);
+}
+
+.switch:checked::after {
+  transform: translateX(18px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch::after {
+    transition: none;
+  }
+}
+
+/* ── Кроки майстра ──────────────────────────────────────────────────────── */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--neutral-bg);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.step[data-state='done'] {
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+.step[data-state='current'] {
+  background: var(--water);
+  color: #fff;
+  font-weight: 600;
+}
+
+.footerActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── Плитки класів ──────────────────────────────────────────────────────── */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--tile-color, var(--water));
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  min-height: 88px;
+  box-sizing: border-box;
+}
+
+.tile:hover {
+  border-color: var(--line-strong);
+  border-left-color: var(--tile-color, var(--water));
+}
+
+.tileName {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.tileNote {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
