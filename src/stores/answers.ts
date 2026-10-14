@@ -17,6 +17,8 @@ export interface SavedAnswer {
 interface AnswersState {
   answers: Record<string, SavedAnswer>
   save: (key: string, answer: SavedAnswer) => void
+  /** Після виходу з акаунта — наступний учень за тим самим комп'ютером починає з чистого аркуша */
+  reset: () => void
 }
 
 const safeSession: StateStorage = {
@@ -50,6 +52,7 @@ export const useAnswers = create<AnswersState>()(
     (set) => ({
       answers: {},
       save: (key, answer) => set((s) => ({ answers: { ...s.answers, [key]: answer } })),
+      reset: () => set({ answers: {} }),
     }),
     { name: 'geo-answers', storage: createJSONStorage(() => safeSession) },
   ),

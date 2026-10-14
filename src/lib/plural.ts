@@ -7,4 +7,6 @@ export function plural(n: number, one: string, few: string, many: string) {
   return many
 }
 
+export const studentsWord = (n: number) => `${n} ${plural(n, 'учень', 'учні', 'учнів')}`
+
 export const tasksWord = (n: number) => `${n} ${plural(n, 'завдання', 'завдання', 'завдань')}`
