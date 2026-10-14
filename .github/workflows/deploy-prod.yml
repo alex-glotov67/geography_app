@@ -1,7 +1,8 @@
 name: Деплой БД і функцій на prod
 
-# Лише вручну, після зеленого CI на main (SPEC 3.5; CLAUDE.md: prod — лише з дозволу вчителя).
-# Фронт на prod публікує Cloudflare Pages з гілки main (docs/setup.md).
+# Лише вручну, після злиття в main і зеленого CI (SPEC 3.5; CLAUDE.md: prod — лише з дозволу вчителя).
+# Фронт на prod публікує Cloudflare Workers Builds з гілки main сам, одразу після злиття;
+# цей workflow доганяє базу (міграції) і Edge Functions. Порядок релізу — docs/setup.md, розділ 6.
 on:
   workflow_dispatch:
     inputs:
@@ -14,8 +15,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Окремий job: падає з поясненням ще до запиту дозволу середовища production
+  guard:
+    name: Перевірка підтвердження і гілки
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: confirm = «prod» і гілка main
+        env:
+          # Через змінну середовища, а не підстановку в скрипт — без ін'єкції з поля вводу
+          CONFIRM: ${{ inputs.confirm }}
+          REF: ${{ github.ref }}
+        run: |
+          ok=true
+          if [ "$CONFIRM" != "prod" ]; then
+            echo "::error title=Не підтверджено::У полі confirm має бути саме «prod», а зараз «$CONFIRM». Запусти workflow ще раз."
+            ok=false
+          fi
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error title=Не та гілка::Деплой на prod — лише з main, а запущено з ${REF#refs/heads/}. Обери main у «Use workflow from»."
+            ok=false
+          fi
+          [ "$ok" = true ]
+
   deploy:
-    if: github.event.inputs.confirm == 'prod' && github.ref == 'refs/heads/main'
+    name: Міграції й Edge Functions на prod
+    needs: guard
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -30,7 +55,7 @@ jobs:
           version: 2.120.0 # як у package.json (devDependencies.supabase); оновлювати разом
       - run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
       - name: Які міграції застосуються
-        run: supabase db push --dry-run
+        run: supabase db push --dry-run 2>&1 | tee /tmp/dry-run.txt
       - name: Міграції
         run: supabase db push
       - name: Edge Functions
@@ -40,3 +65,15 @@ jobs:
           else
             echo "Функцій ще немає — пропускаю"
           fi
+      - name: Підсумок і що перевірити
+        if: success()
+        run: |
+          {
+            echo "## Prod оновлено"
+            echo
+            echo '```'
+            cat /tmp/dry-run.txt
+            echo '```'
+            echo
+            echo "Перевір сайт (docs/setup.md, розділ 6): головна, /grade/8, урок, вхід — без помилок завантаження."
+          } >> "$GITHUB_STEP_SUMMARY"
