@@ -50,7 +50,7 @@ export function LessonPage({ slug }: { slug: string }) {
           <SectionAside grade={s.grade} slug={slug} sectionNumber={s.section?.number ?? null} />
           <div className={layout.content}>
             <header className={layout.header}>
-              <ContourBackground shape="peak" width={300} height={220} color={`var(--grade-${s.grade})`} style={{ right: -70, bottom: -60 }} />
+              <ContourBackground color={`var(--grade-${s.grade})`} />
               <div className={layout.headerTop}>
                 <Link to="/grade/$grade" params={{ grade: String(s.grade) }} className={layout.back}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
