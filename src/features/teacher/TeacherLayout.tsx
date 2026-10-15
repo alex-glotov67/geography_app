@@ -2,10 +2,12 @@ import { Link, Outlet, useNavigate } from '@tanstack/react-router'
 import { signOut, type Me } from '@/api/auth'
 import t from './teacher.module.css'
 
-/** Пункти меню — лише те, що вже працює; Уроки, Банк, Результати, Квізи з'являться у своїх фазах */
+/** Пункти меню — лише те, що вже працює; Банк, Результати, Квізи з'являться у своїх кроках і фазах */
 const LINKS = [
   { to: '/t', label: 'Огляд', exact: true },
   { to: '/t/classes', label: 'Класи й учні', exact: false },
+  { to: '/t/lessons', label: 'Уроки й конструктор', exact: false },
+  { to: '/t/outcomes', label: 'Довідник програми', exact: true },
   { to: '/t/settings', label: 'Налаштування', exact: true },
 ] as const
 

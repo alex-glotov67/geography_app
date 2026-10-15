@@ -55,10 +55,21 @@ export function parseCsv(text: string, delimiter = detectDelimiter(text)): strin
   return rows
 }
 
+export interface Table {
+  /** Для CSV — визначене кодування; для XLSX — 'xlsx' */
+  encoding: string
+  header: string[]
+  records: { line: number; values: Record<string, string>; empty: boolean }[]
+}
+
 /** Таблиця з заголовком: назви стовпців без регістру й пробілів навколо; дані — масив об'єктів. */
-export function readTable(bytes: Uint8Array) {
+export function readTable(bytes: Uint8Array): Table {
   const { text, encoding } = decodeText(bytes)
-  const rows = parseCsv(text.replace(/^\uFEFF/, ''))
+  return tableFromRows(parseCsv(text.replace(/^\uFEFF/, '')), encoding)
+}
+
+/** Те саме з готових рядків (перший аркуш XLSX через SheetJS) */
+export function tableFromRows(rows: string[][], encoding: string): Table {
   const header = (rows[0] ?? []).map((h) => h.trim().toLocaleLowerCase('uk'))
   const records = rows.slice(1).map((cells, i) => ({
     line: i + 2,
