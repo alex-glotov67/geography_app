@@ -70,6 +70,12 @@ isOneToOne: false
       referencedRelation: "lessons"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "lesson_outcomes_lesson_id_fkey"
+      columns: ["lesson_id"]
+isOneToOne: false
+      referencedRelation: "task_usage"
+      referencedColumns: ["lesson_id"]
+    },{
       foreignKeyName: "lesson_outcomes_outcome_id_fkey"
       columns: ["outcome_id"]
 isOneToOne: false
@@ -122,6 +128,12 @@ isOneToOne: false
       referencedRelation: "lessons"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "lesson_versions_lesson_id_fkey"
+      columns: ["lesson_id"]
+isOneToOne: false
+      referencedRelation: "task_usage"
+      referencedColumns: ["lesson_id"]
+    },{
       foreignKeyName: "lesson_versions_owner_id_fkey"
       columns: ["owner_id"]
 isOneToOne: false
@@ -143,14 +155,14 @@ isOneToOne: false
                   ]
                 },"lessons": {
                   Row: {
-                    "blocks": NonNullable<Json>,"grade": number,"homework": Json | null,"id": string,"is_demo": boolean,"ktp_ref": string | null,"number": number | null,"owner_id": string,"published_version": number | null,"quiz_pool": (string)[],"reviewed_by_teacher": boolean,"school_id": string,"section_id": string | null,"simplified": Json | null,"slug": string,"status": string,"textbook_ref": Json | null,"title": string,"updated_at": string
+                    "blocks": NonNullable<Json>,"grade": number,"homework": Json | null,"id": string,"is_demo": boolean,"ktp_ref": string | null,"number": number | null,"owner_id": string,"published_version": number | null,"quiz_pool": (string)[],"reviewed_by_teacher": boolean,"revision": number,"school_id": string,"section_id": string | null,"simplified": Json | null,"slug": string,"status": string,"textbook_ref": Json | null,"title": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "blocks"?: NonNullable<Json>,"grade": number,"homework"?: Json | null,"id"?: string,"is_demo"?: boolean,"ktp_ref"?: string | null,"number"?: number | null,"owner_id"?: string,"published_version"?: number | null,"quiz_pool"?: (string)[],"reviewed_by_teacher"?: boolean,"school_id"?: string,"section_id"?: string | null,"simplified"?: Json | null,"slug": string,"status"?: string,"textbook_ref"?: Json | null,"title": string,"updated_at"?: string
+                    "blocks"?: NonNullable<Json>,"grade": number,"homework"?: Json | null,"id"?: string,"is_demo"?: boolean,"ktp_ref"?: string | null,"number"?: number | null,"owner_id"?: string,"published_version"?: number | null,"quiz_pool"?: (string)[],"reviewed_by_teacher"?: boolean,"revision"?: number,"school_id"?: string,"section_id"?: string | null,"simplified"?: Json | null,"slug": string,"status"?: string,"textbook_ref"?: Json | null,"title": string,"updated_at"?: string
                   }
                   Update: {
-                    "blocks"?: NonNullable<Json>,"grade"?: number,"homework"?: Json | null,"id"?: string,"is_demo"?: boolean,"ktp_ref"?: string | null,"number"?: number | null,"owner_id"?: string,"published_version"?: number | null,"quiz_pool"?: (string)[],"reviewed_by_teacher"?: boolean,"school_id"?: string,"section_id"?: string | null,"simplified"?: Json | null,"slug"?: string,"status"?: string,"textbook_ref"?: Json | null,"title"?: string,"updated_at"?: string
+                    "blocks"?: NonNullable<Json>,"grade"?: number,"homework"?: Json | null,"id"?: string,"is_demo"?: boolean,"ktp_ref"?: string | null,"number"?: number | null,"owner_id"?: string,"published_version"?: number | null,"quiz_pool"?: (string)[],"reviewed_by_teacher"?: boolean,"revision"?: number,"school_id"?: string,"section_id"?: string | null,"simplified"?: Json | null,"slug"?: string,"status"?: string,"textbook_ref"?: Json | null,"title"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -351,14 +363,14 @@ isOneToOne: false
                   ]
                 },"tasks": {
                   Row: {
-                    "archived": boolean,"content": NonNullable<Json>,"feedback": Json | null,"grp": string,"hint": string | null,"id": string,"is_demo": boolean,"level": string,"owner_id": string,"points": number,"print_override": Json | null,"school_id": string,"tags": NonNullable<Json>,"type": string,"updated_at": string,"version": number,"visibility": string
+                    "archived": boolean,"content": NonNullable<Json>,"feedback": Json | null,"grp": string,"hint": string | null,"id": string,"is_demo": boolean,"level": string,"owner_id": string,"points": number,"print_override": Json | null,"revision": number,"school_id": string,"tags": NonNullable<Json>,"type": string,"updated_at": string,"version": number,"visibility": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "archived"?: boolean,"content": NonNullable<Json>,"feedback"?: Json | null,"grp": string,"hint"?: string | null,"id"?: string,"is_demo"?: boolean,"level": string,"owner_id"?: string,"points"?: number,"print_override"?: Json | null,"school_id"?: string,"tags"?: NonNullable<Json>,"type": string,"updated_at"?: string,"version"?: number,"visibility": string
+                    "archived"?: boolean,"content": NonNullable<Json>,"feedback"?: Json | null,"grp": string,"hint"?: string | null,"id"?: string,"is_demo"?: boolean,"level": string,"owner_id"?: string,"points"?: number,"print_override"?: Json | null,"revision"?: number,"school_id"?: string,"tags"?: NonNullable<Json>,"type": string,"updated_at"?: string,"version"?: number,"visibility": string
                   }
                   Update: {
-                    "archived"?: boolean,"content"?: NonNullable<Json>,"feedback"?: Json | null,"grp"?: string,"hint"?: string | null,"id"?: string,"is_demo"?: boolean,"level"?: string,"owner_id"?: string,"points"?: number,"print_override"?: Json | null,"school_id"?: string,"tags"?: NonNullable<Json>,"type"?: string,"updated_at"?: string,"version"?: number,"visibility"?: string
+                    "archived"?: boolean,"content"?: NonNullable<Json>,"feedback"?: Json | null,"grp"?: string,"hint"?: string | null,"id"?: string,"is_demo"?: boolean,"level"?: string,"owner_id"?: string,"points"?: number,"print_override"?: Json | null,"revision"?: number,"school_id"?: string,"tags"?: NonNullable<Json>,"type"?: string,"updated_at"?: string,"version"?: number,"visibility"?: string
                   }
                   Relationships: [
                     {
@@ -456,14 +468,36 @@ isOneToOne: false
                 }
           }
           Views: {
-            [_ in never]: never
+            "task_usage": {
+                  Row: {
+                    "grade": number | null,"lesson_id": string | null,"lesson_number": number | null,"lesson_slug": string | null,"lesson_title": string | null,"published": boolean | null,"role": string | null,"task_id": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    
+                  ]
+                }
           }
           Functions: {
             "publish_lesson":
 { Args: { "p_lesson_id": string }; Returns: number
                            },
+"publish_lesson_reviewed":
+{ Args: { "p_lesson_id": string,"p_revision": number }; Returns: number
+                           },
+"save_lesson":
+{ Args: { "p_fields": Json,"p_id": string,"p_outcome_ids"?: (string)[],"p_revision": number }; Returns: number
+                           },
+"save_task":
+{ Args: { "p_id": string,"p_key": Json,"p_revision": number,"p_task": Json }; Returns: {
+              "id": string,"revision": number,"version": number
+            }[]
+                           },
 "touch_last_login":
 { Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"unpublish_lesson":
+{ Args: { "p_lesson_id": string }; Returns: undefined
                            }
           }
           Enums: {
