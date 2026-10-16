@@ -142,6 +142,28 @@ const classRoute = createRoute({
   component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'ClassRoute'),
 })
 
+const lessonsRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/lessons',
+  // ?grade=8 — вкладка класу (за замовчуванням 8 — пілот)
+  validateSearch: (search: Record<string, unknown>): { grade: number } => ({
+    grade: isGrade(Number(search.grade)) ? Number(search.grade) : 8,
+  }),
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'LessonsRoute'),
+})
+
+const builderLessonRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/lessons/$lessonId',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'LessonOverviewRoute'),
+})
+
+const outcomesRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/outcomes',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'OutcomesRoute'),
+})
+
 const settingsRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/settings',
@@ -175,10 +197,10 @@ export const routeTree = rootRoute.addChildren([
   loginRoute,
   meRoute,
   quizRoute,
-  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, settingsRoute]),
+  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, lessonsRoute, builderLessonRoute, outcomesRoute, settingsRoute]),
 ])
 
-export { classRoute, lessonRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
+export { builderLessonRoute, classRoute, lessonRoute, lessonsRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
 
 export const router = createRouter({
   routeTree,

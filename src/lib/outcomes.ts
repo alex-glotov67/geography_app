@@ -1,5 +1,5 @@
 import { OutcomeRow as RowSchema, type OutcomeRow as Row } from '@shared/schemas/outcomes.ts'
-import { readTable } from './csv'
+import { readTable, type Table } from './csv'
 
 /**
  * Імпорт довідника розділів, тем і очікуваних результатів (SPEC 10.6). Чиста логіка: розбір,
@@ -36,7 +36,11 @@ export const normText = (s: string) => s.trim().replace(/\s+/g, ' ').toLocaleLow
 const topicKey = (r: { grade: number; sectionNumber: number; topicNumber: number }) => `${r.grade}-${r.sectionNumber}-${r.topicNumber}`
 
 export function parseOutcomes(bytes: Uint8Array): { rows: OutcomeRow[]; errors: RowError[]; encoding: string } {
-  const { header, records, encoding } = readTable(bytes)
+  return parseOutcomesTable(readTable(bytes))
+}
+
+/** Розбір з таблиці — CSV (readTable) або перший аркуш XLSX (tableFromRows) */
+export function parseOutcomesTable({ header, records, encoding }: Table): { rows: OutcomeRow[]; errors: RowError[]; encoding: string } {
   const missing = Object.keys(COLUMNS).filter((h) => !header.includes(h))
   if (missing.length) {
     return { rows: [], encoding, errors: [{ line: 1, message: `Немає стовпців: ${missing.map((m) => `«${m}»`).join(', ')}` }] }
