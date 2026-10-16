@@ -27,7 +27,7 @@ a{color:#1D5E8C}a:hover{color:#123F60}
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: 8px">
 <div style="display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: #ECEEEA">
-<sc-for list="{{views}}" as="v" hint-placeholder-count="3">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="4">
 <button onClick="{{v.pick}}" style="min-height: 44px; padding: 0 12px; border-radius: 8px; border: 0; background: {{v.bg}}; font-family: inherit; font-size: 14px; font-weight: {{v.w}}; color: #1E2A2F; cursor: pointer">{{v.name}}</button>
 </sc-for>
 </div>
@@ -46,7 +46,14 @@ a{color:#1D5E8C}a:hover{color:#123F60}
 <label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">§<input value="[N]" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
 <label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #55636A">Сторінки<input value="[00–00]" style="width: 100%; box-sizing: border-box; height: 44px; border: 1px solid #B9C3BE; border-radius: 10px; padding: 0 10px; font-family: inherit; font-size: 15px; color: #1E2A2F"></label>
 </div>
-<span style="font-size: 13px; color: #55636A">Очікувані результати: 2 × ГР1, 1 × ГР2, 1 × ГР3</span>
+<span style="font-size: 14px; font-weight: 600; margin-top: 4px">Очікувані результати</span>
+<span style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.35">
+<span style="color: #55636A; font-size: 13px">Розділ 2 · Тема 1</span>
+<span style="display: flex; gap: 8px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #55636A; padding-top: 2px">8-2-1-01</span><span>[Результат з довідника]</span></span>
+<span style="display: flex; gap: 8px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #55636A; padding-top: 2px">8-2-1-03</span><span>[Результат з довідника]</span></span>
+</span>
+<span style="align-self: flex-start; min-height: 44px; display: flex; align-items: center; padding: 0 12px; border: 1px dashed #B9C3BE; border-radius: 10px; color: #1D5E8C; font-size: 14px">+ з довідника</span>
+<span style="font-size: 13px; color: #55636A">За тегами завдань уроку: 2 × ГР1, 1 × ГР2, 1 × ГР3</span>
 </section>
 
 <section style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D5DAD0">
@@ -137,7 +144,7 @@ class Component extends DCLogic {
 constructor(props) { super(props); this.state = { view: 'Редагування', sel: 'Текст', menu: true }; }
 renderVals() {
 const s = this.state;
-const views = ['Редагування', 'Телефон', 'Комп’ютер'].map((name) => ({ name, bg: s.view === name ? '#FFFFFF' : 'transparent', w: s.view === name ? '600' : '400', pick: () => this.setState({ view: name }) }));
+const views = ['Редагування', 'Телефон', 'Комп’ютер', 'Спрощений'].map((name) => ({ name, bg: s.view === name ? '#FFFFFF' : 'transparent', w: s.view === name ? '600' : '400', pick: () => this.setState({ view: name }) }));
 const outline = [['Мета', '2 пункти'], ['Текст', ''], ['Зображення', '!'], ['Відео', '4 хв'], ['Терміни', '4'], ['Тренування', '4 завд.'], ['Рефлексія', ''], ['ДЗ', '6 завд.']].map(([name, meta]) => ({ name, meta, bg: s.sel === name ? '#EEF4F9' : 'transparent', pick: () => this.setState({ sel: name }) }));
 const off = '#D5DAD0', L = ['#4E8A57', '#9AA33A', '#C99A3A', '#8A5A34'];
 const lv = (n) => ({ c1: L[n-1], c2: n >= 2 ? L[n-1] : off, c3: n >= 3 ? L[n-1] : off, c4: n >= 4 ? L[n-1] : off });
