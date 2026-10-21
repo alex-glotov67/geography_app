@@ -1,7 +1,9 @@
-import { LessonOverview } from '@/features/builder/LessonOverview'
+import { Outlet, useMatches } from '@tanstack/react-router'
+import { BuilderPage } from '@/features/builder/BuilderPage'
 import { LessonsPage } from '@/features/builder/LessonsPage'
 import { OutcomesPage } from '@/features/builder/OutcomesPage'
-import { builderLessonRoute, classRoute, lessonsRoute, teacherRoute } from '@/router'
+import { PreviewPage } from '@/features/builder/PreviewPage'
+import { builderLessonRoute, builderPreviewRoute, classRoute, lessonsRoute, teacherRoute } from '@/router'
 import { ClassesPage } from './ClassesPage'
 import { ClassPage } from './ClassPage'
 import { SettingsPage } from './SettingsPage'
@@ -14,7 +16,10 @@ import { TeacherLayout } from './TeacherLayout'
  */
 
 export function TeacherLayoutRoute() {
-  return <TeacherLayout me={teacherRoute.useRouteContext().me} />
+  // Конструктор і перегляд чернетки — на весь екран, без меню кабінету (макет LessonBuilder)
+  const bare = useMatches({ select: (ms) => ms.some((m) => m.routeId === builderLessonRoute.id || m.routeId === builderPreviewRoute.id) })
+  const { me } = teacherRoute.useRouteContext()
+  return bare ? <Outlet /> : <TeacherLayout me={me} />
 }
 
 export function TeacherHomeRoute() {
@@ -36,9 +41,14 @@ export function LessonsRoute() {
   return <LessonsPage me={teacherRoute.useRouteContext().me} grade={lessonsRoute.useSearch().grade} />
 }
 
-export function LessonOverviewRoute() {
+export function BuilderRoute() {
   const { lessonId } = builderLessonRoute.useParams()
-  return <LessonOverview key={lessonId} me={teacherRoute.useRouteContext().me} lessonId={lessonId} />
+  return <BuilderPage key={lessonId} me={teacherRoute.useRouteContext().me} lessonId={lessonId} />
+}
+
+export function BuilderPreviewRoute() {
+  const { lessonId } = builderPreviewRoute.useParams()
+  return <PreviewPage key={lessonId} lessonId={lessonId} simplified={!!builderPreviewRoute.useSearch().simplified} />
 }
 
 export function OutcomesRoute() {

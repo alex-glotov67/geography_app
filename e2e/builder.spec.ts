@@ -93,10 +93,11 @@ test('уроки: дерево класу зі статусами, новий у
   expect(slug).toMatch(/^g8-u42(-\d+)?$/)
   await form.getByLabel('Тема уроку').fill('ДЕМО: тестовий урок')
   await form.getByRole('button', { name: 'Створити й відкрити конструктор' }).click()
-  await expect(page.getByRole('heading', { level: 1, name: /Урок 42\. ДЕМО: тестовий урок/ })).toBeVisible()
-  await expect(page.getByText(`/lesson/${slug} · чернетка`)).toBeVisible()
+  // Відкривається конструктор (3.3): шапка з класом і № уроку, адреса — та, що пропонувалась
+  await expect(page.getByRole('heading', { level: 1, name: '8 клас · Урок 42. ДЕМО: тестовий урок' })).toBeVisible()
+  await expect(page.getByLabel('Адреса: /lesson/…')).toHaveValue(slug)
 
-  await page.getByRole('link', { name: 'До уроків' }).click()
+  await page.getByRole('link', { name: 'Уроки', exact: true }).click()
   await page.getByRole('searchbox').fill('тестовий')
   await expect(page.getByRole('row').filter({ hasText: slug })).toContainText('Чернетка')
 })
