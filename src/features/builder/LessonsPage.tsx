@@ -19,7 +19,7 @@ import { GRADES } from '@/lib/grades'
 type Teacher = Extract<Me, { kind: 'teacher' }>
 
 const STATUS: Record<LessonRow['status'], { text: string; cls: string }> = {
-  draft: { text: 'Чернетка', cls: t.statusSkip! },
+  draft: { text: 'Чернетка — учні не бачать', cls: t.statusSkip! },
   published: { text: 'Опубліковано', cls: t.statusNew! },
   changed: { text: 'Опубліковано · є зміни', cls: t.statusNew! },
 }
@@ -127,8 +127,13 @@ export function LessonsPage({ me, grade }: { me: Teacher; grade: number }) {
                           {l.slug}
                         </td>
                         <td className={STATUS[l.status].cls}>
-                          {STATUS[l.status].text}
+                          <span className={l.status === 'draft' ? t.strong : undefined}>{STATUS[l.status].text}</span>
                           {l.publishedVersion ? ` (версія ${l.publishedVersion})` : ''}
+                          {l.status === 'draft' && (
+                            <span className={t.muted} style={{ display: 'block', fontSize: 14 }}>
+                              Опублікуйте урок у конструкторі
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

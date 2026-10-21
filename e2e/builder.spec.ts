@@ -98,5 +98,5 @@ test('уроки: дерево класу зі статусами, новий у
 
   await page.getByRole('link', { name: 'До уроків' }).click()
   await page.getByRole('searchbox').fill('тестовий')
-  await expect(page.getByRole('row').filter({ hasText: slug })).toContainText('Чернетка')
+  await expect(page.getByRole('row').filter({ hasText: slug })).toContainText('Чернетка — учні не бачать')
 })
