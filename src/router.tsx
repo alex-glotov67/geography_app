@@ -155,7 +155,16 @@ const lessonsRoute = createRoute({
 const builderLessonRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/lessons/$lessonId',
-  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'LessonOverviewRoute'),
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'BuilderRoute'),
+})
+
+/** Перегляд чернетки в iframe конструктора (SPEC 10.1); ?simplified=1 — спрощений режим */
+const builderPreviewRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/lessons/$lessonId/preview',
+  validateSearch: (search: Record<string, unknown>): { simplified?: boolean } =>
+    search.simplified === 1 || search.simplified === '1' || search.simplified === true ? { simplified: true } : {},
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'BuilderPreviewRoute'),
 })
 
 const outcomesRoute = createRoute({
@@ -197,10 +206,10 @@ export const routeTree = rootRoute.addChildren([
   loginRoute,
   meRoute,
   quizRoute,
-  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, lessonsRoute, builderLessonRoute, outcomesRoute, settingsRoute]),
+  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, lessonsRoute, builderLessonRoute, builderPreviewRoute, outcomesRoute, settingsRoute]),
 ])
 
-export { builderLessonRoute, classRoute, lessonRoute, lessonsRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
+export { builderLessonRoute, builderPreviewRoute, classRoute, lessonRoute, lessonsRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
 
 export const router = createRouter({
   routeTree,
