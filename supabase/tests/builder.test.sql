@@ -33,7 +33,7 @@ select is((select key from public.task_keys where task_id = (select id from ids 
 select throws_ok(
   $$ select * from public.save_task((select id from ids where name = 'task'), 7,
        '{"type":"single_choice","level":"base","grp":"ГР1","content":{"prompt":"x"},"visibility":"open"}', '{"correct":["a"]}') $$,
-  '40001', null, 'застаріла ревізія завдання — конфлікт'
+  'PT409', null, 'застаріла ревізія завдання — конфлікт'
 );
 select results_eq(
   $$ select revision, version from public.save_task((select id from ids where name = 'task'), 1,
@@ -69,7 +69,7 @@ select is((select count(*)::int from public.lesson_outcomes where lesson_id = (s
   'прибраний результат видалено');
 select throws_ok(
   $$ select public.save_lesson((select id from ids where name = 'lesson'), 1, '{"title":"Інша вкладка"}') $$,
-  '40001', null, 'застаріла ревізія уроку — конфлікт'
+  'PT409', null, 'застаріла ревізія уроку — конфлікт'
 );
 select is(public.save_lesson((select id from ids where name = 'lesson'), null, '{"title":"Рельєф України"}'), 3,
   '«Перезаписати моїми змінями» — без перевірки ревізії');
@@ -79,7 +79,7 @@ select is((select count(*)::int from public.task_usage where task_id = (select i
 -- ── Публікація ───────────────────────────────────────────────────────────────────────────
 select throws_ok(
   $$ select public.publish_lesson_reviewed((select id from ids where name = 'lesson'), 2) $$,
-  '40001', null, 'публікація не тієї ревізії, яку переглянув вчитель, — конфлікт'
+  'PT409', null, 'публікація не тієї ревізії, яку переглянув вчитель, — конфлікт'
 );
 select throws_like(
   $$ select public.publish_lesson_reviewed((select id from ids where name = 'lesson'), 3) $$,
