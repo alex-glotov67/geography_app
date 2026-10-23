@@ -177,6 +177,10 @@
     align-items: start;
   }
 
+  .columns[data-aside='false'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .aside {
     display: flex;
     flex-direction: column;
