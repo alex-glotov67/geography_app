@@ -213,14 +213,14 @@ isOneToOne: false
                   ]
                 },"program_outcomes": {
                   Row: {
-                    "archived": boolean,"code": string,"grade": number,"id": string,"is_demo": boolean,"owner_id": string,"school_id": string,"source": string,"text": string,"text_norm": string | null,"topic_id": string,"updated_at": string
+                    "archived": boolean,"code": string,"grade": number,"id": string,"is_demo": boolean,"owner_id": string,"position": number | null,"school_id": string,"source": string,"text": string,"text_norm": string | null,"topic_id": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "archived"?: boolean,"code": string,"grade": number,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"school_id"?: string,"source": string,"text": string,"text_norm"?: never,"topic_id": string,"updated_at"?: string
+                    "archived"?: boolean,"code": string,"grade": number,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"position"?: number | null,"school_id"?: string,"source": string,"text": string,"text_norm"?: never,"topic_id": string,"updated_at"?: string
                   }
                   Update: {
-                    "archived"?: boolean,"code"?: string,"grade"?: number,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"school_id"?: string,"source"?: string,"text"?: string,"text_norm"?: never,"topic_id"?: string,"updated_at"?: string
+                    "archived"?: boolean,"code"?: string,"grade"?: number,"id"?: string,"is_demo"?: boolean,"owner_id"?: string,"position"?: number | null,"school_id"?: string,"source"?: string,"text"?: string,"text_norm"?: never,"topic_id"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -479,11 +479,19 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "publish_lesson":
+            "add_outcome":
+{ Args: { "p_source": string,"p_text": string,"p_topic_id": string }; Returns: {
+              "code": string,"id": string
+            }[]
+                           },
+"publish_lesson":
 { Args: { "p_lesson_id": string }; Returns: number
                            },
 "publish_lesson_reviewed":
 { Args: { "p_lesson_id": string,"p_revision": number }; Returns: number
+                           },
+"reorder_outcomes":
+{ Args: { "p_ids": (string)[],"p_topic_id": string }; Returns: undefined
                            },
 "save_lesson":
 { Args: { "p_fields": Json,"p_id": string,"p_outcome_ids"?: (string)[],"p_revision": number }; Returns: number
