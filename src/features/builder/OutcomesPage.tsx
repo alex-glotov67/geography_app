@@ -4,6 +4,7 @@ import type { Me } from '@/api/auth'
 import { archiveOutcomes, directoryCsv, directoryQuery, type DirSection } from '@/api/builder'
 import { ACCEPT, ImportFileError, readGrid } from '@/features/import/adapters/readGrid'
 import { TeacherPageSkeleton } from '@/features/teacher/TeacherSkeletons'
+import { DirectoryTree, NewSectionButton } from './DirectoryTree'
 import t from '@/features/teacher/teacher.module.css'
 import { tableFromRows } from '@/lib/csv'
 import { parseOutcomesTable, planOutcomes, type OutcomePlan, type OutcomeRow, type RowError } from '@/lib/outcomes'
@@ -109,6 +110,7 @@ export function OutcomesPage({ me }: { me: Teacher }) {
           </span>
         </h1>
         <div className={t.actions}>
+          <NewSectionButton sections={sections} />
           <button type="button" className={t.btn} disabled={!total} onClick={() => download('dovidnyk-programy.csv', directoryCsv(sections))}>
             Експортувати CSV
           </button>
@@ -238,41 +240,12 @@ export function OutcomesPage({ me }: { me: Teacher }) {
       {sections.length === 0 ? (
         <section className={t.card}>
           <p className={t.empty}>
-            Довідник порожній. Імпортуй CSV або XLSX у форматі «Код;Клас;№ розділу;Назва розділу;№ теми;Назва теми;Результат;Джерело» —
-            результати знадобляться в метаданих уроків.
+            Довідник порожній. Імпортуй CSV або XLSX у форматі «Код;Клас;№ розділу;Назва розділу;№ теми;Назва теми;Результат;Джерело»
+            або додай розділи, теми й результати вручну («+ Розділ») — вони знадобляться в метаданих уроків.
           </p>
         </section>
       ) : (
-        sections.map((s) => (
-          <section key={s.id} className={t.card} aria-label={`${s.grade} клас, розділ ${s.number}`}>
-            <h2 className={t.h2}>
-              {s.grade} клас · {s.number === 0 ? 'Вступ' : `Розділ ${s.number}`}. {s.title}
-            </h2>
-            {s.topics.map((tp) => (
-              <details key={tp.id}>
-                <summary style={{ minHeight: 44, display: 'flex', alignItems: 'center', cursor: 'pointer', fontWeight: 500 }}>
-                  {tp.number === 0 ? 'Вступ' : `Тема ${tp.number}`}. {tp.title}
-                  <span className={t.muted} style={{ marginLeft: 8, fontWeight: 400 }}>
-                    ({tp.outcomes.filter((o) => !o.archived).length})
-                  </span>
-                </summary>
-                <ul style={{ margin: '4px 0 8px', paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {tp.outcomes.map((o) => (
-                    <li key={o.id} style={{ display: 'flex', gap: 10, fontSize: 15, opacity: o.archived ? 0.55 : 1 }}>
-                      <span className={t.mono} style={{ fontSize: 13, color: 'var(--muted)', flexShrink: 0, paddingTop: 2 }}>
-                        {o.code}
-                      </span>
-                      <span>
-                        {o.text}
-                        {o.archived && <span className={t.muted}> (архів)</span>}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            ))}
-          </section>
-        ))
+        <DirectoryTree sections={sections} />
       )}
     </>
   )
