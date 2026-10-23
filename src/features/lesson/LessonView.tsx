@@ -42,7 +42,8 @@ export function LessonView({ lesson: s, refs, simplified, onSimplifiedChange, as
   return (
     <LessonContext.Provider value={{ slug: s.slug, grade: s.grade, ...refs, homeworkCount: s.homeworkCount, simplified }}>
       <div className={layout.page}>
-        <div className={layout.columns}>
+        {/* Без бокового списку сітка на комп'ютері — одна колонка, а не вміст у вузькій колонці списку */}
+        <div className={layout.columns} data-aside={aside ? 'true' : 'false'}>
           {aside}
           <div className={layout.content}>
             <header className={layout.header}>

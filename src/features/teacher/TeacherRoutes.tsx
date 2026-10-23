@@ -48,7 +48,7 @@ export function BuilderRoute() {
 
 export function BuilderPreviewRoute() {
   const { lessonId } = builderPreviewRoute.useParams()
-  return <PreviewPage key={lessonId} lessonId={lessonId} simplified={!!builderPreviewRoute.useSearch().simplified} />
+  return <PreviewPage key={lessonId} me={teacherRoute.useRouteContext().me} lessonId={lessonId} simplified={!!builderPreviewRoute.useSearch().simplified} />
 }
 
 export function OutcomesRoute() {

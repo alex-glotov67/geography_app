@@ -113,6 +113,14 @@ test('перегляд чернетки, перевірка, публікаці�
   const preview = page.frameLocator('iframe[title="Перегляд чернетки очима учня"]')
   await expect(preview.getByRole('heading', { level: 1, name: title })).toBeVisible()
   await expect(preview.getByText('ДЕМО: перший пункт мети')).toBeVisible()
+
+  // Комп'ютер — справжній вигляд LessonDesktop: список уроків розділу збоку, вміст — у широкій колонці
+  await page.getByRole('button', { name: 'Комп’ютер' }).click()
+  const desktop = page.frameLocator('iframe[title="Перегляд чернетки очима учня"]')
+  await expect(desktop.getByRole('navigation', { name: 'Уроки розділу' })).toContainText(title)
+  const h1 = desktop.getByRole('heading', { level: 1, name: title })
+  await expect(h1).toBeVisible()
+  expect((await desktop.locator('main').boundingBox())!.width).toBeGreaterThan(700)
   await page.getByRole('button', { name: 'Редагування' }).click()
 
   // TODO(teacher) блокує публікацію (і в панелі перевірки, і в діалозі)

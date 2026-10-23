@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { builderLessonQuery } from '@/api/builder'
+import type { Me } from '@/api/auth'
+import { builderLessonQuery, directoryQuery } from '@/api/builder'
 import layout from '@/features/lesson/lessonLayout.module.css'
 import { LessonView } from '@/features/lesson/LessonView'
+import { SectionAside } from '@/features/lesson/SectionAside'
 import { TeacherPageSkeleton } from '@/features/teacher/TeacherSkeletons'
 import type { PracticeTask } from '@/tasks/TaskCard'
 import type { Level } from '@/lib/levels'
@@ -14,8 +16,9 @@ import { backupKey, readBackup } from './store'
  * Та сама сторінка уроку, що й опублікована; чернетку бере з localStorage і оновлюється з кожною
  * правкою (подія storage з вкладки конструктора).
  */
-export function PreviewPage({ lessonId, simplified: initialSimplified }: { lessonId: string; simplified: boolean }) {
+export function PreviewPage({ me, lessonId, simplified: initialSimplified }: { me: Extract<Me, { kind: 'teacher' }>; lessonId: string; simplified: boolean }) {
   const lesson = useQuery(builderLessonQuery(lessonId))
+  const directory = useQuery(directoryQuery(me.id))
   const [draft, setDraft] = useState<LessonDraftState | null>(() => readBackup(lessonId)?.draft ?? null)
   const [simplified, setSimplified] = useState(initialSimplified)
 
@@ -36,6 +39,7 @@ export function PreviewPage({ lessonId, simplified: initialSimplified }: { lesso
       .map((x) => [x.id, { id: x.id, type: x.type, level: x.level as Level, points: x.points, content: x.content, key: x.key, hint: x.hint, feedback: x.feedback }]),
   )
   const homework = d.homework?.taskIds.length ?? 0
+  const section = directory.data?.find((x) => x.id === d.sectionId)
   return (
     <LessonView
       lesson={{
@@ -47,6 +51,15 @@ export function PreviewPage({ lessonId, simplified: initialSimplified }: { lesso
       simplified={simplified}
       onSimplifiedChange={setSimplified}
       badge={<span className={layout.badge}>Перегляд чернетки</span>}
+      // Як в учня на комп'ютері: список уроків розділу, чернетка — на своєму місці
+      aside={
+        <SectionAside
+          grade={d.grade}
+          slug={d.slug}
+          inSection={(l) => (l.section?.id ?? null) === d.sectionId}
+          draft={{ slug: d.slug, number: d.number, title: d.title || 'Без теми', section: section ? { number: section.number, title: section.title } : null }}
+        />
+      }
     />
   )
 }
