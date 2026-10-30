@@ -63,7 +63,7 @@ test('довідник: повторний імпорт без змін, XLSX з
   const firstRun = (await xlsxCheck.innerText()).includes('нових 1')
   if (firstRun) {
     await page.getByRole('button', { name: 'Імпортувати', exact: true }).click()
-    await expect(page.getByRole('status')).toContainText('нових 1')
+    await expect(page.getByRole('status').filter({ hasText: 'Імпортовано' })).toContainText('нових 1') // на сторінці є й живі регіони dnd-kit
   } else {
     await expect(xlsxCheck).toContainText('нових 0') // повторний запуск: уже імпортовано
     await page.getByRole('button', { name: 'Скасувати' }).click()
