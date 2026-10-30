@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Block } from '@shared/schemas/blocks.ts'
 import { LessonDraft } from '@shared/schemas/lesson.ts'
 import type { BuilderLesson } from '@/api/builder'
+import { isEmptyRichDoc } from '@/lib/richtext'
 import type { GeoPackage, PackageMedia, PackageTask, PackageVideo } from '@/lib/packages/schema'
 import { validatePackage } from '@/lib/packages/validate'
 import { BLOCK_LABELS, type LessonDraftState } from './draft'
@@ -41,10 +42,6 @@ const fieldName = (path: PropertyKey[]) => {
   return names.at(-1) ?? ''
 }
 
-/** Порожній абзац у новому тексті — zod пропускає (абзац без вмісту допустимий), тут — помилка */
-const isEmptyDoc = (doc: { content: { type: string; content?: unknown[] }[] } | undefined) =>
-  !!doc && doc.content.every((n) => n.type === 'paragraph' && !n.content?.length)
-
 function blockIssues(blocks: LessonDraftState['blocks'], prefix: string): DraftIssue[] {
   const issues: DraftIssue[] = []
   blocks.forEach((b, i) => {
@@ -59,7 +56,7 @@ function blockIssues(blocks: LessonDraftState['blocks'], prefix: string): DraftI
         seen.add(text)
       }
     }
-    if ((b.type === 'text' || b.type === 'callout') && isEmptyDoc(b.doc)) issues.push({ level: 'error', message: `${label}: текст порожній`, blockId: b.id })
+    if ((b.type === 'text' || b.type === 'callout') && isEmptyRichDoc(b.doc)) issues.push({ level: 'error', message: `${label}: текст порожній`, blockId: b.id })
   })
   return issues
 }

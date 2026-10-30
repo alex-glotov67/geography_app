@@ -1,5 +1,4 @@
-import { plainDoc } from '@shared/schemas/richtext.ts'
-import { blockId, docToPlain, grSummary, lessonTaskIds, moveItem, newBlock, plainToDoc, toSaveFields, type LessonDraftState } from './draft'
+import { blockId, grSummary, lessonTaskIds, moveItem, newBlock, toSaveFields, type LessonDraftState } from './draft'
 
 const draft = (over: Partial<LessonDraftState> = {}): LessonDraftState => ({
   slug: 'g8-u05', grade: 8, sectionId: null, number: 5, title: 'Рельєф', textbookRef: null, ktpRef: null,
@@ -7,15 +6,6 @@ const draft = (over: Partial<LessonDraftState> = {}): LessonDraftState => ({
 })
 
 describe('чернетка уроку', () => {
-  it('простий текст ↔ RichDoc: абзаци й переноси; форматований — не показується як простий', () => {
-    const doc = plainToDoc('Перший абзац\nз переносом\n\nДругий')
-    expect(docToPlain(doc)).toBe('Перший абзац\nз переносом\n\nДругий')
-    expect(docToPlain(plainDoc('А', 'Б'))).toBe('А\n\nБ')
-    expect(plainToDoc('')).toEqual({ type: 'doc', content: [{ type: 'paragraph' }] })
-    expect(docToPlain({ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Ж', marks: [{ type: 'bold' }] }] }] })).toBeNull()
-    expect(docToPlain({ type: 'doc', content: [{ type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'Н' }] }] })).toBeNull()
-  })
-
   it('нові блоки й унікальні id', () => {
     const seq = [0, 0, 0.5]
     expect(blockId(['b000000'], () => seq.shift()!)).toBe('bi00000')
