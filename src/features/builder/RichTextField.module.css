@@ -1,0 +1,88 @@
+/*
+ * Поле форматованого тексту в конструкторі (макет LessonBuilder: панель «Н3 Ж К • 1. Посил. Табл.»).
+ * Стандартний вигляд @mantine/tiptap перевизначено токенами; кнопки панелі — ціль дотику ≥ 44 px.
+ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.root {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.root:focus-within {
+  outline: 2px solid var(--water);
+  outline-offset: 1px;
+}
+
+.toolbar {
+  gap: 6px;
+  padding: 6px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-sunken);
+  position: static;
+}
+
+.control {
+  min-width: var(--tap);
+  height: var(--tap);
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.control[data-active] {
+  background: var(--water-tint);
+  color: var(--water-dark);
+  border-color: var(--water);
+}
+
+.content {
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.content :global(.ProseMirror) {
+  min-height: 120px;
+  padding: 10px 12px;
+}
+
+.content :global(.ProseMirror h3) {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 12px 0 6px;
+}
+
+.content :global(.ProseMirror a) {
+  color: var(--water);
+}
+
+.content :global(.ProseMirror table) {
+  border-collapse: collapse;
+  margin: 8px 0;
+}
+
+.content :global(.ProseMirror td),
+.content :global(.ProseMirror th) {
+  border: 1px solid var(--line-strong);
+  padding: 6px 8px;
+  min-width: 80px;
+  vertical-align: top;
+}
+
+.content :global(.ProseMirror th) {
+  background: var(--surface-sunken);
+  font-weight: 600;
+}

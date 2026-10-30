@@ -96,42 +96,6 @@ export function newBlock(type: AddableBlock, id: string): Block {
   }
 }
 
-/**
- * Текст із RichDoc для простого редактора: абзаци через порожній рядок. null — у тексті є
- * форматування (заголовки, списки, жирний…), простий редактор його не показує, щоб не стерти.
- */
-export function docToPlain(doc: RichDoc | undefined): string | null {
-  if (!doc) return ''
-  const paragraphs: string[] = []
-  for (const node of doc.content) {
-    if (node.type !== 'paragraph') return null
-    let text = ''
-    for (const inline of (node.content ?? []) as { type: string; text?: string; marks?: unknown[] }[]) {
-      if (inline.type === 'hardBreak') text += '\n'
-      else if (inline.type !== 'text' || inline.marks?.length) return null
-      else text += inline.text ?? ''
-    }
-    paragraphs.push(text)
-  }
-  return paragraphs.join('\n\n')
-}
-
-/** Абзаци через порожній рядок; одиночний перенос — hardBreak */
-export function plainToDoc(text: string): RichDoc {
-  const paragraphs = text.replace(/\r\n/g, '\n').split(/\n{2,}/)
-  return {
-    type: 'doc',
-    content: paragraphs.map((p) => {
-      const lines = p.split('\n')
-      const content = lines.flatMap((line, i) => [
-        ...(i > 0 ? [{ type: 'hardBreak' as const }] : []),
-        ...(line ? [{ type: 'text' as const, text: line }] : []),
-      ])
-      return content.length ? { type: 'paragraph' as const, content } : { type: 'paragraph' as const }
-    }),
-  }
-}
-
 export const moveItem = <T,>(list: readonly T[], from: number, to: number): T[] => {
   if (from === to || from < 0 || to < 0 || from >= list.length || to >= list.length) return [...list]
   const next = [...list]

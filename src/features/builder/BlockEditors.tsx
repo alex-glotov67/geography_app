@@ -2,13 +2,14 @@ import { useState, type ReactNode } from 'react'
 import type { Block } from '@shared/schemas/blocks.ts'
 import type { BuilderLesson } from '@/api/builder'
 import t from '@/features/teacher/teacher.module.css'
-import { ADDABLE_BLOCKS, BLOCK_HINTS, BLOCK_LABELS, blockId, docToPlain, newBlock, plainToDoc, type AddableBlock } from './draft'
+import { ADDABLE_BLOCKS, BLOCK_HINTS, BLOCK_LABELS, blockId, newBlock, type AddableBlock } from './draft'
+import { RichTextField } from './RichTextField'
 import { useBuilder } from './store'
 import b from './builder.module.css'
 
 /*
- * Редактори блоків (SPEC 10.2). У 3.3 — мета, текст (простий: абзаци), терміни, виділений блок,
- * таблиця. Форматування тексту (Tiptap) — у 3.4, медіа й відео — з медіатекою, тренування й ДЗ —
+ * Редактори блоків (SPEC 10.2): мета, текст і виділений блок (форматування — Tiptap), терміни,
+ * таблиця даних. Медіа й відео — з медіатекою, тренування й ДЗ —
  * з банком завдань: такі блоки тут показуються коротко, їх можна переставити чи прибрати.
  */
 
@@ -34,20 +35,6 @@ function RemoveBtn({ label, onClick, disabled }: { label: string; onClick: () =>
     <button type="button" className={b.iconBtn} onClick={onClick} aria-label={label} disabled={disabled}>
       ×
     </button>
-  )
-}
-
-/** Простий текст: абзаци через порожній рядок; форматований (з 3.4 чи пакета) — лише перегляд */
-function PlainDoc({ label, doc, onChange }: { label: string; doc: Of<'text'>['doc'] | undefined; onChange: (doc: Of<'text'>['doc']) => void }) {
-  const plain = docToPlain(doc)
-  if (plain === null) {
-    return <p className={t.notice}>{label}: текст з форматуванням (заголовки, списки, жирний) — редактор форматування з’явиться в наступному оновленні.</p>
-  }
-  return (
-    <label className={t.field}>
-      <span className={t.fieldLabel}>{label}</span>
-      <textarea className={b.textarea} value={plain} onChange={(e) => onChange(plainToDoc(e.target.value))} aria-describedby="plain-hint" />
-    </label>
   )
 }
 
@@ -83,7 +70,7 @@ function TextEditor({ block, update }: { block: Of<'text'>; update: Update<Of<'t
         <span className={t.fieldLabel}>Заголовок (необов’язково)</span>
         <input className={t.input} value={block.title ?? ''} onChange={(e) => update((x) => ({ ...x, title: e.target.value || undefined }))} />
       </label>
-      <PlainDoc label="Текст" doc={block.doc} onChange={(doc) => update((x) => ({ ...x, doc }))} />
+      <RichTextField label="Текст" value={block.doc} onChange={(doc) => update((x) => ({ ...x, doc }))} />
       <label className={t.check}>
         <input
           type="checkbox"
@@ -95,7 +82,9 @@ function TextEditor({ block, update }: { block: Of<'text'>; update: Update<Of<'t
         />
         Окремий простіший текст для спрощеного режиму
       </label>
-      {ownSimplified && <PlainDoc label="Текст у спрощеному режимі" doc={block.simplifiedDoc} onChange={(doc) => update((x) => ({ ...x, simplifiedDoc: doc }))} />}
+      {ownSimplified && (
+        <RichTextField label="Текст у спрощеному режимі" value={block.simplifiedDoc} onChange={(doc) => update((x) => ({ ...x, simplifiedDoc: doc }))} />
+      )}
     </>
   )
 }
@@ -151,7 +140,7 @@ function CalloutEditor({ block, update }: { block: Of<'callout'>; update: Update
           <input className={t.input} value={block.title ?? ''} onChange={(e) => update((x) => ({ ...x, title: e.target.value || undefined }))} />
         </label>
       </div>
-      <PlainDoc label="Текст" doc={block.doc} onChange={(doc) => update((x) => ({ ...x, doc }))} />
+      <RichTextField label="Текст" value={block.doc} onChange={(doc) => update((x) => ({ ...x, doc }))} />
     </>
   )
 }
@@ -389,9 +378,6 @@ export function BlockEditors({ refs }: { refs: Pick<BuilderLesson, 'tasks' | 'me
           </button>
         </div>
       )}
-      <p id="plain-hint" className="visually-hidden">
-        Абзаци відокремлюй порожнім рядком.
-      </p>
       {blocks.map((block, i) => (
         <div key={block.id} style={{ display: 'contents' }}>
           {i > 0 && (
