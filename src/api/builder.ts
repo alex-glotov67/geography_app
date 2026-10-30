@@ -19,6 +19,8 @@ const POLICY = { staleTime: 60_000, refetchOnWindowFocus: false } as const
 export interface DirOutcome {
   id: string
   code: string
+  /** Порядок у темі (перетягування); null — за кодом */
+  position: number | null
   text: string
   source: string
   archived: boolean
@@ -37,7 +39,13 @@ export interface DirSection {
   topics: DirTopic[]
 }
 
-/** Довідник вчителя: розділ → тема → результат, за номерами й кодами */
+const byCode = (a: { code: string }, b: { code: string }) => a.code.localeCompare(b.code, 'uk', { numeric: true })
+
+/** Порядок результатів у темі: задані вчителем позиції, далі решта за кодом */
+export const byPosition = (a: { code: string; position: number | null }, b: { code: string; position: number | null }) =>
+  a.position === null && b.position === null ? byCode(a, b) : a.position === null ? 1 : b.position === null ? -1 : a.position - b.position
+
+/** Довідник вчителя: розділ → тема → результат, за номерами й порядком у темі */
 export const directoryQuery = (ownerId: string) =>
   queryOptions({
     ...POLICY,
@@ -46,7 +54,7 @@ export const directoryQuery = (ownerId: string) =>
       const db = await getSupabase()
       const { data, error } = await db
         .from('sections')
-        .select('id, grade, number, title, topics(id, number, title, program_outcomes(id, code, text, source, archived))')
+        .select('id, grade, number, title, topics(id, number, title, program_outcomes(id, code, text, source, archived, position))')
         .eq('owner_id', ownerId)
         .order('grade')
         .order('number')
@@ -62,7 +70,7 @@ export const directoryQuery = (ownerId: string) =>
             id: t.id,
             number: t.number,
             title: t.title,
-            outcomes: [...t.program_outcomes].sort((a, b) => a.code.localeCompare(b.code, 'uk', { numeric: true })),
+            outcomes: [...t.program_outcomes].sort(byPosition),
           })),
       }))
     },
