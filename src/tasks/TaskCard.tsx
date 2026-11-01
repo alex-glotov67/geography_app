@@ -4,13 +4,15 @@ import { TASK_SCHEMAS, type TaskType } from '@shared/schemas/tasks/index.ts'
 import type { Level } from '@shared/schemas/common.ts'
 import { LevelIcon } from '@/components/LevelIcon'
 import { LEVEL_LABEL } from '@/lib/levels'
-import { answerKey, useAnswers } from '@/stores/answers'
+import { answerKey, previewScope, useAnswers } from '@/stores/answers'
 import { TASKS } from './registry'
 import classes from './tasks.module.css'
 
 /** Відкрите завдання тренування — зі знімка task_versions (SPEC 6.1): ключ доступний клієнту. */
 export interface PracticeTask {
   id: string
+  /** Версія завдання (task_versions) — частина ключа збереженої відповіді */
+  version: number
   type: string
   level: Level
   points: number
@@ -24,7 +26,7 @@ interface Props {
   task: PracticeTask
   /** Номер у межах сторінки тренування */
   number: number
-  /** `${lessonId}@${version}` — де зберігати відповідь (stores/answers); без нього — лише в пам'яті */
+  /** Простір ключа відповіді: practiceScope(урок, версія) — тренування учня; previewScope(…) — перегляд вчителя */
   scope?: string
 }
 
@@ -47,7 +49,7 @@ function message(type: string, r: Scored, task: PracticeTask): { tone: Tone; tex
 }
 
 /** Картка тренувального завдання (Tasks.dc.html): рівень, питання, відповідь, «Перевірити», відгук. */
-export function TaskCard({ task, number, scope = 'local' }: Props) {
+export function TaskCard({ task, number, scope = previewScope('local') }: Props) {
   const uid = useId()
   const parsed = useMemo(() => {
     if (!(task.type in TASK_SCHEMAS)) return null
@@ -58,7 +60,7 @@ export function TaskCard({ task, number, scope = 'local' }: Props) {
   }, [task])
 
   const mod = parsed ? TASKS[parsed.type] : null
-  const key = answerKey(scope, task.id)
+  const key = answerKey(scope, task.id, task.version)
   const saved = useAnswers((st) => st.answers[key])
   const save = useAnswers((st) => st.save)
   // Стартова відповідь (для упорядкування — перемішаний порядок) фіксується один раз і зберігається,

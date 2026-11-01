@@ -3,7 +3,7 @@ import type { Block } from '@shared/schemas/blocks.ts'
 import type { BuilderLesson } from '@/api/builder'
 import t from '@/features/teacher/teacher.module.css'
 import { ADDABLE_BLOCKS, BLOCK_HINTS, BLOCK_LABELS, blockId, newBlock, type AddableBlock } from './draft'
-import { RichTextField } from './RichTextField'
+import { RichTextFieldLazy as RichTextField } from './RichTextFieldLazy'
 import { useBuilder } from './store'
 import b from './builder.module.css'
 

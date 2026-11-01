@@ -155,7 +155,7 @@ const lessonsRoute = createRoute({
 const builderLessonRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/lessons/$lessonId',
-  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'BuilderRoute'),
+  component: lazyRouteComponent(() => import('@/features/builder/BuilderRoutes'), 'BuilderRoute'),
 })
 
 /** Перегляд чернетки в iframe конструктора (SPEC 10.1); ?simplified=1 — спрощений режим */
@@ -164,7 +164,7 @@ const builderPreviewRoute = createRoute({
   path: '/lessons/$lessonId/preview',
   validateSearch: (search: Record<string, unknown>): { simplified?: boolean } =>
     search.simplified === 1 || search.simplified === '1' || search.simplified === true ? { simplified: true } : {},
-  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'BuilderPreviewRoute'),
+  component: lazyRouteComponent(() => import('@/features/builder/BuilderRoutes'), 'BuilderPreviewRoute'),
 })
 
 const outcomesRoute = createRoute({
@@ -184,13 +184,13 @@ const newTaskRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/tasks/new',
   validateSearch: (search: Record<string, unknown>): { type?: string } => (typeof search.type === 'string' ? { type: search.type } : {}),
-  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'NewTaskRoute'),
+  component: lazyRouteComponent(() => import('@/features/bank/TaskEditorRoutes'), 'NewTaskRoute'),
 })
 
 const taskRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/tasks/$taskId',
-  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'TaskRoute'),
+  component: lazyRouteComponent(() => import('@/features/bank/TaskEditorRoutes'), 'TaskRoute'),
 })
 
 const settingsRoute = createRoute({

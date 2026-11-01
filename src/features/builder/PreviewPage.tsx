@@ -36,7 +36,7 @@ export function PreviewPage({ me, lessonId, simplified: initialSimplified }: { m
   const practiceTasks: Record<string, PracticeTask> = Object.fromEntries(
     Object.values(refs.tasks)
       .filter((x) => x.visibility === 'open')
-      .map((x) => [x.id, { id: x.id, type: x.type, level: x.level as Level, points: x.points, content: x.content, key: x.key, hint: x.hint, feedback: x.feedback }]),
+      .map((x) => [x.id, { id: x.id, version: x.version, type: x.type, level: x.level as Level, points: x.points, content: x.content, key: x.key, hint: x.hint, feedback: x.feedback }]),
   )
   const homework = d.homework?.taskIds.length ?? 0
   const section = directory.data?.find((x) => x.id === d.sectionId)

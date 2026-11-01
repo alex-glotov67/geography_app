@@ -45,7 +45,18 @@ const safeSession: StateStorage = {
   },
 }
 
-export const answerKey = (scope: string, taskId: string) => `${scope}:${taskId}`
+/*
+ * Простори ключів відповідей. Тренування учня — `practice/<lessonId>@<lessonVersion>`; перегляд у
+ * конструкторі й редакторі завдань — `preview/<…>`: ці простори не перетинаються, і перегляд не
+ * зберігається в sessionStorage (лише тренування переживає перезавантаження).
+ */
+export const PRACTICE = 'practice/'
+export const PREVIEW = 'preview/'
+export const practiceScope = (lessonId: string, lessonVersion: number) => `${PRACTICE}${lessonId}@${lessonVersion}`
+export const previewScope = (id: string) => `${PREVIEW}${id}`
+
+/** Ключ відповіді: простір + завдання + його версія — інша версія того самого завдання не підхопить старої відповіді */
+export const answerKey = (scope: string, taskId: string, taskVersion: number) => `${scope}/${taskId}@${taskVersion}`
 
 export const useAnswers = create<AnswersState>()(
   persist(
@@ -54,6 +65,12 @@ export const useAnswers = create<AnswersState>()(
       save: (key, answer) => set((s) => ({ answers: { ...s.answers, [key]: answer } })),
       reset: () => set({ answers: {} }),
     }),
-    { name: 'geo-answers', storage: createJSONStorage(() => safeSession) },
+    {
+      // Нова схема ключів — нове ім'я сховища: старі відповіді (без версії завдання) не підхоплюються
+      name: 'geo-answers-v2',
+      storage: createJSONStorage(() => safeSession),
+      // У сховище — лише тренування учня; перегляд вчителя живе в пам'яті вкладки
+      partialize: (s) => ({ answers: Object.fromEntries(Object.entries(s.answers).filter(([k]) => k.startsWith(PRACTICE))) }) as AnswersState,
+    },
   ),
 )

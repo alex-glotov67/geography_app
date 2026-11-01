@@ -1,10 +1,10 @@
-import { render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TaskCard, type PracticeTask } from './TaskCard'
 
 const o = (...pairs: [string, string][]) => pairs.map(([id, text]) => ({ id, text }))
 const task = (type: string, content: unknown, key: unknown, extra: Partial<PracticeTask> = {}): PracticeTask => ({
-  id: type, type, level: 'base', points: 1, content, key, ...extra,
+  id: type, version: 1, type, level: 'base', points: 1, content, key, ...extra,
 })
 /** Відгук завдання (dnd-kit має ще власну живу область role=status) */
 const status = async () => (await screen.findAllByRole('status')).find((e) => e.tagName === 'P' && !!e.textContent)!
@@ -128,15 +128,52 @@ describe('TaskCard — тренування (SPEC 7)', () => {
 describe('збережена відповідь іншої форми (SPEC 13.7: картка не падає)', () => {
   it('відповідь, що не підходить схемі типу, замінюється порожньою', async () => {
     const { useAnswers, answerKey } = await import('@/stores/answers')
-    useAnswers.getState().save(answerKey('mixed', 'tf'), { value: { value: 2.5 }, checked: true })
+    useAnswers.getState().save(answerKey('mixed', 'tf', 1), { value: { value: 2.5 }, checked: true })
     render(
       <TaskCard
         number={1}
         scope="mixed"
-        task={{ id: 'tf', type: 'true_false', level: 'base', points: 1, content: { prompt: 'Чи так?', statements: [{ id: 'sa', text: 'Карпати — гори' }] }, key: { answers: { sa: true } } }}
+        task={{ id: 'tf', version: 1, type: 'true_false', level: 'base', points: 1, content: { prompt: 'Чи так?', statements: [{ id: 'sa', text: 'Карпати — гори' }] }, key: { answers: { sa: true } } }}
       />,
     )
     expect(await screen.findByText('Карпати — гори')).toBeInTheDocument()
     expect(screen.queryByText('Правильно!')).not.toBeInTheDocument()
+  })
+})
+
+describe('ключі відповідей: простори не перетинаються (колізія з редактора завдань)', () => {
+  const sc = (id: string, correct: string) =>
+    task('single_choice', { prompt: `Питання ${id}`, shuffle: false, options: o(['a', 'А'], ['b', 'Б'], ['c', 'В']) }, { correct }, { id })
+
+  it('інша версія того самого завдання не підхоплює стару відповідь', async () => {
+    const { answerKey, practiceScope, useAnswers } = await import('@/stores/answers')
+    const scope = practiceScope('lesson-1', 3)
+    useAnswers.getState().save(answerKey(scope, 'q', 1), { value: { selected: 'a' }, checked: true })
+    render(<TaskCard number={1} scope={scope} task={sc('q', 'a')} />)
+    expect(await screen.findByRole('radio', { name: 'А' })).toBeChecked()
+    cleanup()
+    render(<TaskCard number={1} scope={scope} task={{ ...sc('q', 'b'), version: 2 }} />)
+    expect(await screen.findByRole('radio', { name: 'А' })).not.toBeChecked()
+    expect(screen.queryByText(/Правильно|Не зовсім/)).not.toBeInTheDocument()
+  })
+
+  it('перегляд вчителя й тренування учня з тим самим id — різні відповіді; перегляд не зберігається', async () => {
+    const { answerKey, practiceScope, previewScope, useAnswers } = await import('@/stores/answers')
+    const practice = practiceScope('lesson-1', 1)
+    const preview = previewScope('task:x')
+    expect(answerKey(practice, 'q', 1)).not.toBe(answerKey(preview, 'q', 1))
+    const user = userEvent.setup()
+    render(<TaskCard number={1} scope={preview} task={sc('q', 'a')} />)
+    await user.click(await screen.findByRole('radio', { name: 'Б' }))
+    cleanup()
+    render(<TaskCard number={1} scope={practice} task={sc('q', 'a')} />)
+    expect(await screen.findByRole('radio', { name: 'Б' })).not.toBeChecked()
+    await user.click(screen.getByRole('radio', { name: 'В' }))
+    // У sessionStorage — лише тренування
+    const stored = JSON.parse(sessionStorage.getItem('geo-answers-v2') ?? '{}') as { state?: { answers?: Record<string, unknown> } }
+    const keys = Object.keys(stored.state?.answers ?? {})
+    expect(keys.some((k) => k.startsWith('practice/'))).toBe(true)
+    expect(keys.some((k) => k.startsWith('preview/'))).toBe(false)
+    expect(useAnswers.getState().answers[answerKey(preview, 'q', 1)]).toBeDefined()
   })
 })

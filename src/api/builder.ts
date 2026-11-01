@@ -185,6 +185,7 @@ const rpcError = (error: { code?: string; message: string } | null) => {
 
 export interface BuilderTask {
   id: string
+  version: number
   type: string
   level: string
   grp: string
@@ -241,7 +242,7 @@ export async function loadRefs(ids: { tasks: string[]; media: string[]; videos: 
   const db = await getSupabase()
   const [tasks, keys, media, videos] = await Promise.all([
     ids.tasks.length
-      ? db.from('tasks').select('id, type, level, grp, points, visibility, content, hint, feedback, archived').in('id', ids.tasks)
+      ? db.from('tasks').select('id, type, level, grp, points, visibility, content, hint, feedback, archived, version').in('id', ids.tasks)
       : Promise.resolve({ data: [], error: null }),
     ids.tasks.length ? db.from('task_keys').select('task_id, key').in('task_id', ids.tasks) : Promise.resolve({ data: [], error: null }),
     ids.media.length
@@ -259,7 +260,7 @@ export async function loadRefs(ids: { tasks: string[]; media: string[]; videos: 
       (tasks.data ?? []).map((t) => [
         t.id,
         {
-          id: t.id, type: t.type, level: t.level, grp: t.grp, points: Number(t.points), visibility: t.visibility as BuilderTask['visibility'],
+          id: t.id, version: t.version, type: t.type, level: t.level, grp: t.grp, points: Number(t.points), visibility: t.visibility as BuilderTask['visibility'],
           content: t.content as Record<string, unknown>, key: keyBy.get(t.id) ?? {}, hint: t.hint,
           feedback: t.feedback as BuilderTask['feedback'], archived: t.archived,
         } satisfies BuilderTask,

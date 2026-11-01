@@ -90,7 +90,7 @@ export const lessonQuery = (slug: string) =>
         .from('lesson_versions')
         // Завдання тренування — вкладено в той самий запит (на один мережевий обмін менше)
         .select(
-          'lesson_id, version, snapshot, media_ids, video_ids, homework_count, is_demo, lesson_version_tasks(position, role, task_versions(task_id, type, level, points, content, key, hint, feedback))',
+          'lesson_id, version, snapshot, media_ids, video_ids, homework_count, is_demo, lesson_version_tasks(position, role, task_versions(task_id, version, type, level, points, content, key, hint, feedback))',
         )
         .eq('slug', slug)
         .eq('is_current', true)
@@ -118,7 +118,7 @@ export const lessonQuery = (slug: string) =>
         const t = row.task_versions
         if (!t) continue
         practiceTasks[t.task_id] = {
-          id: t.task_id, type: t.type, level: t.level as Level, points: Number(t.points), content: t.content, key: t.key,
+          id: t.task_id, version: t.version, type: t.type, level: t.level as Level, points: Number(t.points), content: t.content, key: t.key,
           hint: t.hint, feedback: t.feedback as PracticeTask['feedback'],
         }
       }

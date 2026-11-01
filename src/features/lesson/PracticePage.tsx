@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { lessonQuery } from '@/api/content'
 import { LevelIcon } from '@/components/LevelIcon'
 import { LEVELS, LEVEL_LABEL, type Level } from '@/lib/levels'
+import { practiceScope } from '@/stores/answers'
 import { TaskCard } from '@/tasks/TaskCard'
 import { PracticeBack as Back } from './PracticeBack'
 import classes from './PracticePage.module.css'
@@ -38,7 +39,7 @@ export function PracticePage({ slug, level }: { slug: string; level?: Level }) {
       <main className={classes.main}>
         <div className={classes.list}>
           {shown.map((t, i) => (
-            <TaskCard key={t.id} task={t} number={i + 1} scope={`${data.lessonId}@${data.version}`} />
+            <TaskCard key={t.id} task={t} number={i + 1} scope={practiceScope(data.lessonId, data.version)} />
           ))}
         </div>
       </main>
