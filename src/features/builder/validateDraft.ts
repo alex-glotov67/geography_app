@@ -1,8 +1,8 @@
-import { z } from 'zod'
 import { Block } from '@shared/schemas/blocks.ts'
 import { LessonDraft } from '@shared/schemas/lesson.ts'
 import type { BuilderLesson } from '@/api/builder'
 import { isEmptyRichDoc } from '@/lib/richtext'
+import { ukErrors } from '@/lib/zodUk'
 import type { GeoPackage, PackageMedia, PackageTask, PackageVideo } from '@/lib/packages/schema'
 import { validatePackage } from '@/lib/packages/validate'
 import { BLOCK_LABELS, type LessonDraftState } from './draft'
@@ -20,16 +20,6 @@ export interface DraftIssue {
   blockId?: string
 }
 
-const ukLocale = z.locales.uk().localeError
-
-/** Зрозуміло вчителю: «не заповнено», «щонайменше 2»; решта — українська локаль zod */
-const ukErrors: z.core.$ZodErrorMap = (iss) => {
-  if (iss.code === 'too_small' && iss.origin === 'string') return 'не заповнено'
-  if (iss.code === 'too_small' && iss.origin === 'array') return `потрібно щонайменше ${iss.minimum}`
-  if (iss.code === 'too_big' && iss.origin === 'array') return `не більше ${iss.maximum}`
-  if (iss.code === 'invalid_type' && iss.input === undefined) return 'не заповнено'
-  return ukLocale(iss)
-}
 
 const FIELD: Record<string, string> = {
   title: 'тема', slug: 'адреса', number: '№ уроку', items: 'пункти', term: 'термін', definition: 'визначення',

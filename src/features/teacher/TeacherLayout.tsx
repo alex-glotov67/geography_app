@@ -7,6 +7,7 @@ const LINKS = [
   { to: '/t', label: 'Огляд', exact: true },
   { to: '/t/classes', label: 'Класи й учні', exact: false },
   { to: '/t/lessons', label: 'Уроки й конструктор', exact: false },
+  { to: '/t/tasks', label: 'Банк завдань', exact: false },
   { to: '/t/outcomes', label: 'Довідник програми', exact: true },
   { to: '/t/settings', label: 'Налаштування', exact: true },
 ] as const

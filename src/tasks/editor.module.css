@@ -1,0 +1,156 @@
+/* Редактори типів завдань (макет TaskEditor): поля, рядки варіантів, позначка правильного. ≥ 44 px. */
+.field,
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.label {
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.hint {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.textarea,
+.input {
+  box-sizing: border-box;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  min-width: 0;
+}
+
+.textarea {
+  min-height: 72px;
+  padding: 10px 12px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row > .input {
+  flex-grow: 1;
+}
+
+.mark,
+.remove {
+  flex-shrink: 0;
+  width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: transparent;
+  cursor: pointer;
+}
+
+.mark[aria-pressed='true'] {
+  border-color: var(--ok-fg);
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+.remove {
+  color: var(--ink-2);
+  font-size: 18px;
+}
+
+.remove:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.segmented {
+  display: flex;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--neutral-bg);
+}
+
+.segment {
+  min-height: 38px;
+  min-width: 56px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.segment[aria-pressed='true'] {
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.add {
+  align-self: flex-start;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--water);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.check {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--water);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.error {
+  font-size: 14px;
+  color: var(--err-fg);
+}

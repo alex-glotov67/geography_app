@@ -173,6 +173,26 @@ const outcomesRoute = createRoute({
   component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'OutcomesRoute'),
 })
 
+const bankRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/tasks',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'BankRoute'),
+})
+
+/** Нове завдання: ?type=single_choice — тип з каталогу */
+const newTaskRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/tasks/new',
+  validateSearch: (search: Record<string, unknown>): { type?: string } => (typeof search.type === 'string' ? { type: search.type } : {}),
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'NewTaskRoute'),
+})
+
+const taskRoute = createRoute({
+  getParentRoute: () => teacherRoute,
+  path: '/tasks/$taskId',
+  component: lazyRouteComponent(() => import('@/features/teacher/TeacherRoutes'), 'TaskRoute'),
+})
+
 const settingsRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/settings',
@@ -206,10 +226,10 @@ export const routeTree = rootRoute.addChildren([
   loginRoute,
   meRoute,
   quizRoute,
-  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, lessonsRoute, builderLessonRoute, builderPreviewRoute, outcomesRoute, settingsRoute]),
+  teacherRoute.addChildren([teacherHomeRoute, classesRoute, classRoute, lessonsRoute, builderLessonRoute, builderPreviewRoute, outcomesRoute, bankRoute, newTaskRoute, taskRoute, settingsRoute]),
 ])
 
-export { builderLessonRoute, builderPreviewRoute, classRoute, lessonRoute, lessonsRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
+export { builderLessonRoute, builderPreviewRoute, classRoute, newTaskRoute, taskRoute, lessonRoute, lessonsRoute, loginRoute, meRoute, practiceRoute, teacherRoute }
 
 export const router = createRouter({
   routeTree,

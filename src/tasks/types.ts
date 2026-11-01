@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import type { TaskAnswer, TaskContent, TaskType } from '@shared/schemas/tasks/index.ts'
+import type { TaskAnswer, TaskContent, TaskKey, TaskType } from '@shared/schemas/tasks/index.ts'
 
 /** Контрольований компонент завдання (SPEC 7): value/onChange; details — результат перевірки. */
 export interface TaskViewProps<T extends TaskType> {
@@ -17,6 +17,13 @@ export interface TaskModule<T extends TaskType> {
   /** Назва типу для каталогу і підписів */
   label: string
   Task: ComponentType<TaskViewProps<T>>
+  /**
+   * Редактор для вчителя (SPEC 10.3) — у формі React Hook Form над TaskFormValues; без нього тип
+   * у каталозі банку позначено «з'явиться пізніше».
+   */
+  Editor?: ComponentType
+  /** Порожнє завдання-заготовка для «Нове завдання» */
+  template?: () => { content: TaskContent<T>; key: TaskKey<T> }
   /** Порожня відповідь (стан до першої дії) */
   empty: (content: TaskContent<T>) => TaskAnswer<T>
   /** Чи є що перевіряти */
