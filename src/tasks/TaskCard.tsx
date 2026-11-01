@@ -75,12 +75,14 @@ export function TaskCard({ task, number, scope = 'local' }: Props) {
     }
     return empty
   })
+  // Збережена відповідь має відповідати схемі типу (інакше — з чистого аркуша, а не падіння картки)
+  const savedOk = !!saved && !!parsed && TASK_SCHEMAS[parsed.type].answer.safeParse(saved.value).success
   useEffect(() => {
-    if (!saved && initial !== null) save(key, { value: initial, checked: false })
-  }, [saved, initial, key, save])
-  const value = saved?.value ?? initial
+    if (!savedOk && initial !== null) save(key, { value: initial, checked: false })
+  }, [savedOk, initial, key, save])
+  const value = savedOk ? saved!.value : initial
   const result: Scored | null =
-    parsed && saved?.checked ? check(parsed.type, parsed.content as never, parsed.key as never, value as never, task.points) : null
+    parsed && savedOk && saved!.checked ? check(parsed.type, parsed.content as never, parsed.key as never, value as never, task.points) : null
   const [nudge, setNudge] = useState(false)
 
   if (!parsed || !mod) {

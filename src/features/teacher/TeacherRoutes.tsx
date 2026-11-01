@@ -3,7 +3,9 @@ import { BuilderPage } from '@/features/builder/BuilderPage'
 import { LessonsPage } from '@/features/builder/LessonsPage'
 import { OutcomesPage } from '@/features/builder/OutcomesPage'
 import { PreviewPage } from '@/features/builder/PreviewPage'
-import { builderLessonRoute, builderPreviewRoute, classRoute, lessonsRoute, teacherRoute } from '@/router'
+import { BankPage } from '@/features/bank/BankPage'
+import { TaskEditorPage } from '@/features/bank/TaskEditorPage'
+import { builderLessonRoute, builderPreviewRoute, classRoute, newTaskRoute, taskRoute, lessonsRoute, teacherRoute } from '@/router'
 import { ClassesPage } from './ClassesPage'
 import { ClassPage } from './ClassPage'
 import { SettingsPage } from './SettingsPage'
@@ -17,7 +19,7 @@ import { TeacherLayout } from './TeacherLayout'
 
 export function TeacherLayoutRoute() {
   // Конструктор і перегляд чернетки — на весь екран, без меню кабінету (макет LessonBuilder)
-  const bare = useMatches({ select: (ms) => ms.some((m) => m.routeId === builderLessonRoute.id || m.routeId === builderPreviewRoute.id) })
+  const bare = useMatches({ select: (ms) => ms.some((m) => [builderLessonRoute.id, builderPreviewRoute.id, newTaskRoute.id, taskRoute.id].includes(m.routeId as never)) })
   const { me } = teacherRoute.useRouteContext()
   return bare ? <Outlet /> : <TeacherLayout me={me} />
 }
@@ -53,6 +55,18 @@ export function BuilderPreviewRoute() {
 
 export function OutcomesRoute() {
   return <OutcomesPage me={teacherRoute.useRouteContext().me} />
+}
+
+export function BankRoute() {
+  return <BankPage me={teacherRoute.useRouteContext().me} />
+}
+
+export function NewTaskRoute() {
+  return <TaskEditorPage taskId={null} type={newTaskRoute.useSearch().type} />
+}
+
+export function TaskRoute() {
+  return <TaskEditorPage taskId={taskRoute.useParams().taskId} />
 }
 
 export function SettingsRoute() {

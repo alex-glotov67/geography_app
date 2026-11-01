@@ -124,3 +124,19 @@ describe('TaskCard — тренування (SPEC 7)', () => {
     expect(screen.getByText(/не вдалося показати/)).toBeInTheDocument()
   })
 })
+
+describe('збережена відповідь іншої форми (SPEC 13.7: картка не падає)', () => {
+  it('відповідь, що не підходить схемі типу, замінюється порожньою', async () => {
+    const { useAnswers, answerKey } = await import('@/stores/answers')
+    useAnswers.getState().save(answerKey('mixed', 'tf'), { value: { value: 2.5 }, checked: true })
+    render(
+      <TaskCard
+        number={1}
+        scope="mixed"
+        task={{ id: 'tf', type: 'true_false', level: 'base', points: 1, content: { prompt: 'Чи так?', statements: [{ id: 'sa', text: 'Карпати — гори' }] }, key: { answers: { sa: true } } }}
+      />,
+    )
+    expect(await screen.findByText('Карпати — гори')).toBeInTheDocument()
+    expect(screen.queryByText('Правильно!')).not.toBeInTheDocument()
+  })
+})
