@@ -88,6 +88,23 @@ async function ownStudents(deps: Deps, teacherId: string, ids: string[]): Promis
   return rows
 }
 
+/** Одночасних змін пароля в межах одного запиту */
+export const RESET_CONCURRENCY = 5
+
+/** map з обмеженням паралельності; порядок результатів — як у вхідному списку */
+export async function mapLimit<T, R>(items: readonly T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out = new Array<R>(items.length)
+  let next = 0
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++
+      out[i] = await fn(items[i]!)
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
+  return out
+}
+
 export async function manageStudents(deps: Deps, caller: Caller, req: ManageStudentsRequest): Promise<ManageStudentsResponse> {
   const teacher = await requireTeacher(deps, caller)
 
@@ -100,19 +117,27 @@ export async function manageStudents(deps: Deps, caller: Caller, req: ManageStud
     }
     case 'reset-password': {
       const rows = await ownStudents(deps, teacher.id, req.studentIds)
-      const credentials: Credentials[] = []
-      const skipped: SkippedStudent[] = []
-      for (const s of rows) {
-        if (!s.auth_user_id || s.archived) {
-          skipped.push({ displayName: s.display_name, reason: 'archived' })
-          continue
-        }
+      // Паралельно, але не більше RESET_CONCURRENCY одночасно (ліміт часу функції, навантаження Auth);
+      // збій одного учня не скасовує інших — він повертається в skipped з reason 'failed' і id для «Повторити»
+      const results = await mapLimit(rows, RESET_CONCURRENCY, async (s): Promise<Credentials | SkippedStudent> => {
+        if (!s.auth_user_id || s.archived) return { id: s.id, displayName: s.display_name, reason: 'archived' }
         const password = generatePassword()
-        await deps.setPassword(s.auth_user_id, password)
-        credentials.push({ id: s.id, number: s.number, displayName: s.display_name, login: s.login, password })
-      }
-      await deps.audit(teacher.id, 'students.reset_password', { studentIds: credentials.map((c) => c.id) })
-      return { credentials: credentials.sort((a, b) => a.number - b.number), skipped }
+        try {
+          await deps.setPassword(s.auth_user_id, password)
+        } catch (e) {
+          console.error('reset-password', s.id, e instanceof Error ? e.message : e) // без пароля
+          return { id: s.id, displayName: s.display_name, reason: 'failed' }
+        }
+        return { id: s.id, number: s.number, displayName: s.display_name, login: s.login, password }
+      })
+      const credentials = results.filter((r): r is Credentials => 'password' in r).sort((a, b) => a.number - b.number)
+      const skipped = results.filter((r): r is SkippedStudent => 'reason' in r)
+      // Журнал — на кожен запит (пачку), без паролів
+      await deps.audit(teacher.id, 'students.reset_password', {
+        studentIds: credentials.map((c) => c.id),
+        failed: skipped.filter((x) => x.reason === 'failed').map((x) => x.id),
+      })
+      return { credentials, skipped }
     }
     case 'archive':
     case 'unarchive': {
