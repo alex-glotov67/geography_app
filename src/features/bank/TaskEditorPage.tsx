@@ -1,4 +1,5 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { Suspense, useEffect, useId, useMemo, useState } from 'react'
+import { Skeleton } from '@mantine/core'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormProvider, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -12,7 +13,9 @@ import { TeacherPageSkeleton } from '@/features/teacher/TeacherSkeletons'
 import { GRADES } from '@/lib/grades'
 import { ukErrors } from '@/lib/zodUk'
 import { FieldError } from '@/tasks/editorKit'
+import { TASK_EDITORS } from '@/tasks/editors'
 import { TASKS } from '@/tasks/registry'
+import { previewScope } from '@/stores/answers'
 import { TaskCard } from '@/tasks/TaskCard'
 import { feedbackOf, GROUP_OPTIONS, LEVEL_OPTIONS, taskFormSchema, taskPrompt, type TaskFormValues } from './taskForm'
 import k from './bank.module.css'
@@ -58,7 +61,7 @@ function writeDraft(id: string | null, v: TaskFormValues | null) {
 }
 
 function newValues(type: TaskType): TaskFormValues {
-  const tpl = TASKS[type].template!()
+  const tpl = TASK_EDITORS[type]!.template()
   return {
     type, level: 'base', grp: 'ГР1', points: 1, visibility: 'open', grade: 8, hint: '', feedbackCorrect: '', feedbackIncorrect: '',
     content: tpl.content as Record<string, unknown>, key: tpl.key as Record<string, unknown>,
@@ -68,6 +71,19 @@ function newValues(type: TaskType): TaskFormValues {
 /** Схема залежить від типу завдання — збираємо резолвер під поточний тип */
 const resolver: Resolver<TaskFormValues> = (values, ctx, opts) =>
   (zodResolver(taskFormSchema(values.type), { error: ukErrors }) as unknown as Resolver<TaskFormValues>)(values, ctx, opts)
+
+/** Поки вантажиться редактор типу — скелетон тієї ж форми: текст завдання й три рядки (SPEC 13.7) */
+function EditorSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Завантаження редактора" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <Skeleton height={18} width={140} />
+      <Skeleton height={72} />
+      {[0, 1, 2].map((i) => (
+        <Skeleton key={i} height={44} />
+      ))}
+    </div>
+  )
+}
 
 /** «Як побачить учень»: та сама картка, що в тренуванні; без валідного змісту — підказка */
 function Preview({ nonce }: { nonce: number }) {
@@ -80,8 +96,8 @@ function Preview({ nonce }: { nonce: number }) {
     <TaskCard
       key={`${v.type}:${nonce}`}
       number={1}
-      scope={`preview:${instance}:${v.type}:${nonce}`}
-      task={{ id: 'preview', type: v.type, level: v.level, points: v.points, content: v.content, key: v.key, hint: v.hint || null, feedback: feedbackOf(v) }}
+      scope={previewScope(`task:${instance}:${v.type}:${nonce}`)}
+      task={{ id: 'preview', version: 0, type: v.type, level: v.level, points: v.points, content: v.content, key: v.key, hint: v.hint || null, feedback: feedbackOf(v) }}
     />
   )
 }
@@ -193,7 +209,7 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
     reset({ ...newValues(next), level: keep.level, grp: keep.grp, points: keep.points, grade: keep.grade, visibility: keep.visibility }, { keepDefaultValues: true })
   }
 
-  const Fields = TASKS[type].Editor
+  const Fields = TASK_EDITORS[type]?.Editor
   const heading = id ? taskPrompt(getValues('content')) : 'Нове завдання'
 
   return (
@@ -256,11 +272,11 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
                   type="button"
                   className={k.typeCard}
                   aria-pressed={x === type}
-                  disabled={!TASKS[x].Editor}
+                  disabled={!TASK_EDITORS[x]}
                   onClick={() => changeType(x)}
                 >
                   <span className={k.typeName}>{TASKS[x].label}</span>
-                  {!TASKS[x].Editor && <span className={k.typeHint}>редактор — у наступному оновленні</span>}
+                  {!TASK_EDITORS[x] && <span className={k.typeHint}>редактор — у наступному оновленні</span>}
                 </button>
               ))
             )}
@@ -268,7 +284,13 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
 
           <main className={k.main}>
             <section className={b.panel} aria-label="Зміст завдання">
-              {Fields ? <Fields /> : <p className={t.notice}>Редактор цього типу з’явиться в наступному оновленні.</p>}
+              {Fields ? (
+                <Suspense fallback={<EditorSkeleton />}>
+                  <Fields />
+                </Suspense>
+              ) : (
+                <p className={t.notice}>Редактор цього типу з’явиться в наступному оновленні.</p>
+              )}
             </section>
             <section className={b.panel} aria-label="Спільні поля">
               <div className={t.fieldRow}>
@@ -383,7 +405,7 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
 /** /t/tasks/new?type=… або /t/tasks/:id */
 export function TaskEditorPage({ taskId, type }: { taskId: string | null; type?: string }) {
   const q = useQuery({ ...taskQuery(taskId ?? ''), enabled: !!taskId })
-  const initialType = (type && TASKS[type as TaskType]?.Editor ? type : 'single_choice') as TaskType
+  const initialType = (type && TASK_EDITORS[type as TaskType] ? type : 'single_choice') as TaskType
   if (!taskId) return <Editor key="new" task={null} initialType={initialType} />
   if (q.isError) {
     return (

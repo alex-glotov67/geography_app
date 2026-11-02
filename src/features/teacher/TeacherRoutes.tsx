@@ -1,10 +1,7 @@
 import { Outlet, useMatches } from '@tanstack/react-router'
-import { BuilderPage } from '@/features/builder/BuilderPage'
 import { LessonsPage } from '@/features/builder/LessonsPage'
 import { OutcomesPage } from '@/features/builder/OutcomesPage'
-import { PreviewPage } from '@/features/builder/PreviewPage'
 import { BankPage } from '@/features/bank/BankPage'
-import { TaskEditorPage } from '@/features/bank/TaskEditorPage'
 import { builderLessonRoute, builderPreviewRoute, classRoute, newTaskRoute, taskRoute, lessonsRoute, teacherRoute } from '@/router'
 import { ClassesPage } from './ClassesPage'
 import { ClassPage } from './ClassPage'
@@ -43,30 +40,12 @@ export function LessonsRoute() {
   return <LessonsPage me={teacherRoute.useRouteContext().me} grade={lessonsRoute.useSearch().grade} />
 }
 
-export function BuilderRoute() {
-  const { lessonId } = builderLessonRoute.useParams()
-  return <BuilderPage key={lessonId} me={teacherRoute.useRouteContext().me} lessonId={lessonId} />
-}
-
-export function BuilderPreviewRoute() {
-  const { lessonId } = builderPreviewRoute.useParams()
-  return <PreviewPage key={lessonId} me={teacherRoute.useRouteContext().me} lessonId={lessonId} simplified={!!builderPreviewRoute.useSearch().simplified} />
-}
-
 export function OutcomesRoute() {
   return <OutcomesPage me={teacherRoute.useRouteContext().me} />
 }
 
 export function BankRoute() {
   return <BankPage me={teacherRoute.useRouteContext().me} />
-}
-
-export function NewTaskRoute() {
-  return <TaskEditorPage taskId={null} type={newTaskRoute.useSearch().type} />
-}
-
-export function TaskRoute() {
-  return <TaskEditorPage taskId={taskRoute.useParams().taskId} />
 }
 
 export function SettingsRoute() {

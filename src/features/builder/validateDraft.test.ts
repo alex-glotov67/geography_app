@@ -39,7 +39,7 @@ describe('перевірка перед публікацією (SPEC 10.1)', () 
   it('TODO(teacher) в уроці чи завданні, незатверджене відео — помилки; без результатів — попередження', () => {
     const refs = {
       tasks: {
-        t1: { id: 't1', type: 'single_choice', level: 'high', grp: 'ГР2', points: 1, visibility: 'open' as const,
+        t1: { id: 't1', version: 1, type: 'single_choice', level: 'high', grp: 'ГР2', points: 1, visibility: 'open' as const,
           content: { prompt: 'TODO(teacher): питання', options: [{ id: 'a', text: 'А' }, { id: 'b', text: 'Б' }, { id: 'c', text: 'В' }] },
           key: { correct: 'a' }, hint: null, feedback: null, archived: false },
       },
@@ -78,7 +78,7 @@ describe('перевірка перед публікацією (SPEC 10.1)', () 
       }),
       {
         tasks: {
-          s1: { id: 's1', type: 'numeric', level: 'base', grp: 'ГР1', points: 1, visibility: 'secure', content: { prompt: 'Скільки?' },
+          s1: { id: 's1', version: 1, type: 'numeric', level: 'base', grp: 'ГР1', points: 1, visibility: 'secure', content: { prompt: 'Скільки?' },
             key: { answer: 1, tolerance: 0 }, hint: null, feedback: null, archived: false },
         },
         media: { m1: { id: 'm1', url: '', kind: 'image', alt: null, caption: null, source: 'Джерело', license: null, width: 1, height: 1 } },
