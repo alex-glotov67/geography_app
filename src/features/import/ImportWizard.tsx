@@ -27,6 +27,7 @@ const SKIP_TEXT: Record<SkippedStudent['reason'], string> = {
   login_taken: 'логін зайнятий (залишився з минулого року?) — додай учня ще раз',
   class_full: 'у класі вже 99 учнів',
   archived: 'в архіві',
+  failed: 'збій сервера — спробуй ще раз',
 }
 
 const colName = (i: number) => String.fromCharCode(65 + (i % 26)) + (i >= 26 ? Math.floor(i / 26) : '')

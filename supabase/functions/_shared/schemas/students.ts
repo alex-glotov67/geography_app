@@ -42,9 +42,14 @@ export const Credentials = z.object({
 export type Credentials = z.infer<typeof Credentials>
 
 export const SkippedStudent = z.object({
+  /** Учень (для «Повторити»); у create нового учня ще немає — без id */
+  id: Uuid.optional(),
   displayName: z.string(),
-  /** same_name — такий учень уже є; login_taken — логін зайнятий; class_full — понад 99 учнів; archived — учень в архіві */
-  reason: z.enum(['same_name', 'login_taken', 'class_full', 'archived']),
+  /**
+   * same_name — такий учень уже є; login_taken — логін зайнятий; class_full — понад 99 учнів;
+   * archived — учень в архіві; failed — збій Auth для цього учня (інші в запиті оброблено)
+   */
+  reason: z.enum(['same_name', 'login_taken', 'class_full', 'archived', 'failed']),
 })
 export type SkippedStudent = z.infer<typeof SkippedStudent>
 

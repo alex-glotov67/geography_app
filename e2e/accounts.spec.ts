@@ -37,10 +37,14 @@ async function resetPassword(page: Page, name: string): Promise<{ login: string;
   // У таблиці вже може бути попередній пароль цього учня — чекаємо новий
   const before = (await row.count()) ? (await cell(3).innerText()).trim() : null
   await page.getByRole('button', { name: `Новий пароль: ${name}` }).click()
-  await page.getByRole('button', { name: 'Створити нові паролі' }).click()
+  await page.getByRole('button', { name: 'Створити новий пароль' }).click()
   await expect(cell(3)).toHaveText(/^[a-z]+-[a-z]+-[2-9]{2}$/)
   if (before) await expect(cell(3)).not.toHaveText(before)
-  return { login: (await cell(2).innerText()).trim(), password: (await cell(3).innerText()).trim() }
+  const card = { login: (await cell(2).innerText()).trim(), password: (await cell(3).innerText()).trim() }
+  // Картку не друкуємо — закриваємо, погодившись із попередженням
+  page.once('dialog', (d) => void d.accept())
+  await page.getByRole('region', { name: 'Нові паролі' }).getByRole('button', { name: 'Закрити' }).click()
+  return card
 }
 
 test('кабінет вчителя закритий: гість — на вхід з поверненням', async ({ page }) => {
@@ -96,15 +100,17 @@ test('імпорт 30 учнів (Windows-1251), повторний імпорт
   // 3. Картки входу: усім без відомого пароля — нові паролі, потім друк 3 аркушів (10 + 10 + 9)
   await page.getByRole('button', { name: 'Сховати паролі' }).click({ timeout: 1000 }).catch(() => {})
   await page.getByRole('button', { name: 'Друкувати картки входу' }).click()
-  await expect(page.getByRole('alertdialog')).toContainText('нові паролі для 29 учнів')
+  await expect(page.getByRole('alertdialog')).toContainText('Нові паролі для 29 учнів')
   await page.getByRole('button', { name: 'Створити нові паролі' }).click()
-  await page.getByRole('button', { name: 'Друкувати картки', exact: true }).click()
+  await expect(page.getByText('Готово: нові паролі для 29 з 29.')).toBeVisible({ timeout: 60_000 })
+  await page.getByRole('button', { name: 'Друкувати картки (29)' }).click()
   await expect.poll(() => page.evaluate(() => (window as unknown as { __printed?: number }).__printed ?? 0)).toBe(1)
   const sheets = page.locator('[data-print-cards] section')
   await expect(sheets).toHaveCount(3)
   await expect(page.locator('[data-print-cards] article')).toHaveCount(29)
   await expect(page.locator('[data-print-cards] article').first()).toContainText('8b-01')
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')))
+  await page.getByRole('region', { name: 'Нові паролі' }).getByRole('button', { name: 'Закрити' }).click()
 
   // 4. Учень входить з картки: QR → /login?login=…, пароль з картки
   const card = await resetPassword(page, 'Бондар А.')
