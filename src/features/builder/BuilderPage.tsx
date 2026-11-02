@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMediaQuery } from '@mantine/hooks'
 import { useQuery } from '@tanstack/react-query'
-import { isNotFound, Link } from '@tanstack/react-router'
+import { isNotFound, Link, useNavigate } from '@tanstack/react-router'
 import type { Me } from '@/api/auth'
-import { builderLessonQuery, directoryQuery } from '@/api/builder'
+import { builderLessonQuery, directoryQuery, loadRefs } from '@/api/builder'
 import t from '@/features/teacher/teacher.module.css'
 import { TeacherPageSkeleton } from '@/features/teacher/TeacherSkeletons'
 import { BlockEditors } from './BlockEditors'
+import { addToSlot, lessonTaskIds, slotFromParam } from './draft'
 import { MetaPanel } from './MetaPanel'
 import { PublishDialog } from './PublishDialog'
 import { useBuilder, type SaveState } from './store'
@@ -99,7 +100,7 @@ function Unpublish({ session, onClose }: { session: BuilderSession; onClose: () 
   )
 }
 
-export function BuilderPage({ me, lessonId }: { me: Teacher; lessonId: string }) {
+export function BuilderPage({ me, lessonId, attach, slot }: { me: Teacher; lessonId: string; attach?: string; slot?: string }) {
   const lesson = useQuery(builderLessonQuery(lessonId))
   const directory = useQuery(directoryQuery(me.id))
   const session = useBuilderSession(lessonId)
@@ -113,7 +114,32 @@ export function BuilderPage({ me, lessonId }: { me: Teacher; lessonId: string })
     if (lesson.data && useBuilder.getState().lessonId !== lessonId) useBuilder.getState().open(lesson.data)
   }, [lesson.data, lessonId])
 
-  const refs = lesson.data
+  // Завдання, яких ще немає в завантажених даних уроку (додані з банку чи щойно створені) — дозавантажити
+  const missing = useMemo(
+    () => (lesson.data && s.draft && s.lessonId === lessonId ? lessonTaskIds(s.draft).filter((id) => !lesson.data.tasks[id]).sort() : []),
+    [lesson.data, s.draft, s.lessonId, lessonId],
+  )
+  const extra = useQuery({
+    queryKey: ['t', 'builder-refs', lessonId, missing],
+    queryFn: () => loadRefs({ tasks: missing, media: [], videos: [] }),
+    enabled: missing.length > 0,
+    staleTime: Infinity,
+    placeholderData: (prev) => prev,
+  })
+  const refs = useMemo(
+    () => (lesson.data ? { ...lesson.data, tasks: { ...lesson.data.tasks, ...(extra.data?.tasks ?? {}) } } : undefined),
+    [lesson.data, extra.data],
+  )
+
+  // Повернення з «Нове завдання» блоку: додати створене завдання на його місце й прибрати параметри з адреси
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!attach || s.lessonId !== lessonId) return
+    const target = slotFromParam(slot)
+    if (target) useBuilder.getState().edit((d) => addToSlot(d, target, attach))
+    void navigate({ to: '/t/lessons/$lessonId', params: { lessonId }, search: {}, replace: true })
+  }, [attach, slot, s.lessonId, lessonId, navigate])
+
   const checks = useMemo(() => (s.draft && refs ? validateDraft(s.draft, refs) : { errors: [], warnings: [] }), [s.draft, refs])
 
   if (lesson.isError) {
@@ -217,7 +243,7 @@ export function BuilderPage({ me, lessonId }: { me: Teacher; lessonId: string })
             <ChecksPanel errors={checks.errors} warnings={checks.warnings} />
           </aside>
           <main className={b.center}>
-            <BlockEditors refs={refs} />
+            <BlockEditors refs={refs} ownerId={me.id} lessonId={lessonId} />
           </main>
         </div>
       ) : (

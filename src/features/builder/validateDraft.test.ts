@@ -90,3 +90,15 @@ describe('перевірка перед публікацією (SPEC 10.1)', () 
     expect(r.warnings.some((w) => w.message.includes('ліцензію'))).toBe(true)
   })
 })
+
+describe('ДЗ перед публікацією', () => {
+  it('блок ДЗ без завдань і порожній спрощений варіант — помилки з переходом до блоку; ДЗ без блоку — попередження', () => {
+    const hw = { id: 'hw', type: 'homework' as const, simplified: true }
+    const r = validateDraft(draft({ blocks: [...draft().blocks, hw], homework: null }), noRefs)
+    expect(r.errors.find((e) => e.message.startsWith('Домашнє завдання: додай'))?.blockId).toBe('hw')
+    const r2 = validateDraft(draft({ blocks: [...draft().blocks, hw], homework: { taskIds: ['x'] }, simplified: { homeworkTaskIds: [] } }), noRefs)
+    expect(msgs(r2)).toContain('Домашнє завдання: спрощений варіант порожній — додай завдання або вимкни окремий варіант')
+    const r3 = validateDraft(draft({ homework: { taskIds: ['x'] } }), noRefs)
+    expect(r3.warnings.map((w) => w.message)).toContain('Є завдання ДЗ, але блоку «Домашнє завдання» на сторінці немає — учні його не побачать')
+  })
+})

@@ -46,5 +46,6 @@ describe('форма завдання (SPEC 10.3)', () => {
     expect(taskPrompt({ prompt: '  Питання ' })).toBe('Питання')
     expect(taskPrompt({})).toBe('Без тексту')
     expect(taskPrompt({ prompt: 'Чи правильні твердження?', statements: [{ id: 'a', text: 'Карпати — гори' }] })).toBe('Чи правильні твердження? Карпати — гори')
+    expect(taskPrompt({ mode: 'select', text: 'Найвища точка — {{b1}}.' })).toBe('Заповни пропуски: Найвища точка — ….')
   })
 })

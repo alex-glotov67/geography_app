@@ -53,7 +53,7 @@ export function blockId(taken: Iterable<string>, random: () => number = Math.ran
 }
 
 /** Типи блоків, які вже можна додати в конструкторі (решта — з медіатекою й банком завдань) */
-export const ADDABLE_BLOCKS = ['goal', 'text', 'terms', 'callout', 'table'] as const
+export const ADDABLE_BLOCKS = ['goal', 'text', 'terms', 'callout', 'table', 'practice', 'homework'] as const
 export type AddableBlock = (typeof ADDABLE_BLOCKS)[number]
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
@@ -76,6 +76,8 @@ export const BLOCK_HINTS: Record<AddableBlock, string> = {
   terms: 'термін → визначення',
   callout: '«Цікаво знати», «Зверни увагу», «Мій край»',
   table: 'дані з джерелом і датою',
+  practice: 'відкриті завдання з банку за рівнями',
+  homework: 'захищені завдання, один блок на урок',
 }
 
 /** Порожній абзац — стан нового тексту (публікацію заблокує валідатор, поки не заповнено) */
@@ -93,7 +95,50 @@ export function newBlock(type: AddableBlock, id: string): Block {
       return { id, type, simplified: true, variant: 'interesting', doc: emptyDoc() }
     case 'table':
       return { id, type, simplified: true, columns: ['', ''], rows: [['', '']], meta: { source: '', asOf: '' } }
+    case 'practice':
+      return { id, type, simplified: true, taskIds: [] }
+    case 'homework':
+      return { id, type, simplified: true }
   }
+}
+
+// ── Завдання уроку: тренування (блок), ДЗ і ДЗ спрощеного варіанта (SPEC 10.2) ──────────
+
+/** Де стоїть завдання: блок тренування, ДЗ або окреме ДЗ спрощеного варіанта */
+export type TaskSlot = { role: 'practice'; blockId: string } | { role: 'homework' } | { role: 'homeworkSimplified' }
+
+/** Межі списків — як у схемах блоку тренування і ДЗ (blocks.ts, lesson.ts) */
+export const SLOT_MAX: Record<TaskSlot['role'], number> = { practice: 20, homework: 12, homeworkSimplified: 6 }
+
+/** Яке завдання можна поставити: тренування — відкрите (ключ у браузері), ДЗ — захищене (ключ на сервері) */
+export const slotVisibility = (slot: TaskSlot): 'open' | 'secure' => (slot.role === 'practice' ? 'open' : 'secure')
+
+export function slotTaskIds(d: LessonDraftState, slot: TaskSlot): string[] {
+  if (slot.role === 'practice') {
+    const b = d.blocks.find((x) => x.id === slot.blockId)
+    return b?.type === 'practice' ? b.taskIds : []
+  }
+  return (slot.role === 'homework' ? d.homework?.taskIds : d.simplified?.homeworkTaskIds) ?? []
+}
+
+/** Новий список завдань місця (без дублів, у межах ліміту) */
+export function setSlotTaskIds(d: LessonDraftState, slot: TaskSlot, ids: string[]): LessonDraftState {
+  const unique = [...new Set(ids)].slice(0, SLOT_MAX[slot.role])
+  if (slot.role === 'practice') {
+    return { ...d, blocks: d.blocks.map((b) => (b.id === slot.blockId && b.type === 'practice' ? { ...b, taskIds: unique } : b)) }
+  }
+  if (slot.role === 'homework') return { ...d, homework: { taskIds: unique } }
+  return { ...d, simplified: { ...(d.simplified ?? {}), homeworkTaskIds: unique } }
+}
+
+export const addToSlot = (d: LessonDraftState, slot: TaskSlot, taskId: string) => setSlotTaskIds(d, slot, [...slotTaskIds(d, slot), taskId])
+
+/** Окремі завдання ДЗ для спрощеного режиму: вимкнути — спрощений варіант бере основне ДЗ */
+export function setOwnSimplifiedHomework(d: LessonDraftState, on: boolean): LessonDraftState {
+  if (on) return { ...d, simplified: { ...(d.simplified ?? {}), homeworkTaskIds: d.simplified?.homeworkTaskIds ?? [] } }
+  const { homeworkTaskIds: _drop, ...rest } = d.simplified ?? {}
+  void _drop
+  return { ...d, simplified: Object.keys(rest).length ? rest : null }
 }
 
 export const moveItem = <T,>(list: readonly T[], from: number, to: number): T[] => {
@@ -130,4 +175,13 @@ export function grSummary(groups: readonly string[]): string {
     .filter((g) => counts.has(g))
     .map((g) => `${counts.get(g)} × ${g}`)
     .join(', ')
+}
+
+/** Місце завдання в адресі («Нове завдання» з блоку → повернення в урок): practice.<blockId> | homework | homeworkSimplified */
+export const slotToParam = (slot: TaskSlot) => (slot.role === 'practice' ? `practice.${slot.blockId}` : slot.role)
+
+export function slotFromParam(param: string | undefined): TaskSlot | null {
+  if (param === 'homework' || param === 'homeworkSimplified') return { role: param }
+  const m = /^practice\.([A-Za-z0-9_-]{1,64})$/.exec(param ?? '')
+  return m ? { role: 'practice', blockId: m[1]! } : null
 }

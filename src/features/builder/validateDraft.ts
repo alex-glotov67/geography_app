@@ -91,6 +91,11 @@ export function validateDraft(d: LessonDraftState, refs: Pick<BuilderLesson, 'ta
   if (!d.blocks.length) err('Урок порожній — додай хоча б один блок')
   issues.push(...blockIssues(d.blocks, ''), ...blockIssues(d.simplified?.blocks ?? [], 'Спрощений режим: '))
   if (d.blocks.filter((b) => b.type === 'homework').length > 1) err('Блок ДЗ може бути лише один')
+  const hwBlock = d.blocks.find((b) => b.type === 'homework')
+  if (hwBlock && !d.homework?.taskIds.length) err('Домашнє завдання: додай хоча б одне завдання', hwBlock.id)
+  if (hwBlock && d.simplified?.homeworkTaskIds && !d.simplified.homeworkTaskIds.length)
+    err('Домашнє завдання: спрощений варіант порожній — додай завдання або вимкни окремий варіант', hwBlock.id)
+  if (!hwBlock && d.homework?.taskIds.length) warn('Є завдання ДЗ, але блоку «Домашнє завдання» на сторінці немає — учні його не побачать')
 
   const pkg = { ...validatePackage(toPackage(d, refs)), hasTasks: Object.keys(refs.tasks).length > 0 }
   const byId = new Map(d.blocks.map((b) => [b.id, b]))

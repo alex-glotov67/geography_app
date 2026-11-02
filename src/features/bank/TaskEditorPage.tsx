@@ -60,10 +60,17 @@ function writeDraft(id: string | null, v: TaskFormValues | null) {
   }
 }
 
-function newValues(type: TaskType): TaskFormValues {
+/** «Нове завдання» з блоку уроку: куди повернутися й який вид завдання потрібен (тренування — відкрите, ДЗ — захищене) */
+export interface ReturnTo {
+  lessonId: string
+  slot: string
+  visibility: 'open' | 'secure'
+}
+
+function newValues(type: TaskType, visibility: 'open' | 'secure' = 'open'): TaskFormValues {
   const tpl = TASK_EDITORS[type]!.template()
   return {
-    type, level: 'base', grp: 'ГР1', points: 1, visibility: 'open', grade: 8, hint: '', feedbackCorrect: '', feedbackIncorrect: '',
+    type, level: 'base', grp: 'ГР1', points: 1, visibility, grade: 8, hint: '', feedbackCorrect: '', feedbackIncorrect: '',
     content: tpl.content as Record<string, unknown>, key: tpl.key as Record<string, unknown>,
   }
 }
@@ -135,16 +142,17 @@ function UsageWarning({ usage, onSave, onCancel }: { usage: TaskUsage[]; onSave:
   )
 }
 
-function Editor({ task, initialType }: { task: EditableTask | null; initialType: TaskType }) {
+function Editor({ task, initialType, returnTo }: { task: EditableTask | null; initialType: TaskType; returnTo?: ReturnTo }) {
   const qc = useQueryClient()
   const navigate = useNavigate()
   const id = task?.id ?? null
   const [restore, setRestore] = useState<TaskFormValues | null>(() => {
     const d = readDraft(id)
-    const base = task?.values ?? newValues(initialType)
-    return d && JSON.stringify(d) !== JSON.stringify(base) ? d : null
+    const base = task?.values ?? newValues(initialType, returnTo?.visibility)
+    // З блоку уроку — завжди з чистого аркуша потрібного виду, без чужої незбереженої копії
+    return !returnTo && d && JSON.stringify(d) !== JSON.stringify(base) ? d : null
   })
-  const form = useForm<TaskFormValues>({ defaultValues: task?.values ?? newValues(initialType), resolver, mode: 'onSubmit' })
+  const form = useForm<TaskFormValues>({ defaultValues: task?.values ?? newValues(initialType, returnTo?.visibility), resolver, mode: 'onSubmit' })
   const { handleSubmit, register, formState, reset, getValues, control } = form
   const type = useWatch({ control, name: 'type' })
   const [revision, setRevision] = useState(task?.revision ?? null)
@@ -155,8 +163,11 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
   /** Нове завдання створено — перейти на його адресу (без питання про незбережене) */
   const [createdId, setCreatedId] = useState<string | null>(null)
   useEffect(() => {
-    if (createdId) void navigate({ to: '/t/tasks/$taskId', params: { taskId: createdId }, replace: true })
-  }, [createdId, navigate])
+    if (!createdId) return
+    // З блоку уроку — назад в урок, де завдання саме додасться на своє місце
+    if (returnTo) void navigate({ to: '/t/lessons/$lessonId', params: { lessonId: returnTo.lessonId }, search: { attach: createdId, slot: returnTo.slot } })
+    else void navigate({ to: '/t/tasks/$taskId', params: { taskId: createdId }, replace: true })
+  }, [createdId, navigate, returnTo])
   const [nonce, setNonce] = useState(0)
 
   // Копія незбереженої форми — після кожної зміни
@@ -216,20 +227,35 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
     <FormProvider {...form}>
       <form className={b.page} onSubmit={handleSubmit(onValid)} noValidate aria-label="Редактор завдання">
         <header className={b.head}>
-          <Link to="/t/tasks" className={b.back}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M15 6l-6 6 6 6" />
-            </svg>
-            Банк завдань
-          </Link>
+          {returnTo ? (
+            <Link to="/t/lessons/$lessonId" params={{ lessonId: returnTo.lessonId }} className={b.back}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" />
+              </svg>
+              До уроку
+            </Link>
+          ) : (
+            <Link to="/t/tasks" className={b.back}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" />
+              </svg>
+              Банк завдань
+            </Link>
+          )}
           <h1 className={b.title} title={heading}>
             {heading}
           </h1>
           {task?.archived && <span className={b.pillDraft}>В архіві</span>}
           <span className={b.spacer} />
-          <Link to="/t/tasks" className={t.btn}>
-            Скасувати
-          </Link>
+          {returnTo ? (
+            <Link to="/t/lessons/$lessonId" params={{ lessonId: returnTo.lessonId }} className={t.btn}>
+              Скасувати
+            </Link>
+          ) : (
+            <Link to="/t/tasks" className={t.btn}>
+              Скасувати
+            </Link>
+          )}
           <button type="submit" className={t.btnPrimary} disabled={formState.isSubmitting}>
             Зберегти завдання
           </button>
@@ -334,14 +360,20 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
               <fieldset className={k.visibility}>
                 <legend className={t.fieldLabel}>Використання</legend>
                 <label className={t.check}>
-                  <input type="radio" value="open" {...register('visibility')} />
+                  <input type="radio" value="open" disabled={returnTo?.visibility === 'secure'} {...register('visibility')} />
                   Відкрите — тренування (відповідь перевіряється в браузері)
                 </label>
                 <label className={t.check}>
-                  <input type="radio" value="secure" {...register('visibility')} />
+                  <input type="radio" value="secure" disabled={returnTo?.visibility === 'open'} {...register('visibility')} />
                   Захищене — ДЗ і квіз (відповідь бачить лише сервер)
                 </label>
                 <FieldError path="visibility" />
+                {returnTo && (
+                  <span className={t.note}>
+                    {returnTo.visibility === 'open' ? 'Для тренування — лише відкрите завдання.' : 'Для ДЗ — лише захищене завдання.'} Після збереження воно
+                    додасться в урок.
+                  </span>
+                )}
               </fieldset>
               <label className={t.field}>
                 <span className={t.fieldLabel}>Коментар при помилці</span>
@@ -403,10 +435,10 @@ function Editor({ task, initialType }: { task: EditableTask | null; initialType:
 }
 
 /** /t/tasks/new?type=… або /t/tasks/:id */
-export function TaskEditorPage({ taskId, type }: { taskId: string | null; type?: string }) {
+export function TaskEditorPage({ taskId, type, returnTo }: { taskId: string | null; type?: string; returnTo?: ReturnTo }) {
   const q = useQuery({ ...taskQuery(taskId ?? ''), enabled: !!taskId })
   const initialType = (type && TASK_EDITORS[type as TaskType] ? type : 'single_choice') as TaskType
-  if (!taskId) return <Editor key="new" task={null} initialType={initialType} />
+  if (!taskId) return <Editor key="new" task={null} initialType={initialType} returnTo={returnTo} />
   if (q.isError) {
     return (
       <p className={t.alert} style={{ margin: 24 }}>

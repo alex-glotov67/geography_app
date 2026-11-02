@@ -107,6 +107,12 @@ export const taskPrompt = (content: unknown): string => {
   const first = c?.statements?.[0]?.text
   const statement = typeof first === 'string' && first.trim() ? first.trim() : ''
   if (statement) return prompt ? `${prompt} ${statement}` : statement
+  // «Пропуски»: вказівка однакова — показати й текст із пропусками
+  const text = (content as { text?: unknown } | null)?.text
+  if (typeof text === 'string' && text.trim()) {
+    const shown = text.replace(/\{\{b\d+\}\}/g, '…').trim()
+    return `${prompt || 'Заповни пропуски'}: ${shown}`
+  }
   return prompt || 'Без тексту'
 }
 
