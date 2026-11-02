@@ -155,6 +155,11 @@ const lessonsRoute = createRoute({
 const builderLessonRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/lessons/$lessonId',
+  // ?attach=<taskId>&slot=practice.<blockId>|homework|homeworkSimplified — повернення з «Нове завдання» блоку
+  validateSearch: (search: Record<string, unknown>): { attach?: string; slot?: string } =>
+    typeof search.attach === 'string' && /^[0-9a-f-]{36}$/.test(search.attach) && typeof search.slot === 'string'
+      ? { attach: search.attach, slot: search.slot }
+      : {},
   component: lazyRouteComponent(() => import('@/features/builder/BuilderRoutes'), 'BuilderRoute'),
 })
 
@@ -183,7 +188,13 @@ const bankRoute = createRoute({
 const newTaskRoute = createRoute({
   getParentRoute: () => teacherRoute,
   path: '/tasks/new',
-  validateSearch: (search: Record<string, unknown>): { type?: string } => (typeof search.type === 'string' ? { type: search.type } : {}),
+  // ?lesson=<id>&slot=… — «Нове завдання» з блоку тренування чи ДЗ: після збереження — назад в урок
+  validateSearch: (search: Record<string, unknown>): { type?: string; lesson?: string; slot?: string } => ({
+    ...(typeof search.type === 'string' ? { type: search.type } : {}),
+    ...(typeof search.lesson === 'string' && /^[0-9a-f-]{36}$/.test(search.lesson) && typeof search.slot === 'string'
+      ? { lesson: search.lesson, slot: search.slot }
+      : {}),
+  }),
   component: lazyRouteComponent(() => import('@/features/bank/TaskEditorRoutes'), 'NewTaskRoute'),
 })
 

@@ -4,6 +4,7 @@ import type { BuilderLesson } from '@/api/builder'
 import t from '@/features/teacher/teacher.module.css'
 import { ADDABLE_BLOCKS, BLOCK_HINTS, BLOCK_LABELS, blockId, newBlock, type AddableBlock } from './draft'
 import { RichTextFieldLazy as RichTextField } from './RichTextFieldLazy'
+import { HomeworkTasks, PracticeTasks } from './TaskSlots'
 import { useBuilder } from './store'
 import b from './builder.module.css'
 
@@ -240,27 +241,19 @@ function RefSummary({ block, refs }: { block: Block; refs: Pick<BuilderLesson, '
         </>
       )
     }
-    case 'practice':
-      return (
-        <>
-          <ul style={{ margin: 0, paddingLeft: 20, fontSize: 15 }}>
-            {block.taskIds.map((id) => {
-              const task = refs.tasks[id]
-              const prompt = (task?.content as { prompt?: string } | undefined)?.prompt
-              return <li key={id}>{task ? `${prompt ?? task.type} · ${task.grp}` : 'Завдання не знайдено'}</li>
-            })}
-          </ul>
-          {later('банком завдань')}
-        </>
-      )
-    case 'homework':
-      return later('банком завдань')
     default:
       return null
   }
 }
 
-function Editor({ block, refs }: { block: Block; refs: Pick<BuilderLesson, 'tasks' | 'media' | 'videos'> }) {
+/** Для блоків із завданнями: хто вчитель (банк) і який урок (повернення з «Нове завдання») */
+interface Ctx {
+  refs: Pick<BuilderLesson, 'tasks' | 'media' | 'videos'>
+  ownerId: string
+  lessonId: string
+}
+
+function Editor({ block, refs, ownerId, lessonId }: { block: Block } & Ctx) {
   const edit = useBuilder((s) => s.edit)
   const update = <B extends Block>(fn: (x: B) => B) =>
     edit((d) => ({ ...d, blocks: d.blocks.map((x) => (x.id === block.id ? fn(x as B) : x)) }))
@@ -275,12 +268,16 @@ function Editor({ block, refs }: { block: Block; refs: Pick<BuilderLesson, 'task
       return <CalloutEditor block={block} update={update} />
     case 'table':
       return <TableEditor block={block} update={update} />
+    case 'practice':
+      return <PracticeTasks blockId={block.id} ownerId={ownerId} lessonId={lessonId} tasks={refs.tasks} />
+    case 'homework':
+      return <HomeworkTasks ownerId={ownerId} lessonId={lessonId} tasks={refs.tasks} />
     default:
       return <RefSummary block={block} refs={refs} />
   }
 }
 
-function BlockCard({ block, index, refs, onRemove }: { block: Block; index: number; refs: Pick<BuilderLesson, 'tasks' | 'media' | 'videos'>; onRemove: () => void }) {
+function BlockCard({ block, index, onRemove, ...ctx }: { block: Block; index: number; onRemove: () => void } & Ctx) {
   const selected = useBuilder((s) => s.selectedBlockId === block.id)
   const select = useBuilder((s) => s.select)
   const edit = useBuilder((s) => s.edit)
@@ -308,7 +305,7 @@ function BlockCard({ block, index, refs, onRemove }: { block: Block; index: numb
           Видалити
         </button>
       </div>
-      <Editor block={block} refs={refs} />
+      <Editor block={block} {...ctx} />
     </section>
   )
 }
@@ -317,17 +314,18 @@ function AddMenu({ onAdd, hasHomework }: { onAdd: (type: AddableBlock) => void; 
   const later: { name: string; hint: string }[] = [
     { name: 'Зображення, галерея, PDF', hint: 'з медіатекою' },
     { name: 'Відео', hint: 'з медіатекою' },
-    { name: 'Тренування', hint: 'з банком завдань' },
-    ...(hasHomework ? [] : [{ name: 'Домашнє завдання', hint: 'з банком завдань' }]),
   ]
   return (
     <div className={b.menu} role="group" aria-label="Тип нового блоку">
-      {ADDABLE_BLOCKS.map((type) => (
-        <button key={type} type="button" className={b.menuItem} onClick={() => onAdd(type)}>
-          <span className={b.menuName}>{BLOCK_LABELS[type]}</span>
-          <span className={b.menuHint}>{BLOCK_HINTS[type]}</span>
-        </button>
-      ))}
+      {ADDABLE_BLOCKS.map((type) => {
+        const second = type === 'homework' && hasHomework
+        return (
+          <button key={type} type="button" className={b.menuItem} disabled={second} onClick={() => onAdd(type)}>
+            <span className={b.menuName}>{BLOCK_LABELS[type]}</span>
+            <span className={b.menuHint}>{second ? 'уже є в уроці — один на урок' : BLOCK_HINTS[type]}</span>
+          </button>
+        )
+      })}
       {later.map((x) => (
         <button key={x.name} type="button" className={b.menuItem} disabled>
           <span className={b.menuName}>{x.name}</span>
@@ -339,7 +337,7 @@ function AddMenu({ onAdd, hasHomework }: { onAdd: (type: AddableBlock) => void; 
 }
 
 /** Центральна колонка: блоки з редакторами, «+ Додати блок» між будь-якими блоками */
-export function BlockEditors({ refs }: { refs: Pick<BuilderLesson, 'tasks' | 'media' | 'videos'> }): ReactNode {
+export function BlockEditors(ctx: Ctx): ReactNode {
   const blocks = useBuilder((s) => s.draft!.blocks)
   const edit = useBuilder((s) => s.edit)
   const select = useBuilder((s) => s.select)
@@ -386,7 +384,7 @@ export function BlockEditors({ refs }: { refs: Pick<BuilderLesson, 'tasks' | 'me
             </button>
           )}
           {i > 0 && menu(i)}
-          <BlockCard block={block} index={i} refs={refs} onRemove={() => remove(i)} />
+          <BlockCard block={block} index={i} {...ctx} onRemove={() => remove(i)} />
         </div>
       ))}
       <button type="button" className={b.addBlock} onClick={() => setInsertAt(insertAt === blocks.length ? null : blocks.length)} aria-expanded={insertAt === blocks.length}>

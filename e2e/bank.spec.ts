@@ -94,9 +94,9 @@ test('завдання в опублікованому уроці: попере�
   await page.getByRole('link', { name: /^ДЕМО: які форми рельєфу переважають/ }).first().click()
   await page.getByRole('textbox', { name: 'Текст завдання' }).fill(`ДЕМО: які форми рельєфу переважають на рівнинній місцевості? (${id})`)
   await page.getByRole('button', { name: 'Зберегти завдання' }).click()
-  const dialog = page.getByRole('alertdialog', { name: /Використовується в 1 опублікованих уроках/ })
+  const dialog = page.getByRole('alertdialog', { name: /Використовується в \d+ опублікованих уроках/ })
   await expect(dialog).toContainText('Учні побачать зміни після повторної публікації')
-  await expect(dialog.getByRole('link', { name: /8 клас · урок 1/ })).toHaveAttribute('href', /\/t\/lessons\//)
+  await expect(dialog.getByRole('link', { name: /8 клас · урок 1\. ДЕМО: рельєф/ })).toHaveAttribute('href', /\/t\/lessons\//)
   await dialog.getByRole('button', { name: 'Зберегти завдання' }).click()
   await expect(page.getByRole('status')).toContainText(/Збережено як версію \d+|Збережено\./)
 

@@ -16,7 +16,7 @@
   top: 0;
   z-index: 5;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px 16px;
   padding: 14px 28px;
@@ -50,6 +50,11 @@
 
 .head > :not(.title) {
   flex-shrink: 0;
+}
+
+/* Тема забирає вільне місце в першому рядку; кнопки, що не вмістились, — у другому, не за край */
+.head > .title {
+  flex: 1 1 260px;
 }
 
 .pill {
@@ -538,4 +543,43 @@
 
 .narrow {
   margin: 24px;
+}
+
+/* ── Завдання в тренуванні й ДЗ ────────────────────────────────────────── */
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slotList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slotItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap);
+  padding: 4px 4px 4px 12px;
+  border-radius: 10px;
+  background: var(--surface-sunken);
+}
+
+.slotText {
+  flex-grow: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.slotSummary {
+  align-self: center;
+  font-size: 14px;
+  color: var(--ink-2);
 }
