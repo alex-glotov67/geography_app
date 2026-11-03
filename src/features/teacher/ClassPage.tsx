@@ -12,6 +12,7 @@ import { ImportWizard } from '@/features/import/ImportWizard'
 import { studentsWord } from '@/lib/plural'
 import { useCredentials } from '@/stores/credentials'
 import { LoginCards } from './LoginCards'
+import { PasswordReset } from './PasswordReset'
 import { TeacherPageSkeleton } from './TeacherSkeletons'
 import t from './teacher.module.css'
 
@@ -25,7 +26,7 @@ const dateFmt = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'short
 const lastLogin = (iso: string | null) => (iso ? dateFmt.format(new Date(iso)) : 'ще не входив(ла)')
 
 type Teacher = Extract<Me, { kind: 'teacher' }>
-type Confirm = { kind: 'reset'; students: StudentItem[] } | { kind: 'archive'; student: StudentItem } | null
+type Confirm = { kind: 'archive'; student: StudentItem } | null
 
 export function ClassPage({ classId, me, openImport }: { classId: string; me: Teacher; openImport: boolean }) {
   const qc = useQueryClient()
@@ -33,7 +34,6 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
   const classes = useQuery(classesQuery())
   const students = useQuery(classStudentsQuery(classId))
   const credentials = useCredentials((s) => s.byClass[classId])
-  const addCredentials = useCredentials((s) => s.add)
   const clearCredentials = useCredentials((s) => s.clear)
   const [panel, setPanel] = useState<'import' | 'add' | null>(openImport ? 'import' : null)
   const [confirm, setConfirm] = useState<Confirm>(null)
@@ -41,6 +41,13 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
   const [showArchived, setShowArchived] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const stopPrinting = useCallback(() => setPrinting(null), [])
+  /** Кому зараз створюємо нові паролі (один учень, вибрані чи весь клас) */
+  const [resetTargets, setResetTargets] = useState<StudentItem[] | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const closeReset = useCallback(() => {
+    setResetTargets(null)
+    setSelected(new Set())
+  }, [])
 
   const refresh = () => qc.invalidateQueries({ queryKey: ['t'] })
 
@@ -60,14 +67,8 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
   }
 
   const action = useMutation({
-    mutationFn: async (c: NonNullable<Confirm>) => {
-      if (c.kind === 'reset') {
-        const res = await manageStudents({ action: 'reset-password', studentIds: c.students.map((s) => s.id) })
-        if ('credentials' in res) addCredentials(classId, res.credentials)
-        return res
-      }
-      return manageStudents({ action: c.student.archived ? 'unarchive' : 'archive', studentIds: [c.student.id] })
-    },
+    mutationFn: async (c: NonNullable<Confirm>) =>
+      manageStudents({ action: c.student.archived ? 'unarchive' : 'archive', studentIds: [c.student.id] }),
     onSuccess: () => {
       setConfirm(null)
       setError(null)
@@ -89,7 +90,7 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
 
   function printAll() {
     // Пароль відомий лише щойно створеним чи скинутим; для решти — спершу новий пароль
-    if (withoutPassword.length) setConfirm({ kind: 'reset', students: withoutPassword })
+    if (withoutPassword.length) setResetTargets(withoutPassword)
     else setPrinting(fresh)
   }
 
@@ -132,23 +133,26 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
       )}
       {panel === 'add' && <AddStudent classId={classId} onDone={() => setPanel(null)} />}
 
+      {resetTargets && (
+        <PasswordReset
+          key={resetTargets.map((x) => x.id).join()}
+          classId={classId}
+          targets={resetTargets}
+          className={cls.name}
+          schoolName={me.schoolName}
+          onClose={closeReset}
+        />
+      )}
+
       {confirm && (
         <section className={t.cardAccent} role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
           <h2 id="confirm-title" className={t.h2}>
-            {confirm.kind === 'reset'
-              ? 'Нові паролі'
-              : confirm.student.archived
-                ? `Повернути ${confirm.student.displayName} з архіву?`
-                : `Архівувати ${confirm.student.displayName}?`}
+            {confirm.student.archived ? `Повернути ${confirm.student.displayName} з архіву?` : `Архівувати ${confirm.student.displayName}?`}
           </h2>
           <p id="confirm-text" className={t.note} style={{ maxWidth: 640 }}>
-            {confirm.kind === 'reset'
-              ? confirm.students.length === 1
-                ? `Буде створено новий пароль для ${confirm.students[0]!.displayName}. Старий перестане діяти.`
-                : `Паролі не зберігаються, тож для карток буде створено нові паролі для ${studentsWord(confirm.students.length)}. Старі перестануть діяти — роздай нові картки всім.`
-              : confirm.student.archived
-                ? 'Учень знову зможе входити зі своїм логіном і паролем.'
-                : 'Учень, що вибув: вхід вимкнеться, результати збережуться до кінця навчального року.'}
+            {confirm.student.archived
+              ? 'Учень знову зможе входити зі своїм логіном і паролем.'
+              : 'Учень, що вибув: вхід вимкнеться, результати збережуться до кінця навчального року.'}
           </p>
           {error && (
             <p className={t.alert} role="alert">
@@ -160,7 +164,7 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
               Скасувати
             </button>
             <button type="button" className={t.btnPrimary} onClick={() => action.mutate(confirm)} disabled={action.isPending} aria-busy={action.isPending}>
-              {confirm.kind === 'reset' ? 'Створити нові паролі' : confirm.student.archived ? 'Повернути' : 'Архівувати'}
+              {confirm.student.archived ? 'Повернути' : 'Архівувати'}
             </button>
           </div>
         </section>
@@ -222,13 +226,36 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
             {error}
           </p>
         )}
+        {active.length > 0 && (
+          <div className={t.actions}>
+            <button
+              type="button"
+              className={t.btn}
+              disabled={selected.size === 0 || !!resetTargets}
+              onClick={() => setResetTargets(active.filter((s) => selected.has(s.id)))}
+            >
+              Нові паролі для вибраних ({selected.size})
+            </button>
+          </div>
+        )}
         {active.length === 0 ? (
           <p className={t.empty}>Учнів ще немає. Імпортуй список класу або додай учня вручну.</p>
         ) : (
           <StudentsTable
             rows={active.map((s) => (s.id in pendingSimplified ? { ...s, simplifiedMode: pendingSimplified[s.id]! } : s))}
+            selected={selected}
+            onSelect={(ids, on) =>
+              setSelected((cur) => {
+                const next = new Set(cur)
+                for (const id of ids) {
+                  if (on) next.add(id)
+                  else next.delete(id)
+                }
+                return next
+              })
+            }
             onSimplified={toggleSimplified}
-            onReset={(s) => setConfirm({ kind: 'reset', students: [s] })}
+            onReset={(s) => setResetTargets([s])}
             onArchive={(s) => setConfirm({ kind: 'archive', student: s })}
           />
         )}
@@ -249,11 +276,16 @@ export function ClassPage({ classId, me, openImport }: { classId: string; me: Te
 
 function StudentsTable({
   rows,
+  selected,
+  onSelect,
   onSimplified,
   onReset,
   onArchive,
 }: {
   rows: StudentItem[]
+  /** Вибір для дії над кількома учнями (нові паролі) */
+  selected?: Set<string>
+  onSelect?: (ids: string[], on: boolean) => void
   onSimplified?: (id: string, value: boolean) => void
   onReset?: (s: StudentItem) => void
   onArchive: (s: StudentItem) => void
@@ -263,6 +295,17 @@ function StudentsTable({
       <table className={t.table}>
         <thead>
           <tr>
+            {onSelect && (
+              <th scope="col" style={{ width: 44 }}>
+                <input
+                  type="checkbox"
+                  className={t.rowCheck}
+                  aria-label="Вибрати всіх у класі"
+                  checked={rows.length > 0 && rows.every((s) => selected?.has(s.id))}
+                  onChange={(e) => onSelect(rows.map((s) => s.id), e.target.checked)}
+                />
+              </th>
+            )}
             <th scope="col">№</th>
             <th scope="col">Учень</th>
             <th scope="col">Логін</th>
@@ -276,6 +319,17 @@ function StudentsTable({
         <tbody>
           {rows.map((s) => (
             <tr key={s.id} className={s.archived ? t.rowArchived : undefined}>
+              {onSelect && (
+                <td>
+                  <input
+                    type="checkbox"
+                    className={t.rowCheck}
+                    aria-label={`Вибрати: ${s.displayName}`}
+                    checked={!!selected?.has(s.id)}
+                    onChange={(e) => onSelect([s.id], e.target.checked)}
+                  />
+                </td>
+              )}
               <td className={t.num}>{s.number}</td>
               <td className={t.strong}>{s.displayName}</td>
               <td className={t.mono}>{s.login}</td>
