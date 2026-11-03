@@ -1,6 +1,6 @@
 import { PASSWORD_PATTERN } from '../_shared/accounts/index.ts'
 import { HttpError } from '../_shared/http.ts'
-import { manageStudents, type ClassRow, type Deps, type StudentRow } from './service.ts'
+import { manageStudents, mapLimit, RESET_CONCURRENCY, type ClassRow, type Deps, type StudentRow } from './service.ts'
 
 const T1 = 't1'
 const CLASS: ClassRow = { id: 'c1', teacher_id: T1, school_id: 's1', login_prefix: '8b', archived: false }
@@ -122,7 +122,7 @@ describe('manage-students: новий пароль і архів', () => {
     const r = await manageStudents(f.deps, caller, { action: 'reset-password', studentIds: ['e2', 'e1', 'e3'] })
     if (!('credentials' in r)) throw new Error()
     expect(r.credentials.map((c) => c.login)).toEqual(['8b-01', '8b-02'])
-    expect(r.skipped).toEqual([{ displayName: 'В В.', reason: 'archived' }])
+    expect(r.skipped).toEqual([{ id: 'e3', displayName: 'В В.', reason: 'archived' }])
     expect(f.users.get('eu1')!.password).toBe(r.credentials[0]!.password)
     expect(f.audit[0]!.action).toBe('students.reset_password')
   })
@@ -143,5 +143,49 @@ describe('manage-students: новий пароль і архів', () => {
     await fails(manageStudents(f.deps, caller, { action: 'archive', studentIds: ['e1', 'e2'] }), 'forbidden')
     await fails(manageStudents(f.deps, caller, { action: 'reset-password', studentIds: ['e1', 'nope'] }), 'not_found')
     expect(f.students[0]!.archived).toBe(false)
+  })
+})
+
+describe('manage-students: новий пароль пачкою', () => {
+  const many = (n: number) => Array.from({ length: n }, (_, i) => existing(i + 1, `П${i + 1}`, 'А', { login: `8b-${String(i + 1).padStart(2, '0')}` }))
+
+  it(`паралельно, але не більше ${RESET_CONCURRENCY} одночасно; порядок — за номером у списку`, async () => {
+    const f = fakeDeps({ students: many(10) })
+    let active = 0
+    let peak = 0
+    f.deps.setPassword = async () => {
+      active++
+      peak = Math.max(peak, active)
+      await new Promise((r) => setTimeout(r, 5))
+      active--
+    }
+    const r = await manageStudents(f.deps, caller, { action: 'reset-password', studentIds: f.students.map((s) => s.id).reverse() })
+    if (!('credentials' in r)) throw new Error()
+    expect(peak).toBe(RESET_CONCURRENCY)
+    expect(r.credentials.map((c) => c.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  })
+
+  it('збій одного учня не скасовує інших: він — у skipped з id і reason failed; журнал без паролів', async () => {
+    const f = fakeDeps({ students: many(6) })
+    for (const s of f.students) f.users.set(s.auth_user_id!, { email: s.login, password: 'old', banned: false })
+    const base = f.deps.setPassword
+    f.deps.setPassword = async (id, pw) => {
+      if (id === 'eu4') throw new Error('Auth timeout')
+      return base(id, pw)
+    }
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const r = await manageStudents(f.deps, caller, { action: 'reset-password', studentIds: f.students.map((s) => s.id) })
+    spy.mockRestore()
+    if (!('credentials' in r)) throw new Error()
+    expect(r.credentials).toHaveLength(5)
+    expect(r.skipped).toEqual([{ id: 'e4', displayName: 'П4 А.', reason: 'failed' }])
+    expect(f.users.get('eu4')!.password).toBe('old') // старий пароль цього учня й далі діє
+    expect(f.audit.at(-1)).toEqual({ action: 'students.reset_password', details: { studentIds: ['e1', 'e2', 'e3', 'e5', 'e6'], failed: ['e4'] } })
+    expect(JSON.stringify(f.audit)).not.toMatch(/[a-z]+-[a-z]+-[2-9]{2}/)
+  })
+
+  it('mapLimit: порожній список і ліміт більший за кількість', async () => {
+    expect(await mapLimit([], 5, async (x: number) => x)).toEqual([])
+    expect(await mapLimit([1, 2], 5, async (x) => x * 2)).toEqual([2, 4])
   })
 })
