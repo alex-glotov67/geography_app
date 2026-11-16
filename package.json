@@ -17,6 +17,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:related": "vitest related --run",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run validate",
     "e2e": "playwright test",
     "check:dist": "tsx scripts/check-dist.ts",
     "perf": "tsx scripts/lighthouse.ts",
