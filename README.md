@@ -40,6 +40,8 @@ npm run dev
 | `npm run validate` | перевірка пакетів `.geo.zip` / тек-джерел у `seed/` |
 | `npm run import:outcomes -- файл.csv` | довідник розділів і результатів з CSV (формат SPEC 10.6) у локальний Supabase |
 | `npm run test:coverage` | Vitest + 100 % покриття `@shared/scoring` |
+| `npm run test:related -- <файли>` | лише тести, що залежать від указаних файлів (швидкий цикл) |
+| `npm run check` | lint + типи + тести + validate — перед PR |
 | `npm run perf -- / /lesson/<slug>` | Lighthouse на телефоні → `docs/perf.md` |
 | `npm run fonts:metrics` | метрики fallback-шрифтів (після оновлення `@fontsource`) |
 | `scripts/backup/roundtrip-local.sh` | бекап локальної БД і Storage → відновлення → звірка рядків і входу (як у CI) |
